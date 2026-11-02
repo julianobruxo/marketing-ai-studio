@@ -55,6 +55,15 @@ class AgentsMdTest(unittest.TestCase):
         readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
         self.assertLess(readme.index("AGENTS.md"), 300, "a instrução ao assistente abre o README")
 
+    def test_operator_clarification_precedes_all_retry_causes(self):
+        # A brief blocker cannot be fixed by generating a different draft.
+        orchestrator = (REPO_ROOT / "agents/orchestrator.md").read_text(encoding="utf-8")
+        self.assertLess(orchestrator.index("| `brief` |"), orchestrator.index("| `approach` |"))
+        self.assertIn("even if another gate also reports", orchestrator)
+        self.assertIn("Do not send the Writer or Strategist to retry", orchestrator)
+        self.assertIn("pause does not count as an additional round", orchestrator)
+        self.assertIn("even if another gate also reports", self.text)
+
     def test_demote_ignores_code_fences(self):
         self.assertEqual(build_agents.demote("# a\n```\n# b\n```\n## c"), "## a\n```\n# b\n```\n### c")
 
