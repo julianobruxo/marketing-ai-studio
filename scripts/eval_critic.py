@@ -205,9 +205,15 @@ def score_document_case(case: dict, verdict, adjudication: dict) -> dict:
             raise ValueError("Match requires adjudicated category_ok and severity_ok: " + issue["id"])
         rows.append({"issue_id": issue["id"], "diagnosis": diagnosis,
                      "category_ok": m["category_ok"], "severity_ok": m["severity_ok"]})
+    approved = case["expected"].get("document_approved") is True
+    rejected = bool(verdict) and outcome(verdict) == "reject"
     return {
         "id": case["id"],
         "expected_issues": len(rows),
+        "human_praise_count": sum(x.get("kind") == "praise" for x in case["expected"].get("issues", [])),
+        "document_approved": approved,
+        "rejected_approved_document": approved and rejected,
+        "facts_only_objection_to_approved": approved and rejected and rejected_only_on_facts(verdict),
         "aligned": sum(x["diagnosis"] == "aligned" for x in rows),
         "partial": sum(x["diagnosis"] == "partial" for x in rows),
         "missed": sum(x["diagnosis"] == "missed" for x in rows),
@@ -216,7 +222,7 @@ def score_document_case(case: dict, verdict, adjudication: dict) -> dict:
         "severity_ok": sum(x["severity_ok"] for x in rows),
         "unmatched_findings": len(predicted) - len(used),
         "predicted_findings": len(predicted),
-        "document_rejected": bool(verdict) and outcome(verdict) == "reject",
+        "document_rejected": rejected,
     }
 
 
@@ -228,7 +234,9 @@ def score_documents(cases: list, verdicts: dict, adjudications: dict) -> dict:
             raise ValueError("Missing adjudication for document " + case["id"])
         rows.append(score_document_case(case, verdicts.get(case["id"]), adjudications[case["id"]]))
     keys = ("expected_issues", "aligned", "partial", "missed", "different",
-            "category_ok", "severity_ok", "unmatched_findings", "predicted_findings")
+            "category_ok", "severity_ok", "unmatched_findings", "predicted_findings",
+            "human_praise_count", "document_approved", "rejected_approved_document",
+            "facts_only_objection_to_approved")
     totals = {k: sum(r[k] for r in rows) for k in keys}
     totals["documents"] = len(rows)
     totals["documents_rejected"] = sum(r["document_rejected"] for r in rows)
@@ -274,7 +282,10 @@ def main(argv=None) -> int:
               f"human issues {t['expected_issues']} | aligned {t['aligned']} | "
               f"partial {t['partial']} | missed {t['missed']} | different {t['different']} | "
               f"category {t['category_ok']} | severity {t['severity_ok']} | "
-              f"unmatched findings {t['unmatched_findings']}")
+              f"unmatched findings {t['unmatched_findings']} | "
+              f"human praise {t['human_praise_count']} | "
+              f"rejected approved docs {t['rejected_approved_document']} "
+              f"(facts-only {t['facts_only_objection_to_approved']})")
     else:
         before = score(cases, load(args.before), load(args.labels_before) if args.labels_before else None)
         after = score(cases, load(args.after), load(args.labels_after) if args.labels_after else None)
