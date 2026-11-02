@@ -1,0 +1,51 @@
+[
+  {
+    "id": "DOC-SYN-01",
+    "intent": "article",
+    "fidelity": "grounded-creative",
+    "brief": "A practical analysis for operations leaders about customer-support automation. Show the operational trade-offs and avoid unsupported claims.",
+    "job_context": "Fictional company Northstar Systems. Informative, non-promotional editorial voice.",
+    "inputs": "No external research supplied; evaluate coherence and clarity from the document itself.",
+    "candidate": "Why Support Automation Still Needs a Plan\n\nThe team launched a support assistant after a successful pilot. It answered routine questions well, and the internal demonstration looked promising. However, running it across the whole organization introduced different challenges.\n\nThose costs become a challenge. This matters because everything changes once it is live.\n\nThe new process will save money because automation always reduces labor costs. That makes the decision easy.\n\nWhat Leaders Should Check Before Launch\n\nThat is why this matters to the future of automation.",
+    "expected": {
+      "issues": [
+        {
+          "id": "C01",
+          "kind": "problem",
+          "category": "referential-clarity",
+          "quote": "Those costs become a challenge.",
+          "source_comment": "What costs? No concrete costs have been identified.",
+          "needs_context": true
+        },
+        {
+          "id": "C02",
+          "kind": "problem",
+          "category": "unsupported-claim",
+          "quote": "automation always reduces labor costs",
+          "source_comment": "This sweeping statement is unsupported and ignores the business case."
+        },
+        {
+          "id": "C03",
+          "kind": "problem",
+          "category": "heading-promise",
+          "quote": "What Leaders Should Check Before Launch",
+          "source_comment": "This heading promises checks but the section gives none.",
+          "needs_context": true
+        }
+      ]
+    }
+  },
+  {
+    "id": "DOC-SYN-02",
+    "intent": "newsletter",
+    "fidelity": "grounded-creative",
+    "brief": "A concise newsletter introduction to a fictitious learning hub, with a clear reason for the reader to explore it.",
+    "job_context": "Fictional professional education brand.",
+    "inputs": "The hub offers lessons, tutorials and interviews.",
+    "candidate": "Need a practical way to stay current without watching every conference? Our learning hub brings tutorials, short lessons and interviews together in one place. Explore the library and choose what is useful to your team.",
+    "expected": {
+      "issues": [],
+      "document_approved": true
+    }
+  }
+]
