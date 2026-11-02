@@ -9,7 +9,7 @@ Registro canônico das decisões de arquitetura. As decisões foram fechadas no 
 
 **Estados usados:** `Aceito` · `Aceito, com verificação pendente` (a decisão vale, mas um teste previsto pode exigir ajuste de implementação) · `Substituído`.
 
-**Nada neste arquivo descreve recurso implementado.** Todos os testes citados estão planejados e não foram executados.
+**Este arquivo registra decisões, não o estado da implementação** (que fica no `README.md`). Dos testes citados, só o T14 foi implementado e executado (PR 1); os demais estão planejados.
 
 ---
 
@@ -311,7 +311,7 @@ Registro canônico das decisões de arquitetura. As decisões foram fechadas no 
 
 ## Verificações pendentes
 
-São verificações de implementação, não decisões. Nenhuma foi executada.
+São verificações de implementação, não decisões. Até agora só a V-10 foi executada, e apenas para o Corey (PR 1); as demais estão pendentes.
 
 | ID | Verificação | Onde | ADR |
 |---|---|---|---|
