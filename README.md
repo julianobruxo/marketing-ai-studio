@@ -4,10 +4,10 @@
 
 ## Como começar
 
-Cole o link deste repositório em qualquer LLM com subagentes. Ele lê o `AGENTS.md`, abre com a mensagem de boas-vindas e pergunta o que você quer fazer. Se ele só resumir o repositório, envie esta mensagem:
+Cole o link deste repositório em qualquer LLM com subagentes. Ele lê o `AGENTS.md`, abre com a mensagem de boas-vindas e pergunta o que você quer fazer. Se ele só resumir o repositório ou não conseguir abrir o link, envie esta mensagem:
 
 ```text
-Leia o AGENTS.md de https://github.com/julianobruxo/marketing-ai-studio e siga. Depois me peça a tarefa.
+Leia https://raw.githubusercontent.com/julianobruxo/marketing-ai-studio/main/AGENTS.md e siga.
 ```
 
 > **Estado: portátil (ADR-20).** O Studio roda em qualquer LLM com subagentes, a partir do `AGENTS.md`, sem instalar nada. Ele integra as skills de Corey Haines (copy, anúncios, e-mails, LinkedIn) e da ByteDance DeerFlow (newsletter e pesquisa) e roda Strategist, Writer e Critic como subagentes independentes, em até 3 rodadas.
