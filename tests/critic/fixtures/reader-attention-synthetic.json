@@ -1,0 +1,34 @@
+[
+  {
+    "id": "ATTN-01",
+    "test": "generic-checklist-not-effective-public-post",
+    "intent": "social-post",
+    "fidelity": "grounded-creative",
+    "brief": "Write a distinctive LinkedIn post for engineering leaders about making reporting software useful. Professional, concise and natural; no invented facts. Not a checklist request.",
+    "job_context": "Fictional context. No brand facts or claimed studies.",
+    "inputs": "Discuss process ownership and practical adoption risks without numerical claims.",
+    "candidate": "Before launching a reporting dashboard, define the success criteria.\n\nWhat outcome will you measure? Choose a metric and set a target.\n\nWho owns the process? Assign someone to monitor the dashboard.\n\nHow will you manage quality? Test the data before releasing.\n\nHow much can you spend? Set a budget and review it often.\n\nBring the team together to agree on next steps.",
+    "expected": {
+      "verdict": "reject",
+      "category": "editorial",
+      "severity": "blocking",
+      "cause": "approach",
+      "reason": "A routine, repetitive management checklist with no differentiated argument or audience payoff for a post. Facts and utility alone do not satisfy the public-facing editorial objective."
+    }
+  },
+  {
+    "id": "ATTN-02",
+    "test": "purposeful-checklist-not-auto-fail",
+    "intent": "social-post",
+    "fidelity": "grounded-creative",
+    "brief": "Write a LinkedIn checklist of practical review questions before rolling out a reporting dashboard. Plain and useful; no invented facts.",
+    "job_context": "Fictional context. No brand facts or claimed studies.",
+    "inputs": "The team needs to validate metric definition and ownership.",
+    "candidate": "Quick review before a dashboard goes live:\n\n1. Can two teams calculate the headline metric and get the same answer? If not, agree on a definition before measuring it.\n2. Who fixes the source data when it breaks? Write down a person and an escalation route.\n3. What happens if the dashboard is wrong? Decide who can pause decisions based on it.\n\nKeep these answers next to the dashboard. They are more useful than an extra chart.",
+    "expected": {
+      "verdict": "pass",
+      "category": "editorial",
+      "reason": "The brief explicitly asks for a checklist and the three questions have concrete operational value and a connected conclusion; no reason to invent a provocative hook."
+    }
+  }
+]
