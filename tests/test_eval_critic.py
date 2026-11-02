@@ -204,6 +204,20 @@ class DocumentScoreTest(unittest.TestCase):
         self.assertEqual(result["missed"], 2)
         self.assertFalse(result["document_rejected"])
 
+    def test_synthetic_whole_document_fixture(self):
+        root = REPO_ROOT / "tests/critic/fixtures"
+        cases = json.loads((root / "doc-cases-synthetic.json").read_text(encoding="utf-8"))
+        verdicts = json.loads((root / "doc-verdicts-synthetic.json").read_text(encoding="utf-8"))
+        labels = json.loads((root / "doc-adjudications-synthetic.json").read_text(encoding="utf-8"))
+        result = eval_critic.score_documents(cases, verdicts, labels)["totals"]
+        self.assertEqual(result["documents"], 2)
+        self.assertEqual(result["expected_issues"], 3)
+        self.assertEqual(result["aligned"], 3)
+        self.assertEqual(result["missed"], 0)
+        self.assertEqual(result["document_approved"], 1)
+        self.assertEqual(result["rejected_approved_document"], 0)
+        self.assertEqual(result["unmatched_findings"], 0)
+
     def test_non_boolean_adjudication_is_rejected(self):
         bad = {"matches": [
             {"issue_id": "p1", "finding_index": 0, "diagnosis": "aligned",
