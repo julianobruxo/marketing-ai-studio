@@ -135,10 +135,10 @@ One round runs through Strategist, Writer and Critic. The maximum is `max_rounds
 
    | Cause | Next round |
    |---|---|
+   | `brief` | Pause and ask the operator first, even when other causes also fail. No retry while clarification is missing; the pause does not count as a round |
    | `approach` | Strategist proposes a different approach, then Writer and Critic |
    | `writing` | Same approach: Writer and Critic |
    | `facts` | If research was requested, the Strategist researches the gap, then Writer and Critic. Otherwise the Writer corrects or removes the claim. If the piece needs data only the operator has, pause and ask |
-   | `brief` | Pause and ask the operator. The pause does not count as a round |
 
    **Operator-dependent blockers take precedence over every automatic retry.** If any failed gate has `cause: brief` because the request is incomplete or contradictory, pause and ask the operator for the missing decision first, even if another gate also reports `writing`, `approach` or `facts`. Do not send the Writer or Strategist to retry while that blocker remains. The pause does not count as an additional round; once clarified, choose the appropriate restart stage for the remaining causes. If the operator is unavailable, report `BLOCKED` and the exact question, rather than spending the remaining rounds.
 
