@@ -123,7 +123,8 @@ def parse_frontmatter(text: str) -> dict:
 
 # --------------------------------------------------------- links em markdown
 
-_FENCE_RE = re.compile(r"^ {0,3}(```|~~~)")
+_FENCE_OPEN_RE = re.compile(r"^ {0,3}(`{3,}|~{3,})(.*)$")
+_FENCE_CLOSE_RE = re.compile(r"^ {0,3}(`{3,}|~{3,})[ \t]*$")
 _INLINE_CODE_RE = re.compile(r"(`+)(?:.+?)\1")
 _INLINE_LINK_RE = re.compile(
     r"!?\[(?:[^\]\\]|\\.)*\]\(\s*(<[^>]*>|[^)\s]+)(?:\s+(?:\"[^\"]*\"|'[^']*'|\([^)]*\)))?\s*\)"
@@ -132,18 +133,34 @@ _REF_DEF_RE = re.compile(r"^ {0,3}\[[^\]]+\]:\s*(<[^>]*>|\S+)")
 _SCHEME_RE = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*:")
 
 
+def code_block_mask(lines):
+    """Por linha, True se ela está num bloco de código cercado (CommonMark), cercas incluídas.
+
+    Abertura: até 3 espaços + 3 ou mais ` ou ~ (a info string de cerca de crase não pode ter `).
+    Fechamento: mesmo caractere, comprimento >= o da abertura, só espaços ou tabs depois.
+    Bloco sem fechamento vai até o fim.
+    """
+    mask = []
+    fence = None
+    for line in lines:
+        if fence is None:
+            m = _FENCE_OPEN_RE.match(line)
+            if m and not (m.group(1)[0] == "`" and "`" in m.group(2)):
+                fence = (m.group(1)[0], len(m.group(1)))
+            mask.append(fence is not None)
+            continue
+        mask.append(True)
+        m = _FENCE_CLOSE_RE.match(line)
+        if m and m.group(1)[0] == fence[0] and len(m.group(1)) >= fence[1]:
+            fence = None
+    return mask
+
+
 def markdown_links(text: str):
     """Gera (linha, alvo) dos links de um markdown, fora de blocos e trechos de código."""
-    in_fence = None
-    for lineno, line in enumerate(text.replace("\r\n", "\n").split("\n"), start=1):
-        fence = _FENCE_RE.match(line)
-        if fence:
-            if in_fence is None:
-                in_fence = fence.group(1)
-            elif fence.group(1) == in_fence:
-                in_fence = None
-            continue
-        if in_fence:
+    lines = text.replace("\r\n", "\n").split("\n")
+    for lineno, (line, in_code) in enumerate(zip(lines, code_block_mask(lines)), start=1):
+        if in_code:
             continue
         clean = _INLINE_CODE_RE.sub("", line)
         for m in _INLINE_LINK_RE.finditer(clean):
@@ -546,16 +563,8 @@ def split_frontmatter(text: str):
 def headings(lines):
     """(índice, nível, título) de cada título ATX fora de blocos de código."""
     out = []
-    in_fence = None
-    for i, line in enumerate(lines):
-        fence = _FENCE_RE.match(line)
-        if fence:
-            if in_fence is None:
-                in_fence = fence.group(1)
-            elif fence.group(1) == in_fence:
-                in_fence = None
-            continue
-        if in_fence:
+    for i, (line, in_code) in enumerate(zip(lines, code_block_mask(lines))):
+        if in_code:
             continue
         m = _HEADING_RE.match(line)
         if m:
@@ -635,17 +644,8 @@ def rewrite_target(target: str, source: str, skill: str) -> str:
 def rewrite_links(lines, source: str, skill: str):
     """Reescreve links relativos fora de código para apontar ao vendor a partir de compiled/<fonte>/."""
     out = []
-    in_fence = None
-    for line in lines:
-        fence = _FENCE_RE.match(line)
-        if fence:
-            if in_fence is None:
-                in_fence = fence.group(1)
-            elif fence.group(1) == in_fence:
-                in_fence = None
-            out.append(line)
-            continue
-        if in_fence:
+    for line, in_code in zip(lines, code_block_mask(lines)):
+        if in_code:
             out.append(line)
             continue
         code = [m.span() for m in _CODE_SPAN_RE.finditer(line)]
@@ -806,7 +806,6 @@ def cmd_compile(args) -> int:
     sources = overlay_sources(root)
     if not sources:
         print("compile: nenhum overlay em overlays/")
-        return 0
     results = {s: compile_source(root, s, lock, args.accept_mentions) for s in sources}
 
     if args.accept_mentions:
@@ -838,11 +837,19 @@ def cmd_compile(args) -> int:
         for rel, data in sorted(outputs.items()):
             (root / rel).write_bytes(data)
             print(f"compilado: {rel}")
-    for stale_dir in sorted((root / "compiled").iterdir()) if (root / "compiled").is_dir() else []:
-        if stale_dir.is_dir() and stale_dir.name not in sources:
-            for stale in sorted(stale_dir.glob("*.md")):
-                stale.unlink()
-                print(f"removido (sem overlay): {stale.relative_to(root).as_posix()}")
+    # Fontes que só existem em compiled/: os compilados ficaram órfãos.
+    compiled_sources = sorted(p.name for p in (root / "compiled").iterdir() if p.is_dir()) \
+        if (root / "compiled").is_dir() else []
+    for source in compiled_sources:
+        if source in sources:
+            continue
+        stale_dir = root / "compiled" / source
+        for stale in sorted(stale_dir.glob("*.md")):
+            stale.unlink()
+            print(f"removido (sem overlay): {stale.relative_to(root).as_posix()}")
+        if not any(stale_dir.iterdir()):
+            stale_dir.rmdir()
+            print(f"removida pasta vazia: compiled/{source}/")
     return 0
 
 

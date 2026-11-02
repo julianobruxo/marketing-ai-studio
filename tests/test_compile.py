@@ -4,6 +4,7 @@ Os casos de falha rodam numa cópia temporária; o repositório nunca é alterad
 """
 
 import hashlib
+import importlib.util
 import json
 import shutil
 import subprocess
@@ -15,6 +16,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SCRIPT = REPO_ROOT / "scripts" / "vendor.py"
 FIXTURE = Path(__file__).resolve().parent / "fixtures" / "compile-basic"
+FENCES = Path(__file__).resolve().parent / "fixtures" / "compile-fences"
 FX_COMPILED = "compiled/synthetic/demo.md"
 FX_OVERLAY = "overlays/synthetic/demo.md"
 FX_SKILL = "vendor/synthetic/skills/demo/SKILL.md"
@@ -187,6 +189,128 @@ class CompileRepoTest(_TempRepo):
         upstream = self.read("vendor/corey/skills/copywriting/SKILL.md").split("\n")
         line = next(l for l in upstream if "adapted from Profound's `improved-copywriting`" in l)
         self.assertIn(line, self.read("compiled/corey/copywriting.md").split("\n"))
+
+
+def load_vendor_module():
+    spec = importlib.util.spec_from_file_location("vendor_script", SCRIPT)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+class CodeBlockMaskTest(unittest.TestCase):
+    """Regras CommonMark de bloco de código cercado, direto no helper."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.mask = staticmethod(load_vendor_module().code_block_mask)
+
+    def test_longer_fence_contains_shorter_one(self):
+        lines = ["````", "```", "## Tools", "```", "````", "## Tools"]
+        self.assertEqual(self.mask(lines), [True, True, True, True, True, False])
+
+    def test_shorter_closing_fence_does_not_close(self):
+        lines = ["`````", "```", "## Dentro", "````", "## Ainda dentro", "`````", "## Fora"]
+        self.assertEqual(self.mask(lines), [True] * 6 + [False])
+
+    def test_tilde_fence(self):
+        lines = ["~~~text", "## Dentro", "```", "~~~", "## Fora"]
+        self.assertEqual(self.mask(lines), [True, True, True, True, False])
+
+    def test_unclosed_fence_runs_to_end(self):
+        lines = ["texto", "```", "## Dentro", "[x](y.md)"]
+        self.assertEqual(self.mask(lines), [False, True, True, True])
+
+    def test_closing_fence_rules(self):
+        # Fechamento com info string não fecha; com espaços depois, fecha.
+        self.assertEqual(self.mask(["```", "```python", "x", "```   ", "## Fora"]),
+                         [True, True, True, True, False])
+        # Cerca de crase com ` na info string não abre bloco.
+        self.assertEqual(self.mask(["``` a`b", "## Fora"]), [False, False])
+        # Até 3 espaços de recuo abrem; 4 não.
+        self.assertEqual(self.mask(["   ```", "x", "   ```"]), [True, True, True])
+        self.assertEqual(self.mask(["    ```", "## Fora"]), [False, False])
+
+
+class CompileFencesTest(_TempRepo):
+    source_dirs = ("vendor", "provenance", "overlays", "compiled")
+    source_root = FENCES
+    COMPILED = "compiled/fences/demo.md"
+    OVERLAY = "overlays/fences/demo.md"
+
+    def test_four_backtick_block_heading_ignored(self):
+        committed = (self.root / self.COMPILED).read_bytes()
+        code, out = run("compile", "--root", self.root)
+        self.assertEqual(code, 0, out)
+        self.assertEqual((self.root / self.COMPILED).read_bytes(), committed)
+        text = self.read(self.COMPILED)
+        self.assertIn("```bash\necho oi\n```\n\n## Tools\n\n[link no bloco de 4 crases]", text)
+        self.assertLess(text.index("\n````\n\n## Tools\n"), text.index("acréscimo na seção real de Tools"))
+
+    def test_links_in_code_blocks_untouched(self):
+        text = self.read(self.COMPILED)
+        for link in ("](references/nao-existe-4.md)", "](references/nao-existe-til.md)",
+                     "](references/nao-existe-fim.md)"):
+            self.assertIn(link, text)
+        self.assertIn("](../../vendor/fences/skills/demo/references/guide.md)", text)
+        code, out = run("verify", "--root", self.root)
+        self.assertEqual(code, 0, out)
+        self.assertNotIn("nao-existe", out)
+
+    def test_tilde_block_heading_ignored(self):
+        text = self.read(self.COMPILED)
+        self.assertLess(text.index("Formato real."), text.index("acréscimo na seção real de Output Format"))
+        self.assertLess(text.index("acréscimo na seção real de Output Format"), text.index("## Tail"))
+
+    def test_unclosed_block_runs_to_end(self):
+        self.write(self.OVERLAY, self.read(self.OVERLAY)
+                   + "\n<!-- op: acrescentar-após | ## Notes -->\nnão deveria achar.\n<!-- /op -->\n")
+        code, out = run("compile", "--root", self.root)
+        self.assertNotEqual(code, 0, out)
+        self.assertIn("'## Notes' não encontrada", out)
+
+
+class OrphanCleanupTest(unittest.TestCase):
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory(prefix="orphan-test-")
+        self.root = Path(self._tmp.name)
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def copy_fixture(self, fixture: Path):
+        for name in ("vendor", "overlays", "compiled"):
+            shutil.copytree(fixture / name, self.root / name, dirs_exist_ok=True)
+        lock_path = self.root / "provenance/upstream-lock.json"
+        lock = json.loads(lock_path.read_text(encoding="utf-8")) if lock_path.exists() \
+            else {"lock_version": 1, "sources": {}}
+        lock["sources"].update(
+            json.loads((fixture / "provenance/upstream-lock.json").read_text(encoding="utf-8"))["sources"])
+        lock_path.parent.mkdir(parents=True, exist_ok=True)
+        lock_path.write_text(json.dumps(lock, indent=2, sort_keys=True), encoding="utf-8")
+
+    def test_last_source_removed(self):
+        self.copy_fixture(FIXTURE)
+        shutil.rmtree(self.root / "overlays/synthetic")
+        code, out = run("compile", "--root", self.root)
+        self.assertEqual(code, 0, out)
+        self.assertFalse((self.root / "compiled/synthetic").exists(), out)
+        code, out = run("verify", "--root", self.root)
+        self.assertEqual(code, 0, out)
+
+    def test_source_removed_with_other_present(self):
+        self.copy_fixture(FIXTURE)
+        self.copy_fixture(FENCES)
+        kept = (self.root / "compiled/fences/demo.md").read_bytes()
+        code, out = run("verify", "--root", self.root)
+        self.assertEqual(code, 0, out)
+        shutil.rmtree(self.root / "overlays/synthetic")
+        code, out = run("compile", "--root", self.root)
+        self.assertEqual(code, 0, out)
+        self.assertFalse((self.root / "compiled/synthetic").exists(), out)
+        self.assertEqual((self.root / "compiled/fences/demo.md").read_bytes(), kept)
+        code, out = run("verify", "--root", self.root)
+        self.assertEqual(code, 0, out)
 
 
 if __name__ == "__main__":

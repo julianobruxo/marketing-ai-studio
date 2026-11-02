@@ -281,7 +281,7 @@ Registro canônico das decisões de arquitetura. As decisões foram fechadas no 
 - **Consequências:** a mesma regra vale para Corey (PR 2) e ByteDance (PR 9). Uma âncora removida upstream faz o `verify` falhar no PR de sync. Teste T-COMPILE.
 - **Implementação (PR 2):**
   - **Sintaxe:** frontmatter com `overlay_for`, `source`, `upstream_version` e `host_mentions_sha256`. Cada operação é `<!-- op: NOME | ÂNCORA -->conteúdo<!-- /op -->`, e as operações são aplicadas na ordem do arquivo. Texto fora de operação é erro.
-  - **Âncora:** a linha de título exata, com o nível (ex.: `## Before Writing`), que precisa existir exatamente 1x. Títulos dentro de blocos de código (```` ``` ```` ou `~~~`) não contam. A seção vai do título até o próximo título de nível igual ou superior.
+  - **Âncora:** a linha de título exata, com o nível (ex.: `## Before Writing`), que precisa existir exatamente 1x. Títulos dentro de blocos de código não contam. Os blocos seguem a regra CommonMark de cercas, num helper único usado por títulos, links e verificação: abertura com até 3 espaços e 3 ou mais crases ou tis; fechamento com o mesmo caractere, comprimento maior ou igual ao da abertura e nada além de espaços depois; bloco sem fechamento vai até o fim do arquivo. A seção vai do título até o próximo título de nível igual ou superior.
   - **Operações:**
     - `acrescentar-após` insere o conteúdo no fim da seção;
     - `substituir-seção` mantém a linha do título e troca o corpo, inclusive subseções;
