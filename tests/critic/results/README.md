@@ -49,3 +49,17 @@ python scripts/eval_critic.py compare --cases tests/critic/cases.json --before t
 ```
 
 O `pack` cria o pacote cego, e um subagente com o papel de Critic gera os vereditos.
+
+## Continuação: avaliação por documento inteiro
+
+O estudo histórico acima permanece **congelado** e não deve ser apresentado como
+validação de desempenho. O avaliador recebeu um protocolo de avaliação com documentos
+completos e anotações humanas adjudicadas, descrito em
+[`tests/critic/EVALUATION.md`](../EVALUATION.md). A montagem dos pacotes cegos agora
+usa uma allowlist; comentários e rótulos humanos não são repassados ao Critic.
+
+Os exemplos em `tests/critic/fixtures/doc-*.json` são **sintéticos e manualmente
+construídos para testar o código de pontuação**. Seus resultados não medem qualidade
+do modelo. Um teste real exige execuções isoladas, inputs completos, adjudicação
+independente e material privado fora do Git.
+
