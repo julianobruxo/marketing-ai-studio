@@ -1,0 +1,31 @@
+name: Critic evaluation tests
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/eval_critic.py'
+      - 'tests/test_eval_critic.py'
+      - 'tests/critic/**'
+      - '.github/workflows/critic-eval.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  critic-evaluation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Unit tests (standard library)
+        run: python -m unittest discover -s tests -v
+      - name: Blind synthetic full-document pack
+        run: |
+          python scripts/eval_critic.py pack --cases tests/critic/fixtures/doc-cases-synthetic.json --out /tmp/critic-doc-pack
+      - name: Full-document scoring (synthetic, not model performance)
+        run: |
+          python scripts/eval_critic.py score-doc --cases tests/critic/fixtures/doc-cases-synthetic.json --verdicts tests/critic/fixtures/doc-verdicts-synthetic.json --adjudications tests/critic/fixtures/doc-adjudications-synthetic.json
