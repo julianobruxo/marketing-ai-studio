@@ -65,6 +65,61 @@ class CasesTest(unittest.TestCase):
             self.assertNotIn("PRIVATE PERSON", packet)
             self.assertNotIn("Fix this", packet)
 
+    def test_blind_revision_pack_preserves_only_review_relevant_change_metadata(self):
+        old_line = "A concrete example that supported the original angle."
+        case = {
+            "id": "REV01", "intent": "social-post", "candidate": "Rewritten post.",
+            "previous_candidate": old_line, "keep": [old_line],
+            "selected_approach": "Explain the audience decision instead of describing examples.",
+            "keep_exceptions": [{
+                "original_line": old_line, "action": "removed", "reason": "approach",
+                "explanation": "The old example is unrelated to the decision now developed."
+            }],
+            "strategist_private_reasoning": "SHOULD NOT LEAK",
+            "writer_process_notes": "SHOULD NOT LEAK",
+            "source_comment": "PRIVATE HUMAN FEEDBACK",
+            "expected": {"verdict": "pass"}
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            eval_critic.pack([case], Path(tmp))
+            packed = json.loads((Path(tmp) / "cases.json").read_text(encoding="utf-8"))[0]
+            self.assertEqual(packed["selected_approach"], case["selected_approach"])
+            self.assertEqual(packed["keep_exceptions"], case["keep_exceptions"])
+            self.assertEqual(packed["previous_candidate"], old_line)
+            self.assertEqual(packed["keep"], [old_line])
+            self.assertNotIn("expected", packed)
+            self.assertNotIn("source_comment", packed)
+            self.assertNotIn("strategist_private_reasoning", packed)
+            self.assertNotIn("writer_process_notes", packed)
+
+    def test_keep_exceptions_reject_unprotected_or_unsupported_changes(self):
+        old_line = "Good sentence."
+        valid = {
+            "id": "REV02", "candidate": "Other text.", "keep": [old_line],
+            "selected_approach": "Focus on a different audience decision.",
+            "keep_exceptions": [{
+                "original_line": old_line, "action": "removed",
+                "reason": "approach", "explanation": "Conflicts with the new central topic."
+            }]
+        }
+        eval_critic.validate_keep_exceptions(valid)
+        invalids = [
+            {**valid, "selected_approach": ""},
+            {**valid, "keep_exceptions": [{**valid["keep_exceptions"][0], "original_line": "Not protected"}]},
+            {**valid, "keep_exceptions": [{**valid["keep_exceptions"][0], "explanation": "  "}]},
+            {**valid, "keep_exceptions": [{**valid["keep_exceptions"][0], "reason": "preference"}]},
+            {**valid, "keep_exceptions": [{**valid["keep_exceptions"][0], "action": "ignored"}]},
+            {**valid, "keep_exceptions": valid["keep_exceptions"] * 2},
+        ]
+        for index, item in enumerate(invalids):
+            with self.subTest(index=index), self.assertRaises(ValueError):
+                eval_critic.validate_keep_exceptions(item)
+
+    def test_no_change_does_not_require_approach_summary(self):
+        eval_critic.validate_keep_exceptions({
+            "id": "REV03", "keep": ["Sentence retained."], "keep_exceptions": []
+        })
+
     def test_pack_rejects_duplicate_case_ids(self):
         with tempfile.TemporaryDirectory() as tmp:
             with self.assertRaises(ValueError):
