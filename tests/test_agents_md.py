@@ -64,6 +64,40 @@ class AgentsMdTest(unittest.TestCase):
         self.assertIn("pause does not count as an additional round", orchestrator)
         self.assertIn("even if another gate also reports", self.text)
 
+    def test_a_critic_failure_restarts_all_configured_roles(self):
+        orchestrator = (REPO_ROOT / "agents/orchestrator.md").read_text(encoding="utf-8")
+        strategist = (REPO_ROOT / "agents/strategist.md").read_text(encoding="utf-8")
+        self.assertIn("restarts **the entire configured workflow**", orchestrator)
+        self.assertIn("**Strategist** (every round when the intent uses it)", orchestrator)
+        self.assertIn("do not skip the Strategist", orchestrator.lower())
+        self.assertIn("every rejected candidate", strategist.lower())
+        self.assertIn("new independent sub-agent", orchestrator)
+        self.assertIn("the entire configured workflow", self.text)
+
+    def test_critic_must_judge_editorial_attention_not_only_compliance(self):
+        contract = (REPO_ROOT / "agents/critic.md").read_text(encoding="utf-8")
+        self.assertIn("Editorial publishability is a first-class requirement", contract)
+        self.assertIn("Passing the first two does not grant a PASS on the third", contract)
+        self.assertIn("public-facing post", contract)
+        self.assertIn("A requested checklist can pass", contract)
+        self.assertIn("cause: approach", contract)
+        self.assertIn("KEEP AS IS", contract)
+
+    def test_synthetic_attention_cases_are_contrasting_and_blindable(self):
+        from pathlib import Path
+        cases = json.loads((REPO_ROOT / "tests/critic/fixtures/reader-attention-synthetic.json").read_text(encoding="utf-8"))
+        self.assertEqual(len(cases), 2)
+        self.assertEqual([c["expected"]["verdict"] for c in cases], ["reject", "pass"])
+        self.assertNotIn("Anna", json.dumps(cases))
+        self.assertNotIn("Zazmic", json.dumps(cases))
+        import eval_critic
+        import tempfile
+        with tempfile.TemporaryDirectory() as path:
+            eval_critic.pack(cases, Path(path))
+            blind = json.loads((Path(path) / "cases.json").read_text(encoding="utf-8"))
+            self.assertEqual(len(blind), 2)
+            self.assertTrue(all("expected" not in c and "test" not in c for c in blind))
+
     def test_demote_ignores_code_fences(self):
         self.assertEqual(build_agents.demote("# a\n```\n# b\n```\n## c"), "## a\n```\n# b\n```\n### c")
 
