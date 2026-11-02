@@ -18,5 +18,5 @@ host_mentions_sha256: 1d9f93715f4bef5c0ac60671204612b29c6978aa8fd145ce83a72c457d
 <!-- /op -->
 
 <!-- op: acrescentar-após | ## Output -->
-**Studio:** return research notes to the orchestrator: each fact with its URL, publisher or author, and date. You cannot write files.
+**Studio:** return research notes to the orchestrator in the format of your role instructions: for each fact, the source (URL, publisher or author, date), whether you read it with WebFetch (`fetched`) or only saw a snippet (`snippet`), and the exact supporting excerpt. The Critic cannot open the web, so the excerpt is the evidence. You cannot write files.
 <!-- /op -->

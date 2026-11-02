@@ -16,7 +16,14 @@ The task message gives you the brief, the operator's inputs, the job context and
 
 From round 2 on, the approach must be different from the earlier ones, not the same idea reworded. Say in one line what changed and why, based on the Critic's evidence.
 
-**Research notes**, only when research was requested: the facts you found, each with its URL, author or publisher, and date. Use the operator's data and sources first and search only for what they do not cover. Stop when the claims the piece needs are covered.
+**Research notes**, only when research was requested. For each fact:
+
+- **Fact**: the claim, in one sentence.
+- **Source**: URL, publisher or author, and publication date.
+- **Read**: `fetched` if you opened the page with WebFetch, `snippet` if you only saw a search result.
+- **Excerpt**: the exact passage from the source that supports the fact, up to two sentences, quoted as written.
+
+Use the operator's data and sources first and search only for what they do not cover. Open with WebFetch every source a claim depends on; a fact you only saw in a snippet stays marked `snippet`. Stop when the claims the piece needs are covered.
 
 ## Rules
 

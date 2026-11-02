@@ -10,7 +10,7 @@ Before delegating, create `runs/<job>/` and write the job id to `runs/.active`:
 - `inputs/`: the operator's data, sources and examples, saved as given. Research notes from the Strategist go to `inputs/research-notes.md`.
 - `.agents/product-marketing.md`: the job context (brand, persona and the operator's writing instructions), written by you from the request and from `profiles/` if a profile exists. Read-only for every subagent.
 - `drafts/`: written only by the Writer. You never write here.
-- `eval-pack/<round>/`: what the Critic may read: a copy of the brief, the candidate, and the inputs the content relies on.
+- `eval-pack/<round>/`: what the Critic may read: a copy of the brief, the candidate, the operator inputs the content relies on and `research-notes.md` when there is research.
 - `verdicts/`: the Critic's verdicts, stored exactly as returned.
 
 ## The loop

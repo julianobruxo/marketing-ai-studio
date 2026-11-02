@@ -1,5 +1,8 @@
 """T-INSTALL (instalação e configuração, sem Claude Code): scripts/install_host.py."""
 
+import contextlib
+import importlib.util
+import io
 import json
 import shutil
 import subprocess
@@ -7,6 +10,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 INSTALLER = REPO_ROOT / "scripts" / "install_host.py"
@@ -137,6 +141,57 @@ class InstallTest(unittest.TestCase):
         shutil.rmtree(self.target / "hosts")
         code, out = install(self.target)
         self.assertNotEqual(code, 0, out)
+
+    def install_in_process(self, patches):
+        """Roda install() no próprio processo, com partes do instalador trocadas."""
+        spec = importlib.util.spec_from_file_location("install_host_under_test", INSTALLER)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        out = io.StringIO()
+        with contextlib.ExitStack() as stack:
+            for target, name, value in patches(module):
+                stack.enter_context(mock.patch.object(target, name, value))
+            stack.enter_context(contextlib.redirect_stdout(out))
+            code = module.install(self.target)
+        return code, out.getvalue()
+
+    def assertRolledBack(self, code, out):
+        self.assertNotEqual(code, 0, out)
+        self.assertIn("INSTALAÇÃO ABORTADA", out)
+        self.assertFalse((self.target / ".claude/settings.json").exists())
+        self.assertEqual(list((self.target / ".claude/agents").glob("studio-*.md")), [])
+        self.assertFalse((self.target / ".claude/skills/marketing-content-studio").exists())
+        self.assertEqual((self.target / "runs/.active").read_text(encoding="utf-8"), "job-real\n")
+
+    def test_smoke_process_errors_roll_back(self):
+        def raising(exc):
+            def run(*args, **kwargs):
+                raise exc
+            return run
+
+        cases = (
+            ("TimeoutExpired", subprocess.TimeoutExpired(cmd="guard", timeout=30), "hook estourou o tempo"),
+            ("OSError", FileNotFoundError(2, "python não encontrado"), "hook não iniciou"),
+        )
+        for label, exc, message in cases:
+            with self.subTest(label):
+                (self.target / "runs").mkdir(exist_ok=True)
+                (self.target / "runs/.active").write_text("job-real\n", encoding="utf-8")
+                code, out = self.install_in_process(
+                    lambda m: [(m.subprocess, "run", raising(exc))])
+                self.assertRolledBack(code, out)
+                self.assertIn(message, out)
+
+    def test_unexpected_smoke_exception_rolls_back(self):
+        (self.target / "runs").mkdir()
+        (self.target / "runs/.active").write_text("job-real\n", encoding="utf-8")
+
+        def boom(*args, **kwargs):
+            raise RuntimeError("falha inesperada")
+
+        code, out = self.install_in_process(lambda m: [(m, "run_hook", boom)])
+        self.assertRolledBack(code, out)
+        self.assertIn("RuntimeError", out)
 
     def test_broken_guard_aborts(self):
         (self.target / "hosts/claude-code/guard.py").write_text(

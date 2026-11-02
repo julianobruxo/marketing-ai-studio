@@ -75,8 +75,13 @@ def dump_json(data) -> str:
 
 
 def run_hook(command: str, args, payload: str):
-    proc = subprocess.run([command, *args], input=payload.encode("utf-8"),
-                          capture_output=True, timeout=30)
+    try:
+        proc = subprocess.run([command, *args], input=payload.encode("utf-8"),
+                              capture_output=True, timeout=30)
+    except subprocess.TimeoutExpired:
+        return None, "hook estourou o tempo"
+    except OSError as exc:
+        return None, f"hook não iniciou ({exc.__class__.__name__})"
     out = proc.stdout.decode("utf-8", errors="replace").strip()
     try:
         decision = json.loads(out)["hookSpecificOutput"]["permissionDecision"] if out else None
@@ -176,14 +181,17 @@ def install(target: Path) -> int:
     settings_path.write_bytes(dump_json(settings(host, guard.resolve())).encode("utf-8"))
     print(f"settings: {settings_path.relative_to(target).as_posix()}")
 
-    failures = smoke_test(target, host)
+    try:
+        failures = smoke_test(target, host)
+    except Exception as exc:
+        failures = [f"erro no teste de fumaça ({exc.__class__.__name__}: {exc})"]
     if failures:
-        settings_path.unlink()
+        settings_path.unlink(missing_ok=True)
         for path in written:
-            path.unlink()
-        shutil.rmtree(skill_dst)
+            path.unlink(missing_ok=True)
+        shutil.rmtree(skill_dst, ignore_errors=True)
         print("INSTALAÇÃO ABORTADA: o teste de fumaça do hook falhou (" + "; ".join(failures) + ").")
-        print("settings.json e agentes gerados foram removidos.")
+        print("settings.json, agentes e skill gerados foram removidos.")
         return 1
     print("OK: instalação concluída; teste de fumaça do hook passou.")
     return 0

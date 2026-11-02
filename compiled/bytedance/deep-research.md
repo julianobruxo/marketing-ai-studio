@@ -7,7 +7,7 @@ source: https://github.com/bytedance/deer-flow
 commit: 12c304f12ce5c0bf66d8927386e5dd18ea84f685
 upstream_path: skills/public/deep-research/SKILL.md
 upstream_version: 12c304f12ce5c0bf66d8927386e5dd18ea84f685
-overlay: overlays/bytedance/deep-research.md sha256=f96794d59c3b8ba8b4e2888dc0d5399d9db069c037c8fc056a8cd753a852376a
+overlay: overlays/bytedance/deep-research.md sha256=89d5eea677f22f707f9b385c0a425c59111195178ccbf1693887af6ab321fb18
 common: overlays/bytedance/_common.md sha256=5293183d2a62c1b9b34d7328dc6bfd8f8b6999ad8a59e41cc59275ec87021430
 Copyright (c) 2025 Bytedance Ltd. and/or its affiliates; Copyright (c) 2025-2026 DeerFlow Authors. MIT License — see vendor/bytedance/LICENSE.
 -->
@@ -226,4 +226,4 @@ After completing research, you should have:
 
 **Only then proceed to content generation**, using the gathered information to create high-quality, well-informed content.
 
-**Studio:** return research notes to the orchestrator: each fact with its URL, publisher or author, and date. You cannot write files.
+**Studio:** return research notes to the orchestrator in the format of your role instructions: for each fact, the source (URL, publisher or author, date), whether you read it with WebFetch (`fetched`) or only saw a snippet (`snippet`), and the exact supporting excerpt. The Critic cannot open the web, so the excerpt is the evidence. You cannot write files.
