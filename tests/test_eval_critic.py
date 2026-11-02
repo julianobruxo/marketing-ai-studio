@@ -56,21 +56,52 @@ class ScoreTest(unittest.TestCase):
         self.assertTrue(row["verdict_ok"])
         self.assertFalse(row["target_ok"])
 
+    def test_a_tiny_quote_gets_no_credit_for_the_target(self):
+        self.assertFalse(eval_critic.overlaps("the whole bad sentence here", "bad"))
+        self.assertTrue(eval_critic.overlaps("the whole bad sentence", "the whole bad"))
+        self.assertTrue(eval_critic.overlaps("bad", "a very bad line"))
+
+    def test_target_equal_to_the_whole_candidate_is_not_scored(self):
+        case = {"id": "A", "candidate": "all of it", "expected": {"verdict": "reject", "target": "all of it"}}
+        self.assertNotIn("target_ok", eval_critic.score_case(case, [gate("FAIL", "all")]))
+
     def test_keep_is_scored(self):
         verdict = {"gates": [gate("PASS")], "keep": ["the good line"]}
         self.assertTrue(eval_critic.score_case(PASS, verdict)["keep_ok"])
         self.assertFalse(eval_critic.score_case(PASS, [gate("PASS")])["keep_ok"])
 
-    def test_material_finding_counts_as_noticed_but_not_as_reject(self):
+    def test_material_finding_is_flagged_but_is_not_a_reject(self):
         verdict = {"decision": "IMPROVE", "gates": [gate("PASS")]}
         self.assertEqual(eval_critic.outcome(verdict), "pass")
-        self.assertTrue(eval_critic.noticed(verdict))
-        self.assertFalse(eval_critic.noticed({"decision": "KEEP AS IS", "gates": [gate("PASS")]}))
+        self.assertTrue(eval_critic.flagged(verdict))
+        self.assertFalse(eval_critic.flagged({"decision": "KEEP AS IS", "gates": [gate("PASS")]}))
+
+    def test_diagnosis_comes_from_the_label_not_from_any_finding(self):
+        case = {"id": "A", "expected": {"verdict": "reject", "severity": "blocking"}}
+        verdict = {"gates": [{"gate": "voice", "status": "PASS",
+                              "evidence": [{"quote": "x", "severity": "material"}]}]}
+        wrong = eval_critic.score_case(case, verdict, {"match": None, "category": False, "diagnosis": "different"})
+        self.assertFalse(wrong["category_ok"])
+        self.assertEqual(wrong["diagnosis"], "none")
+        right = eval_critic.score_case(case, verdict, {"match": 0, "category": True, "diagnosis": "aligned"})
+        self.assertTrue(right["category_ok"])
+        self.assertFalse(right["severity_ok"])
+
+    def test_fact_objection_to_approved_text_is_not_a_false_fail(self):
+        facts = {"gates": [{"gate": "facts", "status": "FAIL", "evidence": []}]}
+        result = eval_critic.score([PASS], {"B": facts})
+        self.assertEqual(result["false_fail"]["bad"], 0)
+        self.assertEqual(result["fact_dissent"]["bad"], 1)
 
     def test_summary_counts_false_fails_and_missing_verdicts(self):
         result = eval_critic.score([REJECT, PASS], {"B": [gate("FAIL", "x")]})
         self.assertEqual(result["caught"], {"ok": 0, "total": 1})
         self.assertEqual(result["false_fail"], {"bad": 1, "total": 1})
+
+    def test_cases_that_need_context_are_reported_apart(self):
+        case = {"id": "C", "expected": {"verdict": "reject", "needs_context": True}}
+        result = eval_critic.score([REJECT, case], {})
+        self.assertEqual(result["without_context_cases"]["caught"]["total"], 1)
 
 
 if __name__ == "__main__":
