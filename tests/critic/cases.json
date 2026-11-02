@@ -1,0 +1,224 @@
+[
+  {
+    "id": "S01",
+    "test": "artificiality",
+    "intent": "article",
+    "fidelity": "research-backed",
+    "brief": "Opening of a practical article on why reporting projects stall, for operations leaders. Plain, accessible language.",
+    "job_context": "Brand: Northwind Data, a fictional data platform company. Audience: operations leaders at mid-sized companies. No brand profile.",
+    "inputs": "Reporting projects often stall after the first demo because data ownership is unclear after the project team leaves.",
+    "candidate": "The kickoff went well. The slides were great. Everyone nodded. And then, silence.\n\nReporting projects stall after the first demo because nobody owns the numbers once the project team leaves. The demo runs on a clean sample, while the live report depends on data that three departments maintain in different ways.",
+    "expected": {
+      "verdict": "reject",
+      "target": "And then, silence."
+    }
+  },
+  {
+    "id": "S02",
+    "test": "coherence",
+    "intent": "article",
+    "fidelity": "research-backed",
+    "brief": "Section of an article on why reporting projects stall.",
+    "job_context": "Brand: Northwind Data, a fictional data platform company. Audience: operations leaders at mid-sized companies. No brand profile.",
+    "inputs": "Demos run on clean samples. Vendor contracts take months to sign. Most finance teams renew contracts yearly.",
+    "candidate": "Demos run on a clean sample of data, so they rarely expose missing fields.\n\nThe Bottleneck Starts With Procurement\n\nVendor contracts take months to sign. Most finance teams renew them yearly.",
+    "expected": {
+      "verdict": "reject",
+      "target": "Bottleneck Starts With Procurement"
+    }
+  },
+  {
+    "id": "S03",
+    "test": "reference",
+    "intent": "article",
+    "fidelity": "research-backed",
+    "brief": "Paragraph of an article on moving reports from pilot to daily use.",
+    "job_context": "Brand: Northwind Data, a fictional data platform company. Audience: operations leaders at mid-sized companies. No brand profile.",
+    "inputs": "Regional definitions of revenue differ. Sign-off rules change by country.",
+    "candidate": "Teams test a report on one quarter of data and then roll it out to every region. Regional definitions of revenue differ, and sign-off rules change by country. Most projects get lost in this bridge.",
+    "expected": {
+      "verdict": "reject",
+      "target": "this bridge"
+    }
+  },
+  {
+    "id": "S04",
+    "test": "evidence",
+    "intent": "article",
+    "fidelity": "research-backed",
+    "brief": "Paragraph de artigo em português sobre adoção de relatórios automatizados.",
+    "job_context": "Brand: Northwind Data, a fictional data platform company. Audience: operations leaders at mid-sized companies. No brand profile.",
+    "inputs": "Pesquisa Northwind 2025: 72% dos 240 gerentes de operações entrevistados no Brasil disseram confiar em relatórios automatizados para fechar o mês.",
+    "candidate": "Relatórios automatizados ganharam espaço nas áreas de operações, e 72% já confiam neles para fechar o mês. Por isso, o próximo passo é decidir quais processos automatizar primeiro.",
+    "expected": {
+      "verdict": "reject",
+      "target": "72%"
+    }
+  },
+  {
+    "id": "S05",
+    "test": "resolution",
+    "intent": "article",
+    "fidelity": "research-backed",
+    "brief": "Closing sections of an analytical article on why data projects fail. The reader should leave knowing how to move forward, then reach the consultation CTA.",
+    "job_context": "Brand: Northwind Data, a fictional data platform company. Audience: operations leaders at mid-sized companies. No brand profile.",
+    "inputs": "Common causes of failure: unclear ownership, conflicting definitions, no maintenance plan. CTA: Book a consultation with Northwind Data.",
+    "candidate": "Data projects fail because ownership is unclear. They fail because definitions conflict between departments. They also fail because nobody plans for maintenance after launch, and each of these problems gets worse as the project grows.\n\nBook a consultation with Northwind Data.",
+    "expected": {
+      "verdict": "reject",
+      "target": "Book a consultation"
+    }
+  },
+  {
+    "id": "S06",
+    "test": "positioning",
+    "intent": "copy-page",
+    "fidelity": "grounded-creative",
+    "brief": "Services section. It must show that Northwind helps clients build these capabilities.",
+    "job_context": "Brand: Northwind Data, a fictional data platform company. Audience: operations leaders at mid-sized companies. No brand profile.",
+    "inputs": "Northwind's services: building trusted data pipelines, designing cloud architecture, setting up data governance.",
+    "candidate": "Northwind Data helps your company reach production with:\n\n- Trusted data\n- Clean architecture\n- Strong governance",
+    "expected": {
+      "verdict": "reject",
+      "target": "Trusted data"
+    }
+  },
+  {
+    "id": "S07",
+    "test": "preservation",
+    "intent": "copy-page",
+    "fidelity": "grounded-creative",
+    "brief": "Closing CTA for a landing page aimed at teams that rebuild reports by hand. Keep it human and direct.",
+    "job_context": "Brand: Northwind Data, a fictional data platform company. Audience: operations leaders at mid-sized companies. No brand profile.",
+    "inputs": "CTA: a 30-minute review with Northwind Data.",
+    "candidate": "If your team is tired of rebuilding the same monthly report by hand, you already know what it costs. The next step is deciding which report to fix first.\n\nBook a 30-minute review with Northwind Data.",
+    "expected": {
+      "verdict": "pass",
+      "keep": "you already know what it costs"
+    }
+  },
+  {
+    "id": "S08",
+    "test": "context-teaser",
+    "intent": "newsletter",
+    "fidelity": "grounded-creative",
+    "brief": "One teaser block for a promotional newsletter, under 60 words. Its only job is to make the reader click through. It should not explain the whole feature.",
+    "job_context": "Brand: Northwind Data, a fictional data platform company. Audience: operations leaders at mid-sized companies. No brand profile.",
+    "inputs": "The restore drill runs a timed recovery on a copy of customer data and reports the time taken. Link: https://example.com/restore-drill",
+    "candidate": "### Backups You Can Actually Restore\n\nA backup only counts on the day you restore it. Northwind's restore drill runs a timed recovery on a copy of your data and shows how long it really takes.\n\n[See how the restore drill works](https://example.com/restore-drill)",
+    "expected": {
+      "verdict": "pass"
+    }
+  },
+  {
+    "id": "S09",
+    "test": "context-article",
+    "intent": "article",
+    "fidelity": "research-backed",
+    "brief": "Paragraph of a technical article that develops one argument in depth.",
+    "job_context": "Brand: Northwind Data, a fictional data platform company. Audience: operations leaders at mid-sized companies. No brand profile.",
+    "inputs": "Northwind 2025 survey: 41 of 120 finance teams returned to spreadsheets within six months of adopting an automated close. Interviews: teams said the new tool removed a manual check they relied on.",
+    "candidate": "Northwind's 2025 survey of 120 finance teams found that 41 of them went back to spreadsheets within six months of adopting an automated close. That return is easy to misread. Teams usually go back not because they reject automation, but because the new tool removes a manual check they relied on. So fixing the rollout means finding that check before launch, and that work belongs to process design more than to training.",
+    "expected": {
+      "verdict": "pass"
+    }
+  },
+  {
+    "id": "S10",
+    "test": "cta",
+    "intent": "newsletter",
+    "fidelity": "grounded-creative",
+    "brief": "One newsletter block offering the free data audit. The link must deliver what the block promises.",
+    "job_context": "Brand: Northwind Data, a fictional data platform company. Audience: operations leaders at mid-sized companies. No brand profile.",
+    "inputs": "Destination page content for https://example.com/pricing: the Northwind price list, with no audit offer. The audit request form is at https://example.com/audit.",
+    "candidate": "### Is Your Data Ready for Audit Season?\n\nOur free data audit shows where your reports break before your auditors find out.\n\n[Get your free audit](https://example.com/pricing)",
+    "expected": {
+      "verdict": "reject",
+      "target": "Get your free audit"
+    }
+  },
+  {
+    "id": "S11",
+    "test": "regression",
+    "intent": "copy-edit",
+    "fidelity": "grounded-creative",
+    "brief": "Light edit of the original. Keep the author's voice and every specific detail.",
+    "job_context": "Brand: Northwind Data, a fictional data platform company. Audience: operations leaders at mid-sized companies. No brand profile.",
+    "inputs": "",
+    "candidate": "Northwind helps companies optimize their reporting processes and unlock better outcomes across the business.",
+    "expected": {
+      "verdict": "reject",
+      "target": "optimize their reporting"
+    },
+    "original": "Your month-end close should not depend on one person who remembers which spreadsheet is the right one."
+  },
+  {
+    "id": "S12",
+    "test": "contradiction",
+    "intent": "article",
+    "fidelity": "research-backed",
+    "brief": "Section of an article on why reporting projects stall.",
+    "job_context": "Brand: Northwind Data, a fictional data platform company. Audience: operations leaders at mid-sized companies. No brand profile.",
+    "inputs": "Common problems: unclear data ownership, conflicting definitions, missing maintenance plans, weak executive sponsorship.",
+    "candidate": "Three problems stall most reporting projects. The first is unclear data ownership. The second is conflicting definitions. The third is missing maintenance plans. The fourth is weak executive sponsorship, which is the main cause of failure.",
+    "expected": {
+      "verdict": "reject",
+      "target": "The fourth"
+    }
+  },
+  {
+    "id": "S13",
+    "test": "relevance",
+    "intent": "newsletter",
+    "fidelity": "grounded-creative",
+    "brief": "One newsletter block for business leaders about the new voice search, under 60 words. It must show why a business should care.",
+    "job_context": "Brand: Northwind Data, a fictional data platform company. Audience: operations leaders at mid-sized companies. No brand profile.",
+    "inputs": "Voice search uses a neural speech model with streaming transcription and low-latency retrieval. Link: https://example.com/voice",
+    "candidate": "### Voice Search Is Here\n\nNorthwind's voice search uses a neural speech model with streaming transcription and low-latency retrieval across indexed documents.\n\n[Read the release notes](https://example.com/voice)",
+    "expected": {
+      "verdict": "reject",
+      "target": "neural speech model"
+    }
+  },
+  {
+    "id": "S14",
+    "test": "audience-claim",
+    "intent": "article",
+    "fidelity": "research-backed",
+    "brief": "Paragraph of an article on data quality.",
+    "job_context": "Brand: Northwind Data, a fictional data platform company. Audience: operations leaders at mid-sized companies. No brand profile.",
+    "inputs": "Good practice: name one owner per source system and publish its update frequency.",
+    "candidate": "Data quality is worse than most people assume. Fixing it starts with naming one owner for each source system and publishing how often each source is updated.",
+    "expected": {
+      "verdict": "reject",
+      "target": "than most people assume"
+    }
+  },
+  {
+    "id": "S15",
+    "test": "hook",
+    "intent": "newsletter",
+    "fidelity": "grounded-creative",
+    "brief": "Headline and opening line of a newsletter on two stories: a wave of outages and new compliance rules.",
+    "job_context": "Brand: Northwind Data, a fictional data platform company. Audience: operations leaders at mid-sized companies. No brand profile.",
+    "inputs": "October stories: a wave of cloud outages; new compliance rules.",
+    "candidate": "# Outages Made Headlines. Rules Kept Moving.\n\nOctober brought a wave of cloud outages and new compliance rules.",
+    "expected": {
+      "verdict": "reject",
+      "target": "Rules Kept Moving"
+    }
+  },
+  {
+    "id": "S16",
+    "test": "legit-pattern",
+    "intent": "social-post",
+    "fidelity": "grounded-creative",
+    "brief": "LinkedIn post em português anunciando o novo painel. Tom direto, sem emojis, até 600 caracteres, com o link no final.",
+    "job_context": "Marca: Northwind Data, empresa fictícia. Voz pedida: direta, sem emojis.",
+    "inputs": "O painel mostra: dono de cada fonte, data da última atualização, relatórios que dependem dela. Link: https://example.com/painel",
+    "candidate": "O novo painel da Northwind Data já está no ar. Ele mostra três coisas que os times de operações pediam: quem é dono de cada fonte, quando ela foi atualizada e quais relatórios dependem dela.\n\nAssim, quando um número parece errado, dá para descobrir a origem sem abrir chamado.\n\nVeja como funciona: https://example.com/painel",
+    "expected": {
+      "verdict": "pass"
+    }
+  }
+]
