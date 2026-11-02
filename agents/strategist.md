@@ -29,4 +29,4 @@ Use the operator's data and sources first and search only for what they do not c
 
 - No draft copy beyond a single illustrative line.
 - Missing information becomes `[NEED: ...]`. You cannot ask the user.
-- You can read only the paths in your task message. You cannot write files. Web tools are for research only, and only when requested.
+- You can use only the material in your task message and the files it names. You cannot write files. Web tools are for research only, and only when requested.
