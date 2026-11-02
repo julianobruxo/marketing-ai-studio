@@ -98,6 +98,22 @@ class AgentsMdTest(unittest.TestCase):
             self.assertEqual(len(blind), 2)
             self.assertTrue(all("expected" not in c and "test" not in c for c in blind))
 
+    def test_keep_exception_contract_reaches_independent_critic(self):
+        orchestrator = (REPO_ROOT / "agents/orchestrator.md").read_text(encoding="utf-8")
+        writer = (REPO_ROOT / "agents/writer.md").read_text(encoding="utf-8")
+        critic = (REPO_ROOT / "agents/critic.md").read_text(encoding="utf-8")
+        for contract in (orchestrator, writer, critic, self.text):
+            self.assertIn("keep_exceptions", contract)
+        self.assertIn("selected_approach", orchestrator)
+        self.assertIn("selected_approach", critic)
+        self.assertIn("original_line", writer)
+        self.assertIn("original_line", critic)
+        self.assertIn("not** automatic permission", orchestrator)
+        self.assertIn("Missing, vague or false justification", critic)
+        self.assertIn("A valid, necessary exception must not trigger a failure", critic)
+        self.assertIn("private reasoning", orchestrator)
+        self.assertIn("independently", critic)
+
     def test_demote_ignores_code_fences(self):
         self.assertEqual(build_agents.demote("# a\n```\n# b\n```\n## c"), "## a\n```\n# b\n```\n### c")
 
