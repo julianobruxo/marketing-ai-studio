@@ -418,7 +418,9 @@ Os demais saíram do plano ou ficam para o job real do operador (ADR-19).
 - **Consequências:**
   - Um Critic mais exigente em lógica pode aumentar o uso das 3 rodadas.
   - A base de calibração ainda é pequena, com poucos exemplos positivos explícitos, então a medição atual serve de direção, não de taxa de erro.
-  - Num conjunto de controle com comentários reais não usados no ajuste, o Critic novo não reprovou mais do que o anterior, embora tenha notado mais problemas como `material`. Decidir se `material` em título, abertura ou valor deve abrir rodada fica para depois de mais casos.
+  - Num conjunto de controle com comentários reais não usados no ajuste, nenhuma versão reproduziu o diagnóstico da revisora. O contrato só muda de novo com casos independentes e documentos inteiros.
+  - `material` não vira `blocking` por categoria. A severidade depende de quanto o problema compromete a função da peça.
+  - Aprovação humana não anula objeção factual: um texto elogiado ainda pode ter um problema de fato.
 - **Estado:** Aceito
 - **Data:** 2026-11-02
 

@@ -33,11 +33,11 @@ Primeiro ele identifica formato, público, canal e objetivo. Depois avalia sete 
 
 ## Como medir
 
-`scripts/eval_critic.py` monta um pacote cego, pontua os vereditos sem usar modelo e compara duas versões do Critic sobre os mesmos casos. Os casos públicos ficam em `tests/critic/` e são fictícios. Casos reais ficam fora do repositório.
+`scripts/eval_critic.py` monta um pacote cego, pontua os vereditos sem usar modelo e compara duas versões do Critic sobre os mesmos casos. Veredito, categoria, diagnóstico, severidade e preservação são medidos separadamente. Os casos públicos ficam em `tests/critic/` e são fictícios. Casos reais ficam fora do repositório.
 
 ## Limites conhecidos
 
-- **Ainda fica aquém de uma revisão humana.** Em casos reais novos, ele reprovou menos trechos do que a revisora criticou. Veja `tests/critic/results/README.md`.
+- **Ainda não reproduz uma revisão humana.** Em casos reais fora do ajuste, ele não chegou ao mesmo diagnóstico da revisora. Veja `tests/critic/results/README.md`.
 - **Calibração pequena.** A medição mostra direção, não uma taxa de erro. Há poucos exemplos positivos explícitos.
 - **Fatos em excesso.** Com dados de entrada escassos, ele pode marcar `UNVERIFIED` em vários trechos, o que consome rodadas.
 - **A voz é tão boa quanto o seu pedido.** Sem exemplos ou perfil, o Critic não sabe como a marca soa.
