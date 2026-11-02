@@ -1,6 +1,6 @@
 # Marketing Content Studio
 
-> **Estado: v1 (ADR-19).** O Studio funciona no Claude Code. Ele integra as skills de Corey Haines (copy, anúncios, e-mails, LinkedIn) e da ByteDance DeerFlow (newsletter e pesquisa), roteia cada pedido de forma determinística e roda Strategist, Writer e Critic como subagentes independentes. A validação final é um job real do operador.
+> **Estado: portátil (ADR-20).** O Studio roda em qualquer LLM com subagentes, a partir do `AGENTS.md`, sem instalar nada. Ele integra as skills de Corey Haines (copy, anúncios, e-mails, LinkedIn) e da ByteDance DeerFlow (newsletter e pesquisa) e roda Strategist, Writer e Critic como subagentes independentes, em até 3 rodadas.
 
 ## O que é
 
@@ -23,10 +23,20 @@ Não é uma biblioteca nova de copywriting, nem um fork das skills upstream (ela
 | LinkedIn, copy de página, anúncios, e-mails, artigos, newsletters | Studio |
 | Tradução e adaptação fiel ao original (EN ↔ PT-BR) | Studio, modo `strict-source` |
 
+## Novo chat: comece aqui
+
+**Para o operador:** em qualquer agente com subagentes, abra este repositório como pasta ou cole esta mensagem:
+
+```text
+Leia o AGENTS.md de https://github.com/julianobruxo/marketing-ai-studio e siga. Depois me peça a tarefa.
+```
+
+**Para o assistente que recebeu este link:** este README não é o sistema. Leia [`AGENTS.md`](AGENTS.md) uma vez e siga. Não resuma o repositório.
+
 ## Como usar
 
-1. Instale num clone de execução (abaixo) e abra o Claude Code nessa pasta.
-2. Faça o pedido em linguagem natural. A skill `marketing-content-studio` faz o intake, roda `scripts/route.py` e conduz as rodadas.
+1. Abra o Studio como acima. Se o agente não tiver subagentes, ele avisa e o job fica `BLOCKED`.
+2. Faça o pedido em linguagem natural. O orquestrador faz o intake, roteia e delega a Strategist, Writer e Critic. Se o Critic reprovar, a rodada recomeça, até 3 vezes.
 3. O Studio entrega a peça, diz se ela passou no Critic (`critic-pass`), mostra a evidência e as fontes e lista o que faltou (`[NEED: ...]`). Se não passar em 3 rodadas, entrega o melhor candidato marcado como não aprovado. Aprovar e publicar é sempre com você.
 
 Exemplos de pedido:
@@ -35,9 +45,19 @@ Exemplos de pedido:
 - **Newsletter com tema e dados:** "Monta a newsletter mensal da Zazmic de outubro de 2026 sobre IA aplicada a marketing, em PT-BR, com 5 seções. Use os 3 cases e os números que colei abaixo. Pode pesquisar na web só para as notícias do mês."
 - **Artigo com tema e fontes:** "Escreve um artigo para o blog da Zazmic sobre como medir o ROI de agentes de IA, para gestores de marketing, com umas 1.500 palavras. Fontes: os dois links abaixo e o PDF anexo; não pesquise além delas."
 
-A web só é usada quando você pede, e só pelo Strategist. Os arquivos do job ficam em `runs/<job>/` (fora do git); a peça fica em `runs/<job>/drafts/`.
+A web só é usada quando você pede, e só pelo Strategist. Com acesso a arquivos, o job fica em `runs/<job>/` (fora do git) e a peça em `runs/<job>/drafts/`; sem isso, tudo fica na conversa. Os parâmetros do Critic estão em [`CRITIC.md`](CRITIC.md).
 
-## Instalação (sempre num clone de execução)
+## Onde já rodou
+
+| Host | Modo | Estado |
+|---|---|---|
+| App Claude, sessão com subagentes | Portátil | Um job de teste passou na rodada 1, e o Critic reprovou uma versão ruim feita de propósito. O recomeço da rodada ainda não rodou |
+| Claude Code | Reforçado | Instalado e testado ao vivo no PR 3, antes da v1. Nenhum job completo rodou |
+| Claude Work (Cowork), ChatGPT Work, Codex, Antigravity | Portátil | Não testados. A documentação de cada um indica suporte a subagentes |
+
+## Modo reforçado no Claude Code (opcional)
+
+Não é preciso instalar nada para usar o Studio. Este modo soma um hook que bloqueia caminhos e ferramentas por papel, o que dá uma separação imposta, não só combinada. Ele roda sempre num clone de execução, em qualquer pasta.
 
 O instalador grava um `.claude/settings.json` que bloqueia edição em `vendor/`, `compiled/`, `overlays/`, `agents/`, `catalog/`, `scripts/`, `.claude/` e outras pastas. Por isso o Studio roda num clone separado; o clone de desenvolvimento nunca recebe instalação.
 
@@ -55,7 +75,7 @@ O instalador cria os 3 subagentes (`studio-strategist`, `studio-writer`, `studio
 
 1. **Integração, não reescrita.** As skills upstream são a fonte de capacidade.
 2. **Ninguém avalia o próprio trabalho.** Strategist, Writer e Critic rodam como subagentes separados, com contexto isolado. O Critic é somente leitura e nunca vê os rascunhos do Writer.
-3. **Sem simulação.** Sem subagentes reais no host, o job fica `BLOCKED`.
+3. **Sem simulação.** Sem ferramenta de subagente no host, o job fica `BLOCKED`.
 4. **Aprovação é humana.** `critic-pass` torna o candidato elegível; publicar é do operador.
 5. **Fatos com fonte.** Cada afirmação factual vem do operador, do contexto do job ou das notas de pesquisa.
 
@@ -65,6 +85,7 @@ Este repositório é **público** e é um projeto pessoal do operador (ADR-14). 
 
 ## Decisões e licenças
 
-- `DECISIONS.md` é o registro canônico (ADR-01 a ADR-19). Mudanças entram por PR aprovado pelo operador; não há merge automático.
+- `DECISIONS.md` é o registro canônico (ADR-01 a ADR-20). Mudanças entram por PR aprovado pelo operador; não há merge automático.
 - O conteúdo próprio do Studio ainda não tem licença de uso definida (todos os direitos reservados ao autor). O material de terceiros está em `THIRD_PARTY_NOTICES.md`.
 - `MAP.md` descreve a estrutura do repositório.
+- `AGENTS.md` é gerado: edite `agents/` ou `catalog/` e rode `python scripts/build_agents.py`.

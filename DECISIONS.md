@@ -193,13 +193,15 @@ Os demais saíram do plano ou ficam para o job real do operador (ADR-19).
 
 ## ADR-12 — Claude Code como primeiro host, não o único
 
+*Em parte substituído por ADR-20.*
+
 - **Contexto:** o chat do claude.ai não oferece ferramenta de subagente. O Claude Code oferece subagentes com contexto próprio e modelo por subagente. O operador quer controlar gasto e executar em ambiente com separação real de papéis.
 - **Decisão:**
   - O Claude Code é o primeiro host de execução.
   - A sessão principal é o orquestrador, com o modelo mais forte escolhido pelo operador.
   - Strategist, Writer, Critic, Reviewer (e Researcher, no PR 9) são subagentes nomeados, com modelos econômicos definidos em `hosts/claude-code/host.yaml`: Sonnet inicialmente e Haiku onde a medição justificar.
-  - O claude.ai e o ChatGPT ficam para planejamento, revisão e debate.
-  - O MVP usa apenas modelos Claude. Outros fornecedores dependem de um runtime fino, que exige ADR próprio (POSTERIOR).
+  - O claude.ai e o ChatGPT ficam para planejamento, revisão e debate. *(Substituído por ADR-20: qualquer host com subagentes pode rodar o Studio.)*
+  - O MVP usa apenas modelos Claude. Outros fornecedores dependem de um runtime fino, que exige ADR próprio (POSTERIOR). *(Substituído por ADR-20: não há runtime; o `AGENTS.md` é a entrada em qualquer LLM.)*
 - **Consequências:** tudo que é específico do host fica em `hosts/claude-code/`. Os prompts de papel em `agents/` são neutros em relação ao host.
 - **Estado:** Aceito
 - **Data:** 2026-11-02
@@ -308,6 +310,8 @@ Os demais saíram do plano ou ficam para o job real do operador (ADR-19).
 
 ## ADR-18 — Enforcement de permissões no host, em três camadas
 
+*Vale para o modo reforçado no Claude Code. Deixou de ser requisito para rodar um job (ADR-20).*
+
 - **Contexto:** `tools: Write` não restringe caminho. A documentação do Claude Code indica que hooks recebem `agent_id` e `agent_type` dentro de subagentes, e que uma negação por hook PreToolUse prevalece sobre o modo de permissão. Um relato de bug em versão anterior indicou que hooks da sessão pai não disparavam em chamadas de subagentes, então a eficácia precisa ser demonstrada na versão instalada.
 - **Decisão:**
   1. **Allowlist de ferramentas por papel:**
@@ -380,11 +384,29 @@ Os demais saíram do plano ou ficam para o job real do operador (ADR-19).
 - **Estado:** Aceito
 - **Data:** 2026-11-02
 
+## ADR-20 — Portabilidade: `AGENTS.md` como entrada em qualquer LLM
+
+- **Contexto:** o operador queria abrir o repositório em qualquer LLM com subagentes, como já faz com o X Content Brain. O ADR-12 e o ADR-18 levaram a outro produto: instalação obrigatória e execução só no Claude Code. O Brain mostra que clean context e regra escrita bastam para rodar sem instalar nada.
+- **Decisão (do operador):**
+  - **a) Arquivo central.** `AGENTS.md`, na raiz, tem boot, roteamento, loop e o contrato de cada papel. É lido uma vez por sessão. É gerado por `scripts/build_agents.py` a partir de `agents/` e `catalog/`, que continuam canônicos.
+  - **b) Qualquer host com subagentes.** O requisito é a capacidade, não o produto. Sem ferramenta de subagente, o job segue `BLOCKED` e nunca é simulado.
+  - **c) Dois modos.** No modo portátil, a separação vem de contextos limpos e de o orquestrador entregar a cada papel só o seu material. No modo reforçado, o guard do Claude Code (ADR-18) soma o bloqueio por caminho. O modo reforçado é opcional.
+  - **d) Sem shell ou sem arquivos.** O roteamento usa as tabelas do `AGENTS.md`, geradas do mesmo catálogo, e o registro do job fica em blocos rotulados na conversa.
+  - **e) Loop.** Continua o do ADR-19: Strategist → Writer → Critic, recomeçando a cada reprovação, até 3 rodadas. O "melhor candidato" passa a ser uma contagem: menos gates em `FAIL` ou `UNVERIFIED` e, no empate, a rodada mais recente.
+  - **f) Critic explícito.** Os critérios de `quality` saem de "os critérios das skills" para uma lista em `agents/critic.md`, explicada em `CRITIC.md`. O status `N/A` passa a existir para `voice` sem instrução e para `fidelity` fora de `strict-source`.
+- **Consequências:**
+  - O mesmo critério do modo portátil vale para o Brain: nada impede tecnicamente um subagente de ler um arquivo que não recebeu.
+  - Sem shell, o roteamento depende de o modelo aplicar as tabelas, inclusive a regra Yann × X → Brain.
+  - O registro de handoff do ADR-04 (`brain_ref`) não está implementado: o Studio só encaminha o operador para uma sessão do Brain.
+  - Cada host ainda precisa de um job real para contar como testado.
+- **Estado:** Aceito
+- **Data:** 2026-11-02
+
 ---
 
 ## Verificações pendentes
 
-São verificações de implementação, não decisões. Até agora foram executadas a V-10, só para o Corey (PR 1), e, no PR 3, a V-01, a V-02, a V-03 e a V-05, além da V-04 em parte. As demais estão pendentes.
+São verificações de implementação, não decisões. Até agora foram executadas a V-10 e, no PR 3, a V-01, a V-02, a V-03 e a V-05, além da V-04 em parte. A V-06 e a V-09 ficaram sem objeto com o ADR-19, que tirou os orçamentos. As demais estão pendentes. Os PRs citados na coluna "Onde" são do plano do ADR-15, substituído pelo ADR-19.
 
 | ID | Verificação | Onde | ADR |
 |---|---|---|---|
@@ -393,9 +415,9 @@ São verificações de implementação, não decisões. Até agora foram executa
 | V-03 | Sem a ferramenta `Agent`, nenhum subagente consegue criar outro; profundidade 1 efetiva. **Confirmada (PR 3):** o writer foi instruído a lançar um subagente e não tinha a ferramenta; só os 2 subagentes lançados pelo orquestrador iniciaram | PR 3 · T-RO, T-DEPTH | 18 |
 | V-04 | A skill é descoberta em `.claude/skills/marketing-content-studio/` e nenhum `SKILL.md` de `vendor/` ou `compiled/` aparece no host. **Parcial (PR 3):** nenhuma das 9 skills do Corey aparece no host. A skill do Studio é instalada na v1 (`tests/test_install.py`), e a descoberta no host fica para o primeiro job real do operador (ADR-19) | PR 3 · v1 · T-INSTALL | 03 |
 | V-05 | O guard resiste a caminhos relativos, `../`, symlinks e caminhos absolutos fora do escopo. **Confirmada (PR 3):** `tests/test_guard.py` passou no Windows (junction, `\\?\`, ADS, maiúsculas) e no Linux via WSL (symlink de arquivo e de diretório) | PR 3 · T-PATH | 18 |
-| V-06 | O teto nativo em dólar (`--max-budget-usd`) vale para a forma de cobrança do operador; se não valer, o orçamento fica só nos contadores do Studio | PR 5 | 10 |
-| V-07 | Experimento A/B do handoff ao Brain, pelos três critérios do ADR-04 | PR 7 | 04 |
-| V-08 | Baseline de falso PASS e falso FAIL do Critic por modalidade | PR 8 · T15 | 09 |
-| V-09 | Valores iniciais de orçamento do ADR-10 confirmados ou ajustados com 10 jobs reais por perfil | PR 8 | 10 |
-| V-10 | Commits previstos (`88c79f6` no Corey, `12c304f` na ByteDance) reconfirmados ou atualizados no momento da importação. Corey: `88c79f6` confirmado no PR 1 | PR 1 · PR 9 | 02 |
-| V-11 | Local do material não público de marcas (perfil Zazmic, versões rejeitadas) fora do git, sem prejudicar os testes | PR 8 | 14 |
+| V-06 | **Sem objeto (ADR-19):** não há orçamento no runtime; só `max_rounds` limita o custo. ~~O teto nativo em dólar (`--max-budget-usd`) vale para a forma de cobrança do operador~~ | — | 10 |
+| V-07 | Experimento A/B do handoff ao Brain, pelos três critérios do ADR-04. Hoje o Studio só encaminha o operador para uma sessão do Brain (ADR-20) | sem PR | 04 |
+| V-08 | Baseline de falso PASS e falso FAIL do Critic por modalidade. Depende de exemplos avaliados pelo operador, e o golden dataset saiu da v1 | sem PR | 09 |
+| V-09 | **Sem objeto (ADR-19):** os orçamentos do ADR-10 saíram. ~~Valores iniciais de orçamento confirmados com 10 jobs reais por perfil~~ | — | 10 |
+| V-10 | Commits previstos (`88c79f6` no Corey, `12c304f` na ByteDance) reconfirmados ou atualizados no momento da importação. Corey: `88c79f6` confirmado no PR 1. ByteDance: `12c304f` registrado no lock na v1 | PR 1 · v1 | 02 |
+| V-11 | Local do material não público de marcas (perfil Zazmic, versões rejeitadas) fora do git, sem prejudicar os testes | sem PR | 14 |

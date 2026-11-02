@@ -1,6 +1,6 @@
 # MAP — Marketing Content Studio
 
-Mapa do repositório na v1 (ADR-19). Leia este arquivo antes de abrir qualquer outro: ele diz o que existe e para que serve.
+Mapa do repositório (ADR-20). Para rodar um job, leia só o `AGENTS.md`. Este mapa é para quem vai mudar o repositório.
 
 ## Legenda
 
@@ -15,19 +15,23 @@ Mapa do repositório na v1 (ADR-19). Leia este arquivo antes de abrir qualquer o
 
 ```text
 marketing-ai-studio/
+├── AGENTS.md                                                 gerado — arquivo central: boot, roteamento, loop e papéis; lido uma vez por sessão
+├── CLAUDE.md, GEMINI.md                                      canônico — apontam para o AGENTS.md
 ├── README.md, MAP.md, DECISIONS.md, THIRD_PARTY_NOTICES.md   canônico
+├── CRITIC.md                                                 canônico — parâmetros do Critic explicados ao operador
 ├── .gitignore, .gitattributes                                 canônico
 │
 ├── skills/marketing-content-studio/
 │   ├── SKILL.md                                canônico — única entrada; intake, roteamento, entrega
-│   └── references/compatibility.md             canônico — capacidades reais por host
+│   └── references/compatibility.md             canônico — capacidades exigidas e os dois modos
 │
 ├── catalog/                                                 canônico — sintaxe JSON (YAML válido), lido com json
 │   ├── routing.yaml                            dono por persona × marca × canal; intents com skills por papel, Strategist, pesquisa, fidelidade; max_rounds
 │   └── skills.yaml                             skill → compilado, papéis, se é carregável
 │
-├── agents/                                                  canônico — prompt de cada papel, neutro em relação ao host
-│   ├── orchestrator.md                         sessão principal: pasta do job, loop de rodadas, regras duras
+├── agents/                                                  canônico — prompt de cada papel, neutro em relação ao host; fonte do AGENTS.md
+│   ├── boot.md                                 início do AGENTS.md: boot, intake, entrega
+│   ├── orchestrator.md                         sessão principal: registro do job, loop de rodadas, regras duras
 │   ├── strategist.md                           abordagem e pesquisa (só quando pedida)
 │   ├── writer.md                               escreve em drafts/
 │   └── critic.md                               avalia brief, voz, qualidade, fatos e fidelidade
@@ -52,8 +56,9 @@ marketing-ai-studio/
 │
 ├── scripts/
 │   ├── vendor.py                               sync, verify, compile
+│   ├── build_agents.py                         gera o AGENTS.md; --check confere
 │   ├── route.py                                roteador determinístico (sem LLM)
-│   └── install_host.py                         instala agentes, skill de entrada e settings no clone de execução
+│   └── install_host.py                         modo reforçado: instala agentes, skill de entrada e settings no clone de execução
 │
 ├── tests/
 │   ├── test_*.py                               unitários (unittest, só biblioteca padrão)
@@ -91,14 +96,14 @@ Fora da v1 (ADR-19): `workflows/` (a intent no `routing.yaml` faz esse papel), `
 
 ## Clone de desenvolvimento e clone de execução
 
-O `settings.json` gerado nega edição em `vendor/`, `compiled/`, `overlays/`, `agents/`, `hosts/`, `scripts/`, `catalog/`, `.claude/` e outras pastas. Por isso:
+Isto só vale para o modo reforçado do Claude Code. O `settings.json` gerado nega edição em `vendor/`, `compiled/`, `overlays/`, `agents/`, `hosts/`, `scripts/`, `catalog/`, `.claude/` e outras pastas. Por isso:
 
 - **Clone de desenvolvimento** (ex.: `C:\dev\mas`): onde o código muda. Nunca recebe instalação.
 - **Clone de execução** (ex.: `C:\dev\studio-run`): só para rodar o Studio. Recebe `install_host.py --target` e é reinstalado depois de cada atualização.
 
 ## Fluxo de um job
 
-1. A skill de entrada faz o intake e roda `scripts/route.py`.
+1. O orquestrador lê o `AGENTS.md`, confere se há subagentes, faz o intake e roteia (`scripts/route.py` com shell; tabelas do `AGENTS.md` sem shell).
 2. `owner: brain` → handoff ao X Content Brain; `NEEDS_OPERATOR` ou `BLOCKED` → para e avisa o operador.
 3. `ROUTED` → o orquestrador roda até `max_rounds` rodadas de Strategist (quando a intent usa) → Writer → Critic, cada papel só com os compilados do seu papel.
 4. Entrega: o candidato com `critic-pass`, ou o melhor candidato marcado como não aprovado, com a evidência do Critic.
@@ -113,4 +118,5 @@ O `settings.json` gerado nega edição em `vendor/`, `compiled/`, `overlays/`, `
 | Instalador: agentes, skill, settings, fumaça, idempotência | `tests/test_install.py` |
 | Roteamento (T01) | `tests/test_route.py` |
 | Coerência do catálogo | `tests/test_catalog.py` |
+| `AGENTS.md` em sincronia com `agents/` e `catalog/` | `tests/test_agents_md.py` |
 | Host ao vivo: hook em subagente, isolamento, escopo (rodado no PR 3) | `tests/host/live_host_checks.py` |
