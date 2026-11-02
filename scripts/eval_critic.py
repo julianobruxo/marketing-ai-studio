@@ -6,6 +6,8 @@
   python scripts/eval_critic.py score --cases tests/critic/cases.json --verdicts <arquivo> [--labels <arquivo>]
       pontua os vereditos de forma determinística. Com --labels, mede também categoria,
       diagnóstico e severidade, a partir de um alinhamento adjudicado por caso.
+  python scripts/eval_critic.py score-doc --cases <private-cases> --verdicts <verdicts> --adjudications <adjudications>
+      avalia comentários individuais em documentos completos, sem inferir semântica por substring.
   python scripts/eval_critic.py compare --cases tests/critic/cases.json --before <a> --after <b>
       compara duas execuções sobre os mesmos casos.
 
@@ -14,6 +16,7 @@ O modelo gera os vereditos; a pontuação não usa modelo. Só biblioteca padrã
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import shutil
 import sys
@@ -27,11 +30,28 @@ def load(path) -> object:
     return json.loads(Path(path).read_text(encoding="utf-8"))
 
 
-def pack(cases: list, out: Path) -> None:
+# Explicitly allowed eval-pack fields. Never silently pass reviewer feedback to a Critic.
+# Real review files may contain source_comment, labels, suggestions or author names.
+PACK_FIELDS = ("id", "intent", "fidelity", "brief", "job_context", "inputs",
+               "candidate", "original", "context", "research_notes",
+               "previous_candidate", "keep")
+
+
+def pack(cases: list, out: Path, contract=None) -> None:
     out.mkdir(parents=True, exist_ok=True)
-    blind = [{k: v for k, v in case.items() if k not in ("expected", "test")} for case in cases]
+    ids = [case["id"] for case in cases]
+    if len(ids) != len(set(ids)):
+        raise ValueError("Duplicate case IDs")
+    blind = [{k: case[k] for k in PACK_FIELDS if k in case} for case in cases]
     (out / "cases.json").write_text(json.dumps(blind, ensure_ascii=False, indent=2), encoding="utf-8")
-    shutil.copy(REPO_ROOT / "agents/critic.md", out / "contract.md")
+    source = Path(contract) if contract else REPO_ROOT / "agents/critic.md"
+    shutil.copyfile(source, out / "contract.md")
+    manifest = {
+        "contract_sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
+        "case_ids": ids, "case_count": len(ids),
+        "blind_fields": list(PACK_FIELDS),
+    }
+    (out / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 def gates_of(verdict) -> list:
@@ -146,12 +166,82 @@ def line(result: dict) -> str:
     return text
 
 
+
+def score_document_case(case: dict, verdict, adjudication: dict) -> dict:
+    """Score one entire document against individually adjudicated human review issues.
+
+    No lexical matching is used to claim semantic alignment. A human or an
+    independently isolated judge must supply a one-to-one finding mapping.
+    """
+    issues = [x for x in case["expected"].get("issues", []) if x.get("kind", "problem") == "problem"]
+    ids = [x["id"] for x in issues]
+    if len(ids) != len(set(ids)):
+        raise ValueError("Duplicate reviewer issue IDs in " + case["id"])
+    matches = adjudication.get("matches", [])
+    by_id = {x["issue_id"]: x for x in matches}
+    if len(by_id) != len(matches) or set(by_id) != set(ids):
+        raise ValueError("Adjudication must cover each reviewer issue exactly once: " + case["id"])
+    predicted = findings(verdict) if verdict else []
+    used = set()
+    rows = []
+    for issue in issues:
+        m = by_id[issue["id"]]
+        index = m.get("finding_index")
+        if index is None:
+            if m.get("diagnosis") != "missed":
+                raise ValueError("Unmatched issue must be marked missed: " + issue["id"])
+            rows.append({"issue_id": issue["id"], "diagnosis": "missed",
+                         "category_ok": False, "severity_ok": False})
+            continue
+        if not isinstance(index, int) or isinstance(index, bool) or not 0 <= index < len(predicted):
+            raise ValueError("Invalid finding index for " + issue["id"])
+        if index in used:
+            raise ValueError("One finding cannot explain two reviewer issues without separate adjudication")
+        used.add(index)
+        diagnosis = m.get("diagnosis")
+        if diagnosis not in ("aligned", "partial", "different"):
+            raise ValueError("Match requires aligned, partial or different: " + issue["id"])
+        if not isinstance(m.get("category_ok"), bool) or not isinstance(m.get("severity_ok"), bool):
+            raise ValueError("Match requires adjudicated category_ok and severity_ok: " + issue["id"])
+        rows.append({"issue_id": issue["id"], "diagnosis": diagnosis,
+                     "category_ok": m["category_ok"], "severity_ok": m["severity_ok"]})
+    return {
+        "id": case["id"],
+        "expected_issues": len(rows),
+        "aligned": sum(x["diagnosis"] == "aligned" for x in rows),
+        "partial": sum(x["diagnosis"] == "partial" for x in rows),
+        "missed": sum(x["diagnosis"] == "missed" for x in rows),
+        "different": sum(x["diagnosis"] == "different" for x in rows),
+        "category_ok": sum(x["category_ok"] for x in rows),
+        "severity_ok": sum(x["severity_ok"] for x in rows),
+        "unmatched_findings": len(predicted) - len(used),
+        "predicted_findings": len(predicted),
+        "document_rejected": bool(verdict) and outcome(verdict) == "reject",
+    }
+
+
+def score_documents(cases: list, verdicts: dict, adjudications: dict) -> dict:
+    """Report document and issue metrics separately; no fabricated 'accuracy'."""
+    rows = []
+    for case in cases:
+        if case["id"] not in adjudications:
+            raise ValueError("Missing adjudication for document " + case["id"])
+        rows.append(score_document_case(case, verdicts.get(case["id"]), adjudications[case["id"]]))
+    keys = ("expected_issues", "aligned", "partial", "missed", "different",
+            "category_ok", "severity_ok", "unmatched_findings", "predicted_findings")
+    totals = {k: sum(r[k] for r in rows) for k in keys}
+    totals["documents"] = len(rows)
+    totals["documents_rejected"] = sum(r["document_rejected"] for r in rows)
+    return {"rows": rows, "totals": totals}
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     sub = parser.add_subparsers(dest="command", required=True)
     p = sub.add_parser("pack")
     p.add_argument("--cases", required=True)
     p.add_argument("--out", required=True)
+    p.add_argument("--contract", help="frozen Critic contract; defaults to agents/critic.md")
     s = sub.add_parser("score")
     s.add_argument("--cases", required=True)
     s.add_argument("--verdicts", required=True)
@@ -162,10 +252,14 @@ def main(argv=None) -> int:
     c.add_argument("--after", required=True)
     c.add_argument("--labels-before")
     c.add_argument("--labels-after")
+    d = sub.add_parser("score-doc", help="adjudicated full-document issue recall; private inputs stay local")
+    d.add_argument("--cases", required=True)
+    d.add_argument("--verdicts", required=True)
+    d.add_argument("--adjudications", required=True)
     args = parser.parse_args(argv)
     cases = load(args.cases)
     if args.command == "pack":
-        pack(cases, Path(args.out))
+        pack(cases, Path(args.out), contract=args.contract)
         print(f"OK: {len(cases)} caso(s) em {args.out}")
     elif args.command == "score":
         result = score(cases, load(args.verdicts), load(args.labels) if args.labels else None)
@@ -173,6 +267,14 @@ def main(argv=None) -> int:
             print(row)
         print(line(result))
         print("sem casos que exigem contexto: " + line(result["without_context_cases"]))
+    elif args.command == "score-doc":
+        result = score_documents(cases, load(args.verdicts), load(args.adjudications))
+        t = result["totals"]
+        print(f"documents {t['documents']} | rejected {t['documents_rejected']} | "
+              f"human issues {t['expected_issues']} | aligned {t['aligned']} | "
+              f"partial {t['partial']} | missed {t['missed']} | different {t['different']} | "
+              f"category {t['category_ok']} | severity {t['severity_ok']} | "
+              f"unmatched findings {t['unmatched_findings']}")
     else:
         before = score(cases, load(args.before), load(args.labels_before) if args.labels_before else None)
         after = score(cases, load(args.after), load(args.labels_after) if args.labels_after else None)
