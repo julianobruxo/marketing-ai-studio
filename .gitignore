@@ -12,6 +12,13 @@ runs/
 # Briefings e materiais de clientes (ADR-14)
 briefs/
 
+# Corpora reais de revisão e pacotes de avaliação privados (ADR-14)
+critic-corpus-private*.json
+**/critic-corpus-private*.json
+tests/critic/private/
+private-eval/
+*.review-corpus.json
+
 # Segredos e credenciais
 .env
 .env.*
