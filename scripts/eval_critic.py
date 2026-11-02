@@ -37,11 +37,46 @@ PACK_FIELDS = ("id", "intent", "fidelity", "brief", "job_context", "inputs",
                "previous_candidate", "keep", "selected_approach", "keep_exceptions")
 
 
+def validate_keep_exceptions(case: dict) -> None:
+    """Reject malformed preservation metadata before constructing a blind review packet."""
+    if "keep_exceptions" not in case:
+        return
+    records = case["keep_exceptions"]
+    if not isinstance(records, list):
+        raise ValueError("keep_exceptions must be a list: " + str(case.get("id")))
+    old_lines = case.get("keep", [])
+    if not isinstance(old_lines, list) or any(not isinstance(line, str) for line in old_lines):
+        raise ValueError("keep must be a list of lines: " + str(case.get("id")))
+    seen = set()
+    for item in records:
+        if not isinstance(item, dict):
+            raise ValueError("keep_exceptions entries must be objects")
+        line = item.get("original_line")
+        if not isinstance(line, str) or not line.strip() or line not in old_lines:
+            raise ValueError("Exception must identify an exact prior keep line")
+        if line in seen:
+            raise ValueError("Duplicate keep_exceptions line")
+        seen.add(line)
+        if item.get("action") not in ("removed", "rewritten"):
+            raise ValueError("Invalid keep exception action")
+        if item.get("reason") not in ("factual", "blocking", "approach"):
+            raise ValueError("Invalid keep exception reason")
+        explanation = item.get("explanation")
+        if not isinstance(explanation, str) or not explanation.strip():
+            raise ValueError("Keep exception must explain the change")
+    if any(item["reason"] == "approach" for item in records):
+        approach = case.get("selected_approach")
+        if not isinstance(approach, str) or not approach.strip():
+            raise ValueError("Approach exceptions require the selected approach summary")
+
+
 def pack(cases: list, out: Path, contract=None) -> None:
     out.mkdir(parents=True, exist_ok=True)
     ids = [case["id"] for case in cases]
     if len(ids) != len(set(ids)):
         raise ValueError("Duplicate case IDs")
+    for case in cases:
+        validate_keep_exceptions(case)
     blind = [{k: case[k] for k in PACK_FIELDS if k in case} for case in cases]
     (out / "cases.json").write_text(json.dumps(blind, ensure_ascii=False, indent=2), encoding="utf-8")
     source = Path(contract) if contract else REPO_ROOT / "agents/critic.md"
