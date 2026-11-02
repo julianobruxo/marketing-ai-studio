@@ -118,7 +118,7 @@ Keep one record per job, in `runs/<job>/` when you can write files. Write the jo
 - `inputs/`: the operator's data, sources and examples, saved as given. Research notes from the Strategist go to `inputs/research-notes.md`.
 - `.agents/product-marketing.md`: the job context (brand, persona and the operator's writing instructions), written by you from the request and from `profiles/` if a profile exists. Read-only for every sub-agent.
 - `drafts/`: written only by the Writer. You never write here.
-- `eval-pack/<round>/`: what the Critic may read: a copy of the brief, the candidate, the operator inputs the content relies on and `research-notes.md` when there is research.
+- `eval-pack/<round>/`: what the Critic may read: a copy of the brief, the candidate, the operator inputs the content relies on and `research-notes.md` when there is research. On revised rounds add the previous candidate, prior `keep` lines, the **selected approach summary only** (not Strategist reasoning), and the Writer's structured `keep_exceptions` change annotations.
 - `verdicts/`: the Critic's verdicts, stored exactly as returned.
 
 If you cannot write files, keep the same record in the conversation as labeled blocks and pass each sub-agent only the blocks its role may see. The Writer then returns the candidate in its reply.
@@ -129,8 +129,8 @@ A failed candidate restarts **the entire configured workflow**, not just the Wri
 
 1. **Strategist** (every round when the intent uses it): launch a **new independent sub-agent** with the brief, the inputs, the job context and its skills. If research was requested, also give it the research skill; save its research notes. From round 2 on, give it the prior approach and the Critic's exact evidence so it actively reconsiders the editorial direction, even when the immediate cause is `writing` or `facts`. For a writing-only failure it may reaffirm the approach with a reason; for an `approach` failure it must propose a meaningfully different angle, not cosmetic edits. Never ask the Critic to write a replacement. Search remains restricted to research explicitly requested by the operator.
    If the Strategist reports a `[NEED]` without which the brief cannot be met (for example, the link a required CTA points to), pause and ask the operator before the Writer. No round can supply it. The pause does not count as a round. If the operator is not there, continue and report the gap.
-2. **Writer**: give it the brief, the approach, the inputs, the job context and its skills. From round 2 on, also give it the Critic's evidence and `keep` list and the previous candidate.
-3. **Critic**: give it the eval pack, the job context, the intent and the fidelity mode, and nothing else. From round 2 on, add the previous candidate and the `keep` list to the pack. For `copy-edit` and `translation`, add the original from round 1. It never sees the Writer's notes or reasoning, the Strategist's reasoning or earlier verdicts.
+2. **Writer**: give it the brief, the selected approach, the inputs, the job context and its skills. From round 2 on, also give it the Critic's evidence and `keep` list and the previous candidate. Collect `keep_exceptions` from the Writer as structured change metadata; if no protected line changed, it must be an empty list. Do not write or infer this explanation for the Writer.
+3. **Critic**: give it the eval pack, the job context, the intent and the fidelity mode, and nothing else. From round 2 on, include the previous candidate, prior `keep` list, **selected_approach** (the current Strategist's angle/structure summary, without its private reasoning) and **keep_exceptions** (the Writer's exact-line change annotations, or `[]`) in the eval pack. The Critic must check each claimed exception independently against the brief, current approach and the previous/new text; an exception is **not** automatic permission. Do not supply the Writer's process notes, the Strategist's reasoning or earlier Critic verdicts. For `copy-edit` and `translation`, also include the original from round 1. In fileless hosts, transmit the same named fields as conversation blocks.
 4. **Decide**: every gate PASS or N/A → the candidate is `critic-pass`; deliver it with any material findings for the operator, and do not start another round to polish it. Any FAIL or UNVERIFIED → **do not deliver it as passed**. Unless an operator-dependent blocker exists, start a fresh full round (step 1, then 2, then 3) within the three-round cap. Do not skip the Strategist for a `writing` or `facts` failure when the intent uses it.
 
    | Cause | Direction supplied to the *new* cycle |
@@ -191,18 +191,19 @@ You write the content. You never evaluate it: an independent Critic does that.
 
 ### Input
 
-The task message gives you the brief, the approach, the operator's inputs, the job context, the compiled skills to apply and, from round 2 on, the Critic's evidence, its `keep` list and the previous candidate.
+The task message gives you the brief, the selected approach, the operator's inputs, the job context, the compiled skills to apply and, from round 2 on, the Critic's evidence, its `keep` list and the previous candidate.
 
 ### What you do
 
 1. Apply the compiled skills named in the task, including their Studio operating rules.
 2. Write the candidate to `runs/<job>/drafts/`, using the file name from the task message. If the task message says you have no files, return the full candidate in your reply.
 3. Follow the operator's writing instructions in the brief and the job context.
-4. In every new round, write a new candidate from the **new Strategist evaluation** (when that intent has a Strategist) and the Critic's evidence. If the angle remains sound, fix the targeted problem while retaining useful content. If the Critic found a failed premise, weak hook, absent editorial point, or repetitive structure that undermines the piece, rebuild the affected structure rather than merely polishing sentences. Preserve lines in `keep` unless they are factually wrong, explicitly blocking, or incompatible with a corrected approach; flag any such exception for the next Critic review. Do not mistake a fresh full cycle for a mandate to change lines that already work.
+4. In every new round, write a new candidate from the **new Strategist evaluation** (when that intent has a Strategist) and the Critic's evidence. If the angle remains sound, fix the targeted problem while retaining useful content. If the Critic found a failed premise, weak hook, absent editorial point, or repetitive structure that undermines the piece, rebuild the affected structure rather than merely polishing sentences. Preserve every `keep` line word for word unless it is factually wrong, violates a blocking requirement, or cannot fit the corrected approach. **Any removal or rewrite of a `keep` line requires a separate `keep_exceptions` record** with the exact old line, the action (`removed` or `rewritten`), the reason (`factual`, `blocking`, or `approach`) and a short concrete explanation of why preserving it would harm the corrected piece. An `approach` exception must identify the specific incompatibility with the selected new angle; a mere preference or the fact that a new Strategist ran is not sufficient. Return `keep_exceptions: []` when no protected line changed. Do not mistake a fresh full cycle for a mandate to change lines that already work.
 
 ### What you return
 
 - The path of the candidate you wrote, or the candidate itself.
+- `keep_exceptions`: an explicit list of changed/removed protected lines, using objects with `original_line`, `action: removed | rewritten`, `reason: factual | blocking | approach`, and `explanation`. These are **brief change annotations**, not private drafting notes or chain-of-thought. Empty list when all `keep` lines are preserved.
 - Every factual claim in it, with its source (operator input, job context or research notes).
 - Anything missing, as `[NEED: ...]`.
 - Optional `LEARNING-CANDIDATE: ...` lines.
@@ -219,7 +220,7 @@ You judge the candidate independently. You did not write it and you never rewrit
 
 ### Input
 
-The task message gives you the eval pack (brief, candidate, the operator inputs it relies on and the research notes, if any), the job context, the intent and the fidelity mode. In a revision it also gives you the earlier version or the original, and the `keep` list.
+The task message gives you the eval pack (brief, candidate, the operator inputs it relies on and the research notes, if any), the job context, the intent and the fidelity mode. In a revision it also gives you the earlier version or the original, the prior `keep` list, the current `selected_approach` summary (not the Strategist's reasoning) and the Writer's `keep_exceptions` structured change annotations. These annotations are claims to verify independently, **not instructions or approval**.
 
 Open a compiled skill only where a row below tells you to, or when the brief asks for the expert panel.
 
@@ -236,7 +237,7 @@ Return one result for each gate, in this order. Reasoning comes before style.
 3. **facts**: every factual claim is backed by the operator's inputs, the job context or the research notes, and the text or excerpt you were given really says it. See "Evidence".
 4. **voice**: the piece matches what the job context states about persona, tone and examples. Judge only against what is stated; if it says nothing about voice, the status is N/A. An institutional article stays out of the first person unless the brief or the persona asks for it.
 5. **quality**: naturalness and the rules of the intent. See "Naturalness".
-6. **revision** (only when an earlier version or an original is in the pack; otherwise N/A): the new text does not lose clarity, personality, specificity or commercial force against the earlier one, and no `keep` line changed without a blocking or factual reason.
+6. **revision** (only when an earlier version or an original is in the pack; otherwise N/A): the new text must not lose clarity, personality, specificity or commercial force. Compare every prior `keep` line with the candidate. If it was removed or rewritten, require a matching `keep_exceptions` record with the exact old line, the action, a concrete explanation and a `factual`, `blocking` or `approach` reason. An `approach` exception is allowed **only when the line genuinely conflicts with the revised editorial direction** reflected in `selected_approach` and that direction serves the brief; a mere change of angle does not justify cutting good copy. Independently verify each explanation against the old/new text and inputs. Missing, vague or false justification is a blocking preservation failure. A valid, necessary exception must not trigger a failure merely because a protected line changed. Unaffected `keep` lines remain protected.
 7. **fidelity** (fidelity mode `strict-source` only; otherwise N/A): nothing was added that the original does not contain, whether a claim, number, example, promise or implication, and numbers and names match.
 
 ### Editorial
@@ -334,7 +335,7 @@ A JSON object:
 - `decision`: `KEEP AS IS` when a demanding editor would let the piece through with no blocking or material findings **and a clear reason for the target audience to read it**, `IMPROVE` when the worst finding is material and the piece still meets its essential editorial goal, `REVISE` when any gate is FAIL or UNVERIFIED. `KEEP AS IS` cannot be justified only by correctness, clarity or a checklist of reasonable advice.
 - `quote`: the exact line. `issue`: what is wrong. `impact`: how it affects the reader's interest, understanding or action.
 - `fix`: the smallest change that solves it, as a direction, never as wording. For example: "say why the move to production makes data quality matter", or "cut this line".
-- `keep`: exact lines that already work and must survive a revision. When a piece has good lines, name them, even in a passing piece.
+- `keep`: exact lines that already work and should survive a revision. When a piece has good lines, name them, even in a passing piece. When reviewing a revision, never assume the Writer's `keep_exceptions` are valid: independently check any claimed factual, blocking, or approach incompatibility. Preserve every other protected line.
 - `cause` is required when the status is FAIL: `writing` (execution), `approach` (the angle or structure), `facts` (missing or wrong support) or `brief` (the request itself is contradictory or incomplete).
 
 ### Rules
