@@ -41,6 +41,11 @@ def outcome(verdict) -> str:
     return "reject" if any(g.get("status") in BLOCKING for g in gates_of(verdict)) else "pass"
 
 
+def noticed(verdict) -> bool:
+    """O Critic apontou algo que importa, mesmo sem reprovar (achado material)."""
+    return outcome(verdict) == "reject" or (isinstance(verdict, dict) and verdict.get("decision") == "IMPROVE")
+
+
 def quotes(verdict) -> list:
     found = []
     for gate in gates_of(verdict):
@@ -58,6 +63,7 @@ def score_case(case: dict, verdict) -> dict:
     expected = case["expected"]
     result = {"id": case["id"], "expected": expected["verdict"], "got": outcome(verdict) if verdict else "missing"}
     result["verdict_ok"] = result["expected"] == result["got"]
+    result["noticed"] = bool(verdict) and noticed(verdict)
     if expected.get("target") and result["got"] == "reject":
         result["target_ok"] = hits(expected["target"], quotes(verdict))
     elif expected.get("target"):
@@ -80,6 +86,8 @@ def score(cases: list, verdicts: dict) -> dict:
         "verdict": count("verdict_ok"),
         "caught": {"ok": sum(1 for r in rejects if r["got"] == "reject"), "total": len(rejects)},
         "false_fail": {"bad": sum(1 for r in passes if r["got"] == "reject"), "total": len(passes)},
+        "noticed": {"ok": sum(1 for r in rejects if r["noticed"]), "total": len(rejects)},
+        "noticed_on_good": {"bad": sum(1 for r in passes if r["noticed"]), "total": len(passes)},
         "target": count("target_ok"),
         "keep": count("keep_ok"),
     }
@@ -90,6 +98,8 @@ def line(result: dict) -> str:
             f"pegou {result['caught']['ok']}/{result['caught']['total']} | "
             f"apontou o trecho certo {result['target']['ok']}/{result['target']['total']} | "
             f"falso FAIL {result['false_fail']['bad']}/{result['false_fail']['total']} | "
+            f"notou {result['noticed']['ok']}/{result['noticed']['total']} | "
+            f"apontou em texto bom {result['noticed_on_good']['bad']}/{result['noticed_on_good']['total']} | "
             f"keep {result['keep']['ok']}/{result['keep']['total']}")
 
 

@@ -61,6 +61,12 @@ class ScoreTest(unittest.TestCase):
         self.assertTrue(eval_critic.score_case(PASS, verdict)["keep_ok"])
         self.assertFalse(eval_critic.score_case(PASS, [gate("PASS")])["keep_ok"])
 
+    def test_material_finding_counts_as_noticed_but_not_as_reject(self):
+        verdict = {"decision": "IMPROVE", "gates": [gate("PASS")]}
+        self.assertEqual(eval_critic.outcome(verdict), "pass")
+        self.assertTrue(eval_critic.noticed(verdict))
+        self.assertFalse(eval_critic.noticed({"decision": "KEEP AS IS", "gates": [gate("PASS")]}))
+
     def test_summary_counts_false_fails_and_missing_verdicts(self):
         result = eval_critic.score([REJECT, PASS], {"B": [gate("FAIL", "x")]})
         self.assertEqual(result["caught"], {"ok": 0, "total": 1})

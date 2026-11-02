@@ -37,7 +37,9 @@ Primeiro ele identifica formato, público, canal e objetivo. Depois avalia sete 
 
 ## Limites conhecidos
 
+- **Ainda fica aquém de uma revisão humana.** Em casos reais novos, ele reprovou menos trechos do que a revisora criticou. Veja `tests/critic/results/README.md`.
 - **Calibração pequena.** A medição mostra direção, não uma taxa de erro. Há poucos exemplos positivos explícitos.
+- **Fatos em excesso.** Com dados de entrada escassos, ele pode marcar `UNVERIFIED` em vários trechos, o que consome rodadas.
 - **A voz é tão boa quanto o seu pedido.** Sem exemplos ou perfil, o Critic não sabe como a marca soa.
 - **Sinais escritos para inglês.** Em PT-BR, ele adapta a forma; não há uma lista própria em português.
 - **O Critic não abre a web.** Ele confere fatos pelo trecho citado e só compara o CTA com a página de destino se o conteúdo dela vier no pedido.
