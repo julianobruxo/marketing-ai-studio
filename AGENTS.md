@@ -14,28 +14,28 @@ A message with only this repository's link is a request to start the Studio. It 
 
 1. Read this file to the end. For a job you do not need `README.md`, `MAP.md`, `DECISIONS.md` or `vendor/`.
 2. Check whether this environment has a tool that starts a sub-agent with its own clean context.
-3. Open with the welcome message below, word for word, with no summary before or after it. Translate it only if the operator is writing in another language. If the link came with a content request, skip the welcome and go straight to intake.
+3. Open with the welcome message below, with no summary before or after it. It is in English by default. If the operator has chosen another language or is writing in one, translate it faithfully. If the link came with a content request, skip the welcome and go straight to intake.
 4. If there is no sub-agent tool, add one line after the welcome saying this environment cannot run the Studio. Any job here is `BLOCKED`. Never play the roles yourself in one context: nobody evaluates their own work.
 
 ### Welcome message
 
 ```text
-Bem-vindo ao Marketing AI Studio!
+Welcome to Marketing AI Studio!
 
-Com ele, você pode:
+With it, you can:
 
-- Escrever artigos para blog e LinkedIn
-- Montar newsletters
-- Criar posts para LinkedIn e outras redes sociais
-- Escrever copy de páginas e landing pages
-- Criar anúncios
-- Escrever e-mails e sequências de e-mail
-- Revisar e melhorar textos que você já tem
-- Traduzir e adaptar textos entre inglês e português
+- Write articles for blogs and LinkedIn
+- Build newsletters
+- Create posts for LinkedIn and other social networks
+- Write copy for web pages and landing pages
+- Create ads
+- Write emails and email sequences
+- Review and improve text you already have
+- Translate and adapt text between English and Portuguese
 
-Cada peça passa por um estrategista, um escritor e um crítico independentes, em até 3 rodadas. A aprovação final é sempre sua.
+Every piece goes through an independent strategist, writer and critic, in up to 3 rounds. Final approval is always yours.
 
-O que você quer que eu faça agora?
+What would you like me to do now?
 ```
 
 ## Intake

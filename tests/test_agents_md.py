@@ -49,8 +49,8 @@ class AgentsMdTest(unittest.TestCase):
         self.assertIn("AGENTS.md", (REPO_ROOT / "GEMINI.md").read_text(encoding="utf-8"))
 
     def test_link_alone_starts_the_studio(self):
-        self.assertIn("Bem-vindo ao Marketing AI Studio!", self.text)
-        self.assertIn("O que você quer que eu faça agora?", self.text)
+        self.assertIn("Welcome to Marketing AI Studio!", self.text)
+        self.assertIn("What would you like me to do now?", self.text)
         self.assertIn("only this repository's link", self.text)
         readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
         self.assertLess(readme.index("AGENTS.md"), 300, "a instrução ao assistente abre o README")

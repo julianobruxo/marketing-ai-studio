@@ -1,10 +1,10 @@
 # Marketing Content Studio
 
-> **Assistente: se você recebeu só o link deste repositório, isso é um pedido para iniciar o Studio, não para resumi-lo.** Leia agora o [`AGENTS.md`](AGENTS.md) (https://raw.githubusercontent.com/julianobruxo/marketing-ai-studio/main/AGENTS.md) e siga o boot: abra com a mensagem de boas-vindas que está lá, palavra por palavra, e aguarde o pedido.
+> **Assistente: se você recebeu só o link deste repositório, isso é um pedido para iniciar o Studio, não para resumi-lo.** Leia agora o [`AGENTS.md`](AGENTS.md) (https://raw.githubusercontent.com/julianobruxo/marketing-ai-studio/main/AGENTS.md) e siga o boot: abra com a mensagem de boas-vindas que está lá, em inglês ou no idioma do operador, e aguarde o pedido.
 
 ## Como começar
 
-Cole o link deste repositório em qualquer LLM com subagentes. Ele lê o `AGENTS.md`, abre com a mensagem de boas-vindas e pergunta o que você quer fazer. Se ele só resumir o repositório ou não conseguir abrir o link, envie esta mensagem:
+Cole o link deste repositório em qualquer LLM com subagentes. Ele lê o `AGENTS.md`, abre com a mensagem de boas-vindas, em inglês por padrão ou no idioma que você escolher, e pergunta o que você quer fazer. Se ele só resumir o repositório ou não conseguir abrir o link, envie esta mensagem:
 
 ```text
 Leia https://raw.githubusercontent.com/julianobruxo/marketing-ai-studio/main/AGENTS.md e siga.
