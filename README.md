@@ -36,7 +36,7 @@ Não é uma biblioteca nova de copywriting, nem um fork das skills upstream (ela
 ## Como usar
 
 1. Cole o link do repositório. Se o agente não tiver subagentes, ele avisa e o job fica `BLOCKED`.
-2. Faça o pedido em linguagem natural. O orquestrador faz o intake, roteia e delega a Strategist, Writer e Critic. Se o Critic reprovar, nova rodada, até 3 no total. Ele protege o que já funciona, e o Strategist só muda a abordagem quando ela é o problema.
+2. Faça o pedido em linguagem natural. O orquestrador faz o intake e delega a Strategist, Writer e Critic. **O Critic é o gate de passagem, inclusive para relevância e interesse editorial:** se reprovar, a próxima rodada reinicia o fluxo completo configurado (novo Strategist, quando a intent o utiliza; novo Writer; novo Critic), até 3 rodadas. O Strategist reavalia a direção em toda reprovação e obrigatoriamente troca a abordagem quando o problema é estratégico. O Writer preserva os trechos bons, salvo correções necessárias.
 3. O Studio entrega a peça, diz se ela passou no Critic (`critic-pass`), mostra a evidência e as fontes e lista o que faltou (`[NEED: ...]`). Se não passar em 3 rodadas, entrega o melhor candidato marcado como não aprovado. Aprovar e publicar é sempre com você.
 
 Exemplos de pedido:
