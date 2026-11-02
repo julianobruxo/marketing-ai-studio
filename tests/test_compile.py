@@ -185,6 +185,23 @@ class CompileRepoTest(_TempRepo):
             self.assertIn("Copyright (c) 2025 Corey Haines. MIT License — see vendor/corey/LICENSE.", out)
             self.assertEqual(frontmatter(out), frontmatter(self.read(f"vendor/corey/skills/{s}/SKILL.md")), s)
 
+    def test_bytedance_compile_reproducible_with_copyright(self):
+        names = ("deep-research", "newsletter-generation")
+        committed = {n: (self.root / f"compiled/bytedance/{n}.md").read_bytes() for n in names}
+        for _ in range(2):
+            code, out = run("compile", "--root", self.root)
+            self.assertEqual(code, 0, out)
+            for n in names:
+                self.assertEqual((self.root / f"compiled/bytedance/{n}.md").read_bytes(), committed[n], n)
+        for n in names:
+            out = self.read(f"compiled/bytedance/{n}.md")
+            self.assertIn("commit: 12c304f12ce5c0bf66d8927386e5dd18ea84f685", out)
+            self.assertIn(f"upstream_path: skills/public/{n}/SKILL.md", out)
+            self.assertIn("Copyright (c) 2025 Bytedance Ltd. and/or its affiliates; "
+                          "Copyright (c) 2025-2026 DeerFlow Authors. MIT License — see vendor/bytedance/LICENSE.", out)
+            self.assertEqual(frontmatter(out),
+                             frontmatter(self.read(f"vendor/bytedance/skills/public/{n}/SKILL.md")), n)
+
     def test_copywriting_keeps_profound_attribution(self):
         upstream = self.read("vendor/corey/skills/copywriting/SKILL.md").split("\n")
         line = next(l for l in upstream if "adapted from Profound's `improved-copywriting`" in l)

@@ -1,6 +1,6 @@
 # THIRD_PARTY_NOTICES
 
-> **Estado (PR 2): o material do Corey Haines foi importado no PR 1, e 6 skills dele têm material derivado em `compiled/corey/` desde o PR 2. Nenhum arquivo da ByteDance foi importado ainda (previsto para o PR 9).** Este documento registra as fontes, suas licenças e as regras de atribuição.
+> **Estado (v1): o material do Corey Haines e da ByteDance DeerFlow está importado em `vendor/`, com material derivado em `compiled/corey/` (6 skills) e `compiled/bytedance/` (2 skills).** Este documento registra as fontes, suas licenças e as regras de atribuição.
 
 ## Fontes
 
@@ -31,9 +31,10 @@
 - **Repositório:** https://github.com/bytedance/deer-flow
 - **Skill principal:** https://github.com/bytedance/deer-flow/tree/main/skills/public/newsletter-generation
 - **Licença:** MIT
-- **Aviso de copyright do upstream:** `Copyright (c) 2025 Bytedance Ltd. and/or its affiliates`
-- **Commit previsto:** `12c304f` (reconfirmado no PR 9)
-- **Importação prevista (PR 9):** `skills/public/newsletter-generation/SKILL.md`, `skills/public/deep-research/SKILL.md` e `LICENSE`.
+- **Avisos de copyright do upstream:** `Copyright (c) 2025 Bytedance Ltd. and/or its affiliates` e `Copyright (c) 2025-2026 DeerFlow Authors`
+- **Commit importado:** `12c304f12ce5c0bf66d8927386e5dd18ea84f685` (o upstream não versiona as skills; a versão no lock é o SHA)
+- **Importado na v1 (3 arquivos, em `vendor/bytedance/`, no mesmo caminho do upstream):** `skills/public/newsletter-generation/SKILL.md`, `skills/public/deep-research/SKILL.md` e `LICENSE`. Os sha256 estão em `provenance/upstream-lock.json`.
+- **Material derivado:** `compiled/bytedance/newsletter-generation.md` e `compiled/bytedance/deep-research.md`, com o comentário de origem e os dois avisos de copyright: `Copyright (c) 2025 Bytedance Ltd. and/or its affiliates; Copyright (c) 2025-2026 DeerFlow Authors. MIT License — see vendor/bytedance/LICENSE.`
 - **Fora do escopo:** a plataforma DeerFlow (aplicação, backend e demais skills) não é importada.
 
 ### 3. X Content Brain — não é material de terceiros
@@ -46,9 +47,9 @@
 
 1. **Cópia literal (`vendor/<fonte>/`):** os arquivos ficam idênticos ao upstream, sem edição. O `LICENSE` original de cada fonte é copiado na íntegra para `vendor/<fonte>/LICENSE`.
 2. **Material derivado (`compiled/<fonte>/`):** cada arquivo compilado combina o texto upstream com overlays do Studio e traz um cabeçalho com repositório de origem, commit, versão da skill, hash do overlay, aviso de copyright do upstream e a indicação "MIT License — see `vendor/<fonte>/LICENSE`".
-3. **Rastreabilidade:** `provenance/upstream-lock.json` registra, por arquivo importado, origem, commit e sha256. Este documento é atualizado no PR 1 (Corey) e no PR 9 (ByteDance) com a lista efetiva do que foi importado.
+3. **Rastreabilidade:** `provenance/upstream-lock.json` registra, por arquivo importado, origem, commit e sha256. Este documento é atualizado a cada importação com a lista efetiva do que foi importado.
 4. **Sem remoção de avisos:** nenhum overlay ou compilação remove avisos de copyright, licença ou atribuição presentes no upstream.
 
 ## Texto da licença MIT
 
-A licença MIT de cada fonte é reproduzida integralmente, como publicada no upstream: `vendor/corey/LICENSE` (importada no PR 1) e `vendor/bytedance/LICENSE` (prevista para o PR 9).
+A licença MIT de cada fonte é reproduzida integralmente, como publicada no upstream: `vendor/corey/LICENSE` e `vendor/bytedance/LICENSE`.
