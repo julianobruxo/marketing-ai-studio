@@ -1,0 +1,65 @@
+{
+  "DOC-SYN-01": {
+    "decision": "REVISE",
+    "gates": [
+      {
+        "gate": "brief",
+        "status": "PASS",
+        "evidence": []
+      },
+      {
+        "gate": "editorial",
+        "status": "FAIL",
+        "evidence": [
+          {
+            "quote": "Those costs become a challenge.",
+            "severity": "blocking",
+            "criterion": "Reference",
+            "issue": "Unexplained costs"
+          },
+          {
+            "quote": "What Leaders Should Check Before Launch",
+            "severity": "blocking",
+            "criterion": "Promise",
+            "issue": "Heading not answered"
+          }
+        ]
+      },
+      {
+        "gate": "facts",
+        "status": "FAIL",
+        "evidence": [
+          {
+            "quote": "automation always reduces labor costs",
+            "severity": "blocking",
+            "criterion": "Evidence",
+            "issue": "Universal claim without support"
+          }
+        ]
+      }
+    ],
+    "keep": [
+      "The team launched a support assistant after a successful pilot."
+    ]
+  },
+  "DOC-SYN-02": {
+    "decision": "KEEP AS IS",
+    "gates": [
+      {
+        "gate": "brief",
+        "status": "PASS",
+        "evidence": []
+      },
+      {
+        "gate": "editorial",
+        "status": "PASS",
+        "evidence": []
+      },
+      {
+        "gate": "facts",
+        "status": "PASS",
+        "evidence": []
+      }
+    ]
+  }
+}

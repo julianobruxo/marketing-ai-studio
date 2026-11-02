@@ -1,0 +1,30 @@
+{
+  "DOC-SYN-01": {
+    "matches": [
+      {
+        "issue_id": "C01",
+        "finding_index": 0,
+        "diagnosis": "aligned",
+        "category_ok": true,
+        "severity_ok": true
+      },
+      {
+        "issue_id": "C02",
+        "finding_index": 2,
+        "diagnosis": "aligned",
+        "category_ok": true,
+        "severity_ok": true
+      },
+      {
+        "issue_id": "C03",
+        "finding_index": 1,
+        "diagnosis": "aligned",
+        "category_ok": true,
+        "severity_ok": true
+      }
+    ]
+  },
+  "DOC-SYN-02": {
+    "matches": []
+  }
+}
