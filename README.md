@@ -1,6 +1,6 @@
 # Marketing Content Studio
 
-> **Estado: pré-implementação (PR 2).** Este repositório contém documentação, decisões de arquitetura e as skills do Corey Haines em `vendor/corey/`, com lock e verificação de integridade. Seis delas estão compiladas com os overlays do Studio em `compiled/corey/` (`scripts/vendor.py`). Nenhuma funcionalidade de geração de conteúdo foi implementada. Os arquivos da ByteDance ainda não foram importados.
+> **Estado: pré-implementação (PR 3).** Este repositório contém documentação, decisões de arquitetura e as skills do Corey Haines em `vendor/corey/`, com lock e verificação de integridade. Seis delas estão compiladas com os overlays do Studio em `compiled/corey/` (`scripts/vendor.py`). Também traz os prompts dos papéis (`agents/`), o host Claude Code com o guard de permissões (`hosts/claude-code/`) e o instalador (`scripts/install_host.py`). Nenhuma funcionalidade de geração de conteúdo foi implementada. Os arquivos da ByteDance ainda não foram importados.
 
 ## O que é
 
@@ -48,8 +48,8 @@ Só existe no repositório o que está marcado como concluído ou em revisão; o
 |---|---|---|
 | 0 | Documentação e decisões | concluído |
 | 1 | Vendor do Corey, lock e verificação de integridade | concluído |
-| 2 | Overlays e compilação das skills roteadas do Corey | em revisão |
-| 3 | Agentes, configuração do host Claude Code, guard de permissões e instalador | planejado |
+| 2 | Overlays e compilação das skills roteadas do Corey | concluído |
+| 3 | Agentes, configuração do host Claude Code, guard de permissões e instalador | em revisão |
 | 4 | Skill de entrada, mapa e catálogo de roteamento | planejado |
 | 5 | Schemas, políticas de independência e loop editorial | planejado |
 | 6 | Workflows `strict-source` e `copy`, perfis de marca e persona, contexto por job | planejado |
@@ -64,7 +64,17 @@ O Studio só será declarado **funcional** ao fim do PR 9, quando reunir: Corey 
 
 O primeiro host é o **Claude Code**: a sessão principal faz o papel de orquestrador e os demais papéis rodam como subagentes nomeados. O Claude Code é o primeiro host, não o único; tudo que é específico dele fica em `hosts/claude-code/` (ADR-12). O chat do claude.ai e o ChatGPT servem para planejamento, revisão e debate, não para execução.
 
-**Instalação:** ainda não há nada a instalar. O instalador está previsto para o PR 3.
+**Instalação, sempre num clone de execução:** o instalador grava um `.claude/settings.json` que bloqueia edição em `vendor/`, `compiled/`, `overlays/`, `policies/`, `scripts/`, `.claude/` e outras pastas do Studio. Por isso o Studio roda num clone separado, só para execução. O clone de desenvolvimento nunca recebe instalação, ou o agente de código perderia a permissão de editar o repositório.
+
+```bash
+git clone https://github.com/julianobruxo/marketing-ai-studio.git C:\dev\studio-run
+```
+
+```bash
+python C:\dev\studio-run\scripts\install_host.py --host claude-code --target C:\dev\studio-run
+```
+
+O instalador cria os 4 subagentes (`studio-strategist`, `studio-writer`, `studio-critic`, `studio-reviewer`) e as configurações, e termina com um teste de fumaça do hook. A skill de entrada só existe a partir do PR 4. O hook guarda o caminho absoluto do Python usado na instalação, então reinstale depois de cada `git pull` ou troca de Python.
 
 ## Privacidade
 

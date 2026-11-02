@@ -2,7 +2,7 @@
 
 Mapa da estrutura aprovada no manifesto R4. Leia este arquivo antes de abrir qualquer outro. Ele diz o que existe, para que serve e em qual PR cada item entra.
 
-**Hoje (PR 2) existem apenas:** `README.md`, `MAP.md`, `DECISIONS.md`, `THIRD_PARTY_NOTICES.md`, `.gitignore`, `.gitattributes`, `vendor/corey/`, `provenance/upstream-lock.json`, `overlays/corey/` (`_common.md` e 6 overlays), `compiled/corey/` (6 compilados), `scripts/vendor.py` (`sync`, `verify` e `compile`) e `tests/` (`test_vendor.py`, `test_compile.py` e fixtures sintéticas). Todos os outros itens estão planejados.
+**Hoje (PR 2) existem apenas:** `README.md`, `MAP.md`, `DECISIONS.md`, `THIRD_PARTY_NOTICES.md`, `.gitignore`, `.gitattributes`, `vendor/corey/`, `provenance/upstream-lock.json`, `overlays/corey/` (`_common.md` e 6 overlays), `compiled/corey/` (6 compilados), `agents/` (5 prompts de papel), `hosts/claude-code/` (`host.yaml` e `guard.py`), `scripts/vendor.py` (`sync`, `verify` e `compile`), `scripts/install_host.py` e `tests/` (`test_vendor.py`, `test_compile.py`, `test_guard.py`, `test_install.py`, `host/live_host_checks.py` e fixtures sintéticas). Todos os outros itens estão planejados.
 
 ## Legenda
 
@@ -90,8 +90,8 @@ marketing-ai-studio/                                              [público · r
 │   └── researcher.md                           MVP · PR 9
 │
 ├── hosts/claude-code/
-│   ├── host.yaml                               MVP · PR 3   canônico — modelo, ferramentas, env e regras de caminho por papel
-│   └── guard.py                                MVP · PR 3   canônico — hook PreToolUse: caminho por papel + log de tentativas
+│   ├── host.yaml                               MVP · PR 3   canônico — modelo, ferramentas, env e regras de caminho por papel; sintaxe JSON (YAML válido), lido com json
+│   └── guard.py                                MVP · PR 3   canônico — hook PreToolUse fail-closed: caminho por papel + log de toda chamada
 │
 ├── policies/
 │   ├── independent-agents.md                   MVP · PR 5   canônico — inclui aprovação humana
@@ -116,6 +116,7 @@ marketing-ai-studio/                                              [público · r
 │
 ├── tests/
 │   ├── fixtures/                               MVP · PR 1 em diante — sintéticos, rotulados como tal
+│   ├── host/live_host_checks.py                MVP · PR 3   testes ao vivo do host (claude -p); fora do unittest discover; gasta tokens
 │   └── test_*.py                               MVP · PR 1 em diante
 │
 ├── examples/                                   POSTERIOR    nasce com o primeiro item operator-approved
@@ -128,12 +129,32 @@ marketing-ai-studio/                                              [público · r
 
 | Caminho | Produzido por | Observação |
 |---|---|---|
-| `.claude/skills/marketing-content-studio/` | `install_host.py` (PR 3) | cópia de `skills/marketing-content-studio/` |
+| `.claude/skills/marketing-content-studio/` | `install_host.py` (PR 4) | cópia de `skills/marketing-content-studio/` |
 | `.claude/agents/<papel>.md` | `install_host.py` (PR 3) | frontmatter de `host.yaml` + corpo de `agents/` |
-| `.claude/settings.json` | `install_host.py` (PR 3) | env, regras de permissão e hooks |
-| `runs/<job>/` | execução | drafts, eval-pack, vereditos, ledgers, tool-log, contexto de marca do job |
+| `.claude/settings.json` | `install_host.py` (PR 3) | env, `deny` de edição e hook PreToolUse do guard (Python e guard com caminho absoluto) |
+| `runs/.active` | orquestrador | id da tarefa ativa; o guard confina cada papel a essa tarefa |
+| `runs/tool-log.jsonl` | `guard.py` | toda chamada de ferramenta, com tarefa, papel, alvo, decisão e motivo; nunca gravável por ferramenta |
+| `runs/<job>/` | execução | layout abaixo |
+
+Layout de `runs/<job>/`:
+
+| Caminho | Quem grava | Quem lê |
+|---|---|---|
+| `brief.md` | orquestrador | todos os papéis, exceto Critic e Reviewer (que recebem a cópia no eval-pack) |
+| `inputs/` | orquestrador (material do operador) | Strategist, Writer |
+| `.agents/product-marketing.md` | orquestrador (contexto compilado do job) | todos os papéis, só leitura |
+| `drafts/` | só o Writer | Writer |
+| `eval-pack/<rodada>/` | orquestrador (brief, candidato, ledger, trechos de fonte) | Critic, Reviewer |
+| `verdicts/` | orquestrador (vereditos como retornados) | orquestrador |
 
 Tudo em `.claude/` precisa poder ser reconstruído a partir de um clone limpo (T-INSTALL). Se algum item não puder, ele passa a ser fonte canônica versionada.
+
+### Clone de desenvolvimento e clone de execução
+
+O `settings.json` gerado nega edição em `vendor/`, `compiled/`, `overlays/`, `agents/`, `hosts/`, `scripts/`, `.claude/` e outras pastas. Por isso:
+
+- **Clone de desenvolvimento** (ex.: `C:\dev\mas`): onde o agente de código trabalha nos PRs. Nunca recebe instalação.
+- **Clone de execução** (ex.: `C:\dev\studio-run`): só para rodar o Studio. Recebe `install_host.py --target` e é reinstalado depois de cada atualização.
 
 ### Itens removidos (não criar)
 
@@ -150,7 +171,13 @@ O conteúdo de cada um foi absorvido por outro arquivo da árvore, conforme a R4
 
 ## Testes de aceitação previstos
 
-**Implementados e executados: T14 (PR 1, `tests/test_vendor.py`) e T-COMPILE (PR 2, `tests/test_compile.py`).** Os demais testes da tabela estão planejados.
+**Implementados e executados:**
+- T14 (PR 1, `tests/test_vendor.py`);
+- T-COMPILE (PR 2, `tests/test_compile.py`);
+- T-PATH e a configuração do T-INSTALL (PR 3, `tests/test_guard.py` e `tests/test_install.py`);
+- os testes ao vivo do PR 3, com o relatório no PR: T-HOOK, T-WRITE, T-ISO-W, T-ISO-O, T-SCOPE, T-RO, T-DEPTH e T-INSTALL etapa 1 (`tests/host/live_host_checks.py`).
+
+Os demais testes da tabela estão planejados.
 
 | ID | O que verifica | PR |
 |---|---|---|
@@ -163,7 +190,9 @@ O conteúdo de cada um foi absorvido por outro arquivo da árvore, conforme a R4
 | T-SCOPE | Critic lê só o material autorizado; tentativas fora do escopo negadas e registradas | 3 |
 | T-RO | Critic e Reviewer sem ferramenta de escrita (prova estática + ausência de efeito) | 3 |
 | T-WRITE | Writer escreve em `drafts/`; permitido e registrado | 3 |
-| T-INSTALL | etapa 1: clone limpo → instalação → só a skill do Studio aparece no host | 3 |
+| T-DEPTH | Writer instruído a lançar subagente não consegue: ferramenta ausente e nenhum subagente extra iniciado | 3 |
+| T-INSTALL | etapa 1: clone limpo → instalação → agentes e configurações instalados; nenhuma skill do Corey aparece no host | 3 |
+| T-INSTALL | descoberta da skill do Studio no host (movida do PR 3; ADR-15) | 4 |
 | T-INSTALL | etapa 2: a skill executa um job de fixture e gera o run ledger | 6 |
 | T01 | roteamento por dono (Yann × X → Brain; Zazmic LinkedIn → Studio) | 4 |
 | T03 | autor e avaliador com o mesmo ID ou contexto → hard FAIL | 5 |

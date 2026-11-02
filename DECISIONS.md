@@ -9,7 +9,7 @@ Registro canônico das decisões de arquitetura. As decisões foram fechadas no 
 
 **Estados usados:** `Aceito` · `Aceito, com verificação pendente` (a decisão vale, mas um teste previsto pode exigir ajuste de implementação) · `Substituído`.
 
-**Este arquivo registra decisões, não o estado da implementação** (que fica no `README.md`). Dos testes citados, só o T14 (PR 1) e o T-COMPILE (PR 2) foram implementados e executados; os demais estão planejados.
+**Este arquivo registra decisões, não o estado da implementação** (que fica no `README.md`). Dos testes citados, foram implementados e executados o T14 (PR 1), o T-COMPILE (PR 2) e, no PR 3, o T-PATH, o T-HOOK, o T-WRITE, o T-ISO-W, o T-ISO-O, o T-SCOPE, o T-RO, o T-DEPTH e a etapa 1 do T-INSTALL. Os demais estão planejados.
 
 ---
 
@@ -249,6 +249,7 @@ Registro canônico das decisões de arquitetura. As decisões foram fechadas no 
   O Studio só é declarado funcional ao fim do PR 9, com Corey, ByteDance, handoff ao Brain, loop multiagente com avaliação independente e marcas/personas configuráveis.
 - **Consequências:**
   - O T-INSTALL tem duas etapas. No PR 3 cobre instalação e descoberta. A execução de um job de fixture só é possível a partir do PR 6, quando existem entrada, schemas e o primeiro workflow.
+  - **Ajuste (PR 3):** a skill de entrada só existe a partir do PR 4. Por isso a etapa 1 do T-INSTALL, no PR 3, confere a instalação dos agentes e das configurações, e que nenhuma skill do Corey aparece no host. A descoberta da skill do Studio passa para o PR 4.
   - Cada PR vira um prompt para o agente de código do operador e só é implementado depois da aprovação dele.
 - **Estado:** Aceito
 - **Data:** 2026-11-02
@@ -321,22 +322,43 @@ Registro canônico das decisões de arquitetura. As decisões foram fechadas no 
   - No T-ISO, os canários ficam só no contexto privado de cada agente. Se um canário aparecer em material compartilhado (briefing, candidato, eval-pack), o teste é inválido, não reprovado.
   - Se o hook não disparar dentro de subagentes na versão instalada, a implementação para no PR 3 até haver alternativa (sandbox ou outra forma de enforcement).
   - **Risco residual aceito:** o `Bash` da sessão principal é registrado no log, mas não é confinado por caminho.
-- **Estado:** Aceito, com verificação pendente (V-01, V-02, V-03, V-05)
+- **Implementação (PR 3):**
+  - **Hook:** cobre todas as ferramentas (`matcher: "*"`) e usa a forma exec do Claude Code: `command` é o caminho absoluto do Python da instalação, e `args` traz o caminho absoluto do guard. Sem shell, não há problema de aspas no Windows. Usa `onFailure: "block"` (Claude Code 2.1.295 ou superior) e timeout de 30 s. Assim, um guard que não inicia, quebra ou trava bloqueia a ferramenta, em vez de liberá-la.
+  - **Guard fail-closed:** a decisão sai sempre como JSON no formato documentado do PreToolUse (`hookSpecificOutput.permissionDecision`), em ASCII e com exit 0. O guard nunca depende do exit code para negar. Qualquer exceção, JSON inválido, ferramenta sem o campo de caminho esperado ou falha ao gravar o log de um subagente vira `deny`.
+  - **Papel:** sem `agent_type`, é o orquestrador. Um `agent_type` listado no `host.yaml` vira esse papel. Qualquer outro tem tudo negado.
+  - **Tarefa ativa:** o id fica em `runs/.active`, validado como nome simples. Sem tarefa ativa, subagentes têm tudo negado. O orquestrador segue o fluxo normal de permissões e só recebe `allow` para gravar `runs/.active`.
+  - **Caminhos:** antes de resolver, o guard rejeita NUL, os prefixos `\\?\` e `\\.\`, `:` fora da letra de unidade (alternate data streams) e qualquer componente `..`, inclusive codificado. Depois resolve a partir do `cwd` da chamada (ou `CLAUDE_PROJECT_DIR`), aplica `realpath` e exige que o alvo fique dentro da raiz do repositório. Nega se qualquer componente existente entre a raiz e o alvo for symlink ou junction. A comparação é por componente e com `normcase`, então `drafts` ≠ `drafts-evil`.
+  - **Regras:**
+    - escrita e leitura seguem as listas `write` e `read` do `host.yaml`, com `{job}` substituído, e `orchestrator_except` vale;
+    - `runs/tool-log.jsonl` nunca é gravável por ferramenta;
+    - `Agent`: o orquestrador só pode lançar os 4 `studio-*`, e subagente nunca lança;
+    - `Bash`, `Glob`, `Grep`, `WebFetch`, `WebSearch`, ferramentas MCP e desconhecidas: subagente tem negado; para o orquestrador, o guard não decide e só registra, e a chamada segue o fluxo normal de permissões;
+    - a exceção é a `SubagentHandback`, que entrega o relatório do subagente no modo auto e não toca arquivos: ela é liberada para subagentes.
+  - **`allow` só dentro do escopo:** o guard devolve `allow` só para operações de arquivo dentro do escopo do papel e para lançar `studio-*`. Um `allow` pula o pedido de permissão do Claude Code. Por isso, as ferramentas do orquestrador sem confinamento por caminho ficam sem decisão do guard, e não com `allow`.
+  - **Log:** toda chamada vai para um arquivo único, `runs/tool-log.jsonl`, conforme o `host.yaml`, com `ts`, `job`, `agent_id`, `agent_type`, papel, ferramenta, alvo (canônico ou bruto), decisão e motivo.
+  - **`deny_edit` ampliada:** `vendor/**`, `compiled/**`, `provenance/**`, `policies/**`, `profiles/**`, `overlays/**`, `agents/**`, `hosts/**`, `skills/**`, `scripts/**` e `.claude/**`, como regras `Edit(/…)` relativas à raiz do projeto.
+  - **`host.yaml` em sintaxe JSON:** é YAML válido e é lido com o módulo `json` da biblioteca padrão, sem dependência externa.
+  - **Clones separados:** a instalação vai só para um clone de execução (ex.: `C:\dev\studio-run`). O clone de desenvolvimento fica sem instalação, porque a `deny_edit` bloquearia a edição do repositório pelo agente de código.
+  - **Testes:**
+    - `tests/test_guard.py` cobre o T-PATH e as regras;
+    - `tests/test_install.py` cobre configuração, fumaça e idempotência do instalador;
+    - `tests/host/live_host_checks.py` roda o Claude Code em modo headless para os testes ao vivo e fica fora do `unittest discover`.
+- **Estado:** Aceito. V-01, V-02, V-03 e V-05 foram confirmadas no PR 3 com o Claude Code 2.1.303 (ver Verificações pendentes).
 - **Data:** 2026-11-02
 
 ---
 
 ## Verificações pendentes
 
-São verificações de implementação, não decisões. Até agora só a V-10 foi executada, e apenas para o Corey (PR 1); as demais estão pendentes.
+São verificações de implementação, não decisões. Até agora foram executadas a V-10, só para o Corey (PR 1), e, no PR 3, a V-01, a V-02, a V-03 e a V-05, além da V-04 em parte. As demais estão pendentes.
 
 | ID | Verificação | Onde | ADR |
 |---|---|---|---|
-| V-01 | Hooks PreToolUse disparam dentro de subagentes na versão instalada do Claude Code | PR 3 · T-HOOK | 18 |
-| V-02 | `CLAUDE_CODE_FORK_SUBAGENT=0` elimina fork; subagentes não veem o histórico do orquestrador | PR 3 · T-ISO-O | 18 |
-| V-03 | Sem a ferramenta `Agent`, nenhum subagente consegue criar outro; profundidade 1 efetiva | PR 3 · T-RO | 18 |
-| V-04 | A skill é descoberta em `.claude/skills/marketing-content-studio/` e nenhum `SKILL.md` de `vendor/` ou `compiled/` aparece no host | PR 3 · T-INSTALL | 03 |
-| V-05 | O guard resiste a caminhos relativos, `../`, symlinks e caminhos absolutos fora do escopo | PR 3 · T-PATH | 18 |
+| V-01 | Hooks PreToolUse disparam dentro de subagentes na versão instalada do Claude Code. **Confirmada (PR 3, Claude Code 2.1.303):** o tool-log tem as chamadas do `studio-writer` e do `studio-critic` com o `agent_id` de cada um | PR 3 · T-HOOK | 18 |
+| V-02 | `CLAUDE_CODE_FORK_SUBAGENT=0` elimina fork; subagentes não veem o histórico do orquestrador. **Confirmada (PR 3):** o canário da sessão principal não aparece nas respostas nem nas transcrições dos subagentes, e não estava em nenhum payload | PR 3 · T-ISO-O | 18 |
+| V-03 | Sem a ferramenta `Agent`, nenhum subagente consegue criar outro; profundidade 1 efetiva. **Confirmada (PR 3):** o writer foi instruído a lançar um subagente e não tinha a ferramenta; só os 2 subagentes lançados pelo orquestrador iniciaram | PR 3 · T-RO, T-DEPTH | 18 |
+| V-04 | A skill é descoberta em `.claude/skills/marketing-content-studio/` e nenhum `SKILL.md` de `vendor/` ou `compiled/` aparece no host. **Parcial (PR 3):** nenhuma das 9 skills do Corey aparece no host. A descoberta da skill do Studio fica para o PR 4 (ADR-15) | PR 3 · PR 4 · T-INSTALL | 03 |
+| V-05 | O guard resiste a caminhos relativos, `../`, symlinks e caminhos absolutos fora do escopo. **Confirmada (PR 3):** `tests/test_guard.py` passou no Windows (junction, `\\?\`, ADS, maiúsculas) e no Linux via WSL (symlink de arquivo e de diretório) | PR 3 · T-PATH | 18 |
 | V-06 | O teto nativo em dólar (`--max-budget-usd`) vale para a forma de cobrança do operador; se não valer, o orçamento fica só nos contadores do Studio | PR 5 | 10 |
 | V-07 | Experimento A/B do handoff ao Brain, pelos três critérios do ADR-04 | PR 7 | 04 |
 | V-08 | Baseline de falso PASS e falso FAIL do Critic por modalidade | PR 8 · T15 | 09 |

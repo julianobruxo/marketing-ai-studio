@@ -1,0 +1,64 @@
+{
+  "_format": "JSON, que também é YAML válido; lido com o módulo json da biblioteca padrão.",
+  "host": "claude-code",
+  "orchestrator": {
+    "body": "agents/orchestrator.md",
+    "model": "chosen by the operator for the main session",
+    "installed_as": "not a subagent; loaded by the Studio entry skill (PR 4)"
+  },
+  "subagents": {
+    "studio-strategist": {
+      "body": "agents/strategist.md",
+      "model": "sonnet",
+      "tools": ["Read"],
+      "description": "Marketing Content Studio strategist. Use only when the Studio orchestrator invokes it by name for a job."
+    },
+    "studio-writer": {
+      "body": "agents/writer.md",
+      "model": "sonnet",
+      "tools": ["Read", "Write"],
+      "description": "Marketing Content Studio writer. Use only when the Studio orchestrator invokes it by name for a job."
+    },
+    "studio-critic": {
+      "body": "agents/critic.md",
+      "model": "sonnet",
+      "tools": ["Read"],
+      "description": "Marketing Content Studio critic. Use only when the Studio orchestrator invokes it by name for a job."
+    },
+    "studio-reviewer": {
+      "body": "agents/reviewer.md",
+      "model": "sonnet",
+      "tools": ["Read"],
+      "description": "Marketing Content Studio reviewer. Use only when the Studio orchestrator invokes it by name for a job."
+    }
+  },
+  "env": {
+    "CLAUDE_CODE_FORK_SUBAGENT": "0",
+    "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"
+  },
+  "deny_edit": [
+    "vendor/**", "compiled/**", "provenance/**", "policies/**", "profiles/**",
+    "overlays/**", "agents/**", "hosts/**", "skills/**", "scripts/**", ".claude/**"
+  ],
+  "active_job_file": "runs/.active",
+  "tool_log": "runs/tool-log.jsonl",
+  "write": {
+    "orchestrator": ["runs/.active", "runs/{job}/**"],
+    "orchestrator_except": ["runs/{job}/drafts/**", "runs/tool-log.jsonl"],
+    "studio-writer": ["runs/{job}/drafts/**"],
+    "studio-strategist": [],
+    "studio-critic": [],
+    "studio-reviewer": []
+  },
+  "read": {
+    "orchestrator": ["**"],
+    "studio-strategist": ["runs/{job}/brief.md", "runs/{job}/inputs/**", "runs/{job}/.agents/**", "compiled/**", "vendor/*/skills/**"],
+    "studio-writer": ["runs/{job}/brief.md", "runs/{job}/inputs/**", "runs/{job}/.agents/**", "runs/{job}/drafts/**", "compiled/**", "vendor/*/skills/**"],
+    "studio-critic": ["runs/{job}/eval-pack/**", "runs/{job}/.agents/**", "compiled/**", "vendor/*/skills/**"],
+    "studio-reviewer": ["runs/{job}/eval-pack/**", "runs/{job}/.agents/**", "compiled/**", "vendor/*/skills/**"]
+  },
+  "other_tools": {
+    "orchestrator": "allow and log (Bash is logged but not confined by path; ADR-18 residual risk)",
+    "subagents": "deny anything not in their tools list"
+  }
+}
