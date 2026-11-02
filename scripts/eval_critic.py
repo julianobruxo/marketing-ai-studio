@@ -34,7 +34,7 @@ def load(path) -> object:
 # Real review files may contain source_comment, labels, suggestions or author names.
 PACK_FIELDS = ("id", "intent", "fidelity", "brief", "job_context", "inputs",
                "candidate", "original", "context", "research_notes",
-               "previous_candidate", "keep")
+               "previous_candidate", "keep", "selected_approach", "keep_exceptions")
 
 
 def pack(cases: list, out: Path, contract=None) -> None:
