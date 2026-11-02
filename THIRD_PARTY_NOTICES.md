@@ -1,6 +1,6 @@
 # THIRD_PARTY_NOTICES
 
-> **Estado (PR 1): o material do Corey Haines foi importado no PR 1. Nenhum arquivo da ByteDance foi importado ainda (previsto para o PR 9).** Este documento registra as fontes, suas licenças e as regras de atribuição.
+> **Estado (PR 2): o material do Corey Haines foi importado no PR 1, e 6 skills dele têm material derivado em `compiled/corey/` desde o PR 2. Nenhum arquivo da ByteDance foi importado ainda (previsto para o PR 9).** Este documento registra as fontes, suas licenças e as regras de atribuição.
 
 ## Fontes
 
@@ -15,6 +15,14 @@
   - `skills/ads/references/meta-decision-system.md` e `skills/ads/references/abm-playbook.md` (dependências transitivas do `ad-creative`): 2 arquivos;
   - `LICENSE`: 1 arquivo.
   - A lista por arquivo, com sha256, está em `provenance/upstream-lock.json`.
+- **Material derivado (PR 2):** `compiled/corey/` tem 6 compilados (`product-marketing`, `copywriting`, `copy-editing`, `social`, `ad-creative` e `emails`). Cada um combina o `SKILL.md` upstream com os overlays do Studio e traz o comentário de origem com commit, versão, hashes e o aviso `Copyright (c) 2025 Corey Haines. MIT License — see vendor/corey/LICENSE.`
+- **Atribuição aninhada, já presente no upstream:** o material do Corey inclui trechos adaptados de skills publicadas sob MIT em [skills-marketing-library](https://github.com/retieedra-profound/skills-marketing-library):
+  - `improved-copywriting`, da Profound: em `skills/copywriting/SKILL.md` e `skills/copy-editing/references/checklist.md`, e citada também em `skills/copywriting/references/ai-tells.md`;
+  - `humanizer`, da Profound, e `writing`, da Wispr Flow: em `skills/copywriting/references/ai-tells.md`;
+  - `copy-editing`, da Wispr Flow: em `skills/copy-editing/references/checklist.md`;
+  - `brand-voice`, da Wispr Flow: em `skills/product-marketing/references/brand-voice.md`.
+
+  As linhas de crédito ficam sem alteração em `vendor/corey/`. A do `copywriting/SKILL.md` também está em `compiled/corey/copywriting.md`; nenhum overlay remove crédito.
 - **Fora do escopo:** a pasta `tools/` (CLIs e integrações de plataforma) não é importada.
 - **Observação:** a skill `marketing-council` simula conselheiros com base em obras publicadas de profissionais reais. A própria skill exige que essa saída seja rotulada como simulação, e o Studio mantém essa exigência.
 
@@ -37,7 +45,7 @@
 ## Regras de atribuição a partir da importação
 
 1. **Cópia literal (`vendor/<fonte>/`):** os arquivos ficam idênticos ao upstream, sem edição. O `LICENSE` original de cada fonte é copiado na íntegra para `vendor/<fonte>/LICENSE`.
-2. **Material derivado (`compiled/<fonte>/`):** cada arquivo compilado combina o texto upstream com overlays do Studio e traz um cabeçalho com repositório de origem, commit, versão da skill, hash do overlay, aviso de copyright do upstream e a indicação "Licença MIT — ver `vendor/<fonte>/LICENSE`".
+2. **Material derivado (`compiled/<fonte>/`):** cada arquivo compilado combina o texto upstream com overlays do Studio e traz um cabeçalho com repositório de origem, commit, versão da skill, hash do overlay, aviso de copyright do upstream e a indicação "MIT License — see `vendor/<fonte>/LICENSE`".
 3. **Rastreabilidade:** `provenance/upstream-lock.json` registra, por arquivo importado, origem, commit e sha256. Este documento é atualizado no PR 1 (Corey) e no PR 9 (ByteDance) com a lista efetiva do que foi importado.
 4. **Sem remoção de avisos:** nenhum overlay ou compilação remove avisos de copyright, licença ou atribuição presentes no upstream.
 

@@ -9,7 +9,7 @@ Registro canônico das decisões de arquitetura. As decisões foram fechadas no 
 
 **Estados usados:** `Aceito` · `Aceito, com verificação pendente` (a decisão vale, mas um teste previsto pode exigir ajuste de implementação) · `Substituído`.
 
-**Este arquivo registra decisões, não o estado da implementação** (que fica no `README.md`). Dos testes citados, só o T14 foi implementado e executado (PR 1); os demais estão planejados.
+**Este arquivo registra decisões, não o estado da implementação** (que fica no `README.md`). Dos testes citados, só o T14 (PR 1) e o T-COMPILE (PR 2) foram implementados e executados; os demais estão planejados.
 
 ---
 
@@ -279,6 +279,23 @@ Registro canônico das decisões de arquitetura. As decisões foram fechadas no 
   - O orquestrador carrega o compilado, nunca vendor e overlay lado a lado.
   - O compilado é **gerado e commitado** para revisão de diff, e nunca é editado à mão.
 - **Consequências:** a mesma regra vale para Corey (PR 2) e ByteDance (PR 9). Uma âncora removida upstream faz o `verify` falhar no PR de sync. Teste T-COMPILE.
+- **Implementação (PR 2):**
+  - **Sintaxe:** frontmatter com `overlay_for`, `source`, `upstream_version` e `host_mentions_sha256`. Cada operação é `<!-- op: NOME | ÂNCORA -->conteúdo<!-- /op -->`, e as operações são aplicadas na ordem do arquivo. Texto fora de operação é erro.
+  - **Âncora:** a linha de título exata, com o nível (ex.: `## Before Writing`), que precisa existir exatamente 1x. Títulos dentro de blocos de código não contam. Os blocos seguem a regra CommonMark de cercas, num helper único usado por títulos, links e verificação: abertura com até 3 espaços e 3 ou mais crases ou tis; fechamento com o mesmo caractere, comprimento maior ou igual ao da abertura e nada além de espaços depois; bloco sem fechamento vai até o fim do arquivo. A seção vai do título até o próximo título de nível igual ou superior.
+  - **Operações:**
+    - `acrescentar-após` insere o conteúdo no fim da seção;
+    - `substituir-seção` mantém a linha do título e troca o corpo, inclusive subseções;
+    - `desativar` troca título e seção por `> **[Studio]** Section "<título>" is disabled in this Studio: <motivo>`;
+    - `vincular-contexto` não tem âncora: troca um trecho literal (`<!-- trecho -->…<!-- /trecho -->`), que precisa ocorrer exatamente 1x, pelo snippet `context-binding`.
+
+    Nas três operações com âncora, linhas vazias e `---` no fim da seção ficam fora do corpo e são preservadas como separador.
+  - **Bloco comum:** `overlays/<fonte>/_common.md` define os snippets `operating-rules`, inserido logo após o H1 de cada compilado, e `context-binding`.
+  - **Links:** links markdown relativos fora de código são reescritos para apontar ao arquivo em `vendor/<fonte>/skills/<skill>/` a partir de `compiled/<fonte>/`, preservando a âncora `#`. Links http(s), mailto, só de âncora e absolutos ficam como estão.
+  - **Comentário de origem:** vem logo após o frontmatter upstream, que fica inalterado. Registra repo, commit, caminho e versão upstream, sha256 do overlay e do `_common.md`, e a linha de copyright e licença lida do `LICENSE` vendorizado. Não há timestamp: a mesma entrada gera os mesmos bytes (LF).
+  - **Idioma:** os overlays são escritos em inglês, porque são texto lido pelo modelo no meio do texto upstream, que é em inglês. A documentação humana continua em PT-BR.
+  - **Menções de host:** para cada skill com overlay, o `compile` conta 13 padrões (`.agents/`, `.claude/`, `outputs/`, `npx`, `MCP`, `web_fetch` e outros) no `SKILL.md` e nas references. O sha256 das linhas ordenadas `arquivo<TAB>padrão<TAB>contagem` fica em `host_mentions_sha256`. Um hash divergente faz `compile` e `verify` falharem, e só `compile --accept-mentions` grava o hash novo. Isso força revisão humana quando o upstream muda.
+  - **verify:** passa a falhar também por âncora ou trecho que não resolve, compilado diferente de um compile novo, compilado sem overlay ou overlay sem compilado, `upstream_version` diferente do lock, link de `compiled/` que não resolve e hash de menções divergente.
+  - **Skills sem overlay** (`content-strategy`, `sales-enablement`, `marketing-council`) não têm compilado e não são carregáveis.
 - **Estado:** Aceito
 - **Data:** 2026-11-02
 

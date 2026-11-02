@@ -1,0 +1,33 @@
+{
+  "lock_version": 1,
+  "sources": {
+    "fences": {
+      "commit": "2222222222222222222222222222222222222222",
+      "extra_files": {},
+      "license": {
+        "path": "vendor/fences/LICENSE",
+        "sha256": "22fad9ed15c66e5744bdea7227dd8e3ab513a7c8d407e1525c2c922b2bbae66e",
+        "upstream_path": "LICENSE"
+      },
+      "repo": "https://example.invalid/fences",
+      "retrieved_at": "2026-11-02",
+      "selection": {
+        "extra_files": [],
+        "skills": [
+          "demo"
+        ]
+      },
+      "skills": {
+        "demo": {
+          "files": {
+            "vendor/fences/skills/demo/SKILL.md": "3722f5d0813c76877f2ca63ac88e5c2e2417903705dd24b81c2cd08a67d454e4",
+            "vendor/fences/skills/demo/references/guide.md": "d2ee66d4206d6e3a9c21e100743aa4e92af8aa76d8723feb483481e9abbdc245"
+          },
+          "reason": "selecionada",
+          "upstream_path": "skills/demo",
+          "version": "1.0.0"
+        }
+      }
+    }
+  }
+}

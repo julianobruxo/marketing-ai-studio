@@ -1,6 +1,6 @@
 # Marketing Content Studio
 
-> **Estado: pré-implementação (PR 1).** Este repositório contém documentação, decisões de arquitetura e as skills do Corey Haines em `vendor/corey/`, com lock e verificação de integridade (`scripts/vendor.py`). Nenhuma funcionalidade de geração de conteúdo foi implementada. Os arquivos da ByteDance ainda não foram importados.
+> **Estado: pré-implementação (PR 2).** Este repositório contém documentação, decisões de arquitetura e as skills do Corey Haines em `vendor/corey/`, com lock e verificação de integridade. Seis delas estão compiladas com os overlays do Studio em `compiled/corey/` (`scripts/vendor.py`). Nenhuma funcionalidade de geração de conteúdo foi implementada. Os arquivos da ByteDance ainda não foram importados.
 
 ## O que é
 
@@ -47,8 +47,8 @@ Só existe no repositório o que está marcado como concluído ou em revisão; o
 | PR | Escopo | Estado |
 |---|---|---|
 | 0 | Documentação e decisões | concluído |
-| 1 | Vendor do Corey, lock e verificação de integridade | em revisão |
-| 2 | Overlays e compilação das skills roteadas do Corey | planejado |
+| 1 | Vendor do Corey, lock e verificação de integridade | concluído |
+| 2 | Overlays e compilação das skills roteadas do Corey | em revisão |
 | 3 | Agentes, configuração do host Claude Code, guard de permissões e instalador | planejado |
 | 4 | Skill de entrada, mapa e catálogo de roteamento | planejado |
 | 5 | Schemas, políticas de independência e loop editorial | planejado |
