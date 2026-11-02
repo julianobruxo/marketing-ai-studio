@@ -41,6 +41,9 @@ AGENT_TOOLS = {"Agent", "Task"}
 # Ferramenta interna que entrega o relatório do subagente ao orquestrador (modo auto).
 # Não lê nem grava arquivos; negá-la impediria o relatório de chegar.
 REPORT_TOOLS = {"SubagentHandback"}
+# Ferramentas que alcançam o sistema de arquivos sem passar pela checagem de caminho:
+# nunca liberadas para subagente, mesmo se listadas no host.yaml.
+FS_REACHING_TOOLS = {"Bash", "PowerShell", "Glob", "Grep"}
 JOB_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}")
 ORCHESTRATOR = "orchestrator"
 
@@ -201,6 +204,8 @@ def decide(event: dict, host: dict):
 
     if tool in REPORT_TOOLS and is_sub:
         return role, "allow", "entrega do relatório do subagente", None
+    if is_sub and tool in subagents[role].get("tools", []) and tool not in FS_REACHING_TOOLS:
+        return role, "allow", f"{tool} está na lista de ferramentas do papel", None
     if is_sub:
         return role, "deny", f"{tool} não é permitido a subagentes", None
     return role, "pass", "orquestrador: ferramenta sem confinamento por caminho (registrada)", None

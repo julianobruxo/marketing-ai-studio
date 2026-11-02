@@ -1,6 +1,42 @@
 {
   "lock_version": 1,
   "sources": {
+    "bytedance": {
+      "commit": "12c304f12ce5c0bf66d8927386e5dd18ea84f685",
+      "extra_files": {},
+      "license": {
+        "path": "vendor/bytedance/LICENSE",
+        "sha256": "b23dff4d4bac8d17b6efaaa7e88c2b730149c4dda45699ce676b719cfdffe7e1",
+        "upstream_path": "LICENSE"
+      },
+      "repo": "https://github.com/bytedance/deer-flow",
+      "retrieved_at": "2026-11-02",
+      "selection": {
+        "extra_files": [],
+        "skills": [
+          "deep-research",
+          "newsletter-generation"
+        ]
+      },
+      "skills": {
+        "deep-research": {
+          "files": {
+            "vendor/bytedance/skills/public/deep-research/SKILL.md": "04712f4daa7937cc1f8dabc1a086a9549e670eb3fa3f1a8d30abdc3ea8b31a79"
+          },
+          "reason": "selecionada",
+          "upstream_path": "skills/public/deep-research",
+          "version": "12c304f12ce5c0bf66d8927386e5dd18ea84f685"
+        },
+        "newsletter-generation": {
+          "files": {
+            "vendor/bytedance/skills/public/newsletter-generation/SKILL.md": "cc66adb99053a781d6b5ce65f5e698c62384b8793421d15067d880e7b32538dc"
+          },
+          "reason": "selecionada",
+          "upstream_path": "skills/public/newsletter-generation",
+          "version": "12c304f12ce5c0bf66d8927386e5dd18ea84f685"
+        }
+      }
+    },
     "corey": {
       "commit": "88c79f6528a9347420e57ceb1fff9a60de651768",
       "extra_files": {

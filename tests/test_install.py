@@ -34,7 +34,7 @@ class InstallTest(unittest.TestCase):
     def setUp(self):
         self._tmp = tempfile.TemporaryDirectory(prefix="install-test-")
         self.target = Path(self._tmp.name).resolve()
-        for name in ("agents", "hosts"):
+        for name in ("agents", "hosts", "skills"):
             shutil.copytree(REPO_ROOT / name, self.target / name, ignore=shutil.ignore_patterns("__pycache__"))
         (self.target / "README.md").write_text("# alvo\n", encoding="utf-8")
 
@@ -67,8 +67,9 @@ class InstallTest(unittest.TestCase):
 
     def test_tool_allowlists(self):
         self.installed()
-        for name in ("studio-strategist", "studio-critic", "studio-reviewer"):
-            self.assertEqual(self.agent(name)["tools"], "Read", name)
+        self.assertEqual(sorted(HOST["subagents"]), ["studio-critic", "studio-strategist", "studio-writer"])
+        self.assertEqual(self.agent("studio-critic")["tools"], "Read")
+        self.assertEqual(self.agent("studio-strategist")["tools"], "Read, WebSearch, WebFetch")
         self.assertEqual(self.agent("studio-writer")["tools"], "Read, Write")
         for name in HOST["subagents"]:
             tools = self.agent(name)["tools"].split(", ")
@@ -108,9 +109,27 @@ class InstallTest(unittest.TestCase):
         self.installed()
         self.assertEqual((self.target / "runs/.active").read_text(encoding="utf-8"), "job-real\n")
 
-    def test_no_entry_skill(self):
+    def test_entry_skill_copied_byte_for_byte(self):
         self.installed()
-        self.assertFalse((self.target / ".claude/skills").exists())
+        src = self.target / "skills/marketing-content-studio"
+        dst = self.target / ".claude/skills/marketing-content-studio"
+        files = sorted(p.relative_to(src) for p in src.rglob("*") if p.is_file())
+        self.assertIn(Path("SKILL.md"), files)
+        self.assertEqual(sorted(p.relative_to(dst) for p in dst.rglob("*") if p.is_file()), files)
+        for rel in files:
+            self.assertEqual((dst / rel).read_bytes(), (src / rel).read_bytes(), rel)
+        (dst / "sobra.md").write_text("velho\n", encoding="utf-8")
+        self.installed()
+        self.assertFalse((dst / "sobra.md").exists())
+
+    def test_old_reviewer_removed(self):
+        agents = self.target / ".claude/agents"
+        agents.mkdir(parents=True)
+        (agents / "studio-reviewer.md").write_text("---\nname: studio-reviewer\n---\n", encoding="utf-8")
+        (agents / "outro-agente.md").write_text("não é do Studio\n", encoding="utf-8")
+        self.installed()
+        self.assertFalse((agents / "studio-reviewer.md").exists())
+        self.assertTrue((agents / "outro-agente.md").exists())
 
     def test_target_required_and_must_be_studio_clone(self):
         proc = subprocess.run([sys.executable, str(INSTALLER), "--host", "claude-code"], capture_output=True)

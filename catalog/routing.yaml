@@ -1,0 +1,98 @@
+{
+  "_format": "JSON, que também é YAML válido; lido com o módulo json da biblioteca padrão.",
+  "version": 2,
+  "max_rounds": 3,
+  "aliases": {
+    "persona": {
+      "yann-kronberg": ["yann", "yann kronberg", "yann-kronberg"]
+    },
+    "brand": {
+      "zazmic": ["zazmic", "zazmic.ai", "zazmic inc", "zazmic brasil", "zazmic brazil"]
+    },
+    "channel": {
+      "x": ["x", "twitter", "x.com", "tweet"],
+      "linkedin": ["linkedin"],
+      "email": ["email", "e-mail"],
+      "web": ["web", "website", "site", "landing page", "blog"],
+      "ads": ["ads", "meta ads", "google ads", "linkedin ads"],
+      "newsletter": ["newsletter"]
+    }
+  },
+  "owner_rules": [
+    {
+      "id": "yann-on-x",
+      "match": {"persona": "yann-kronberg", "channel": "x"},
+      "owner": "brain",
+      "status": "ROUTED",
+      "reason": "ADR-04: conteúdo do Yann Kronberg no X é do X Content Brain"
+    },
+    {
+      "id": "zazmic-on-x",
+      "match": {"brand": "zazmic", "channel": "x"},
+      "owner": null,
+      "status": "NEEDS_OPERATOR",
+      "reason": "Zazmic no X: o operador precisa dizer se é a conta do Yann (Brain) ou conteúdo de marca (Studio)"
+    },
+    {
+      "id": "default",
+      "match": {},
+      "owner": "studio",
+      "status": "ROUTED",
+      "reason": "conteúdo do Studio"
+    }
+  ],
+  "intents": {
+    "translation": {
+      "fidelity": "strict-source",
+      "strategist": false,
+      "research_skill": null,
+      "skills": {"writer": [], "critic": ["corey/copy-editing"]}
+    },
+    "copy-edit": {
+      "fidelity": "grounded-creative",
+      "strategist": false,
+      "research_skill": null,
+      "skills": {"writer": ["corey/copy-editing"], "critic": ["corey/copy-editing"]}
+    },
+    "copy-page": {
+      "fidelity": "grounded-creative",
+      "strategist": true,
+      "research_skill": null,
+      "skills": {"strategist": ["corey/copywriting"], "writer": ["corey/copywriting"], "critic": ["corey/copywriting", "corey/copy-editing"]}
+    },
+    "social-post": {
+      "fidelity": "grounded-creative",
+      "strategist": true,
+      "research_skill": null,
+      "skills": {"strategist": ["corey/social"], "writer": ["corey/social", "corey/copywriting"], "critic": ["corey/social", "corey/copy-editing"]}
+    },
+    "ad": {
+      "fidelity": "grounded-creative",
+      "strategist": true,
+      "research_skill": null,
+      "skills": {"strategist": ["corey/ad-creative"], "writer": ["corey/ad-creative"], "critic": ["corey/ad-creative", "corey/copy-editing"]}
+    },
+    "email": {
+      "fidelity": "grounded-creative",
+      "strategist": true,
+      "research_skill": null,
+      "skills": {"strategist": ["corey/emails"], "writer": ["corey/emails"], "critic": ["corey/emails", "corey/copy-editing"]}
+    },
+    "article": {
+      "fidelity": "research-backed",
+      "strategist": true,
+      "research_skill": "bytedance/deep-research",
+      "skills": {"strategist": ["corey/copywriting"], "writer": ["corey/copywriting"], "critic": ["corey/copywriting", "corey/copy-editing"]}
+    },
+    "newsletter": {
+      "fidelity": "research-backed",
+      "strategist": true,
+      "research_skill": "bytedance/deep-research",
+      "skills": {"strategist": ["bytedance/newsletter-generation"], "writer": ["bytedance/newsletter-generation"], "critic": ["bytedance/newsletter-generation", "corey/copy-editing"]}
+    },
+    "campaign": {
+      "status": "BLOCKED",
+      "reason": "campanha multicanal fica para depois (ADR-19); peça cada peça separadamente"
+    }
+  }
+}

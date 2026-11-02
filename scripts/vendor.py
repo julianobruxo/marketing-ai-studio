@@ -41,8 +41,20 @@ SOURCES = {
         "owner": "coreyhaines31",
         "repo": "marketingskills",
         "license": "LICENSE",
+        "skills_root": "skills",
+    },
+    "bytedance": {
+        "owner": "bytedance",
+        "repo": "deer-flow",
+        "license": "LICENSE",
+        "skills_root": "skills/public",
     },
 }
+
+
+def skill_dir(source: str, skill: str) -> str:
+    """Pasta da skill no upstream (e em vendor/<fonte>/, que espelha o upstream)."""
+    return f"{SOURCES[source]['skills_root']}/{skill}"
 
 SHA_RE = re.compile(r"[0-9a-f]{40}")
 
@@ -223,7 +235,7 @@ def select_members(tar: tarfile.TarFile, skills, extras, license_path):
     wanted = {}
     problems = []
     for skill in skills:
-        base = f"skills/{skill}/"
+        base = f"{skill}/"
         found = False
         for rel, m in by_path.items():
             if not rel.startswith(base):
@@ -236,7 +248,7 @@ def select_members(tar: tarfile.TarFile, skills, extras, license_path):
                 continue
             wanted[rel] = m
         if not found:
-            problems.append(f"skill inexistente no upstream: skills/{skill}")
+            problems.append(f"skill inexistente no upstream: {skill}")
     for rel in list(extras) + [license_path]:
         m = by_path.get(rel)
         if m is None:
@@ -288,10 +300,10 @@ def link_graph(upstream: Path, files):
     return graph
 
 
-def snapshot_descriptions(vendor_dir: Path, skills):
+def snapshot_descriptions(vendor_dir: Path, source: str, skills):
     out = {}
     for skill in skills:
-        p = vendor_dir / "skills" / skill / "SKILL.md"
+        p = vendor_dir / skill_dir(source, skill) / "SKILL.md"
         if p.exists():
             out[skill] = parse_frontmatter(p.read_text(encoding="utf-8")).get("description")
     return out
@@ -331,12 +343,13 @@ def cmd_sync(args) -> int:
 
     vendor_rel = PurePosixPath("vendor") / source
     vendor_dir = root / vendor_rel
-    old_desc = snapshot_descriptions(vendor_dir, skills + (sorted(old["skills"]) if old else []))
+    old_desc = snapshot_descriptions(vendor_dir, source, skills + (sorted(old["skills"]) if old else []))
 
     with tempfile.TemporaryDirectory(prefix="vendor-sync-") as tmp:
         tmp = Path(tmp)
         tar_path = fetch_tarball(source, args.ref, tmp)
-        upstream = extract_selection(tar_path, tmp / "x", skills, extras, cfg["license"])
+        upstream = extract_selection(tar_path, tmp / "x", [skill_dir(source, s) for s in skills],
+                                     extras, cfg["license"])
 
         selected = sorted(
             str(p.relative_to(upstream).as_posix()) for p in upstream.rglob("*") if p.is_file()
@@ -361,7 +374,7 @@ def cmd_sync(args) -> int:
             "extra_files": {},
         }
         for skill in skills:
-            base = f"skills/{skill}/"
+            base = f"{skill_dir(source, skill)}/"
             files = {
                 str(vendor_rel / rel): sha256_file(upstream / rel)
                 for rel in selected
@@ -370,15 +383,16 @@ def cmd_sync(args) -> int:
             fm = parse_frontmatter((upstream / base / "SKILL.md").read_text(encoding="utf-8")) \
                 if (upstream / base / "SKILL.md").exists() else {}
             entry["skills"][skill] = {
-                "upstream_path": f"skills/{skill}",
-                "version": fm.get("metadata.version") or fm.get("version"),
+                "upstream_path": skill_dir(source, skill),
+                # Sem versão no frontmatter (ByteDance), a versão é o SHA do commit.
+                "version": fm.get("metadata.version") or fm.get("version") or args.ref,
                 "reason": "selecionada",
                 "files": files,
             }
         for rel in extras:
             required_by = sorted(
                 skill for skill in skills
-                if rel in reachable_from([f for f in selected if f.startswith(f"skills/{skill}/")], graph)
+                if rel in reachable_from([f for f in selected if f.startswith(f"{skill_dir(source, skill)}/")], graph)
             )
             entry["extra_files"][str(vendor_rel / rel)] = {
                 "upstream_path": rel,
@@ -399,7 +413,7 @@ def cmd_sync(args) -> int:
     lock.setdefault("sources", {})[source] = entry
     write_lock(root, lock)
 
-    new_desc = snapshot_descriptions(vendor_dir, skills)
+    new_desc = snapshot_descriptions(vendor_dir, source, skills)
     print_sync_report(source, old, entry, old_desc, new_desc)
     return 0
 
@@ -628,7 +642,7 @@ def apply_op(lines, name: str, anchor, content: str, snippets: dict):
     raise OverlayError(f"operação desconhecida: {name!r} (válidas: {', '.join(OPS)})")
 
 
-def rewrite_target(target: str, source: str, skill: str) -> str:
+def rewrite_target(target: str, source: str, udir: str) -> str:
     angle = target.startswith("<") and target.endswith(">")
     inner = target[1:-1] if angle else target
     lp = relative_link_path(inner)
@@ -636,12 +650,12 @@ def rewrite_target(target: str, source: str, skill: str) -> str:
         return target
     path, suffix = re.match(r"([^#?]*)(.*)", inner, re.S).groups()
     new = posixpath.relpath(
-        posixpath.normpath(f"vendor/{source}/skills/{skill}/{path}"), f"compiled/{source}"
+        posixpath.normpath(f"vendor/{source}/{udir}/{path}"), f"compiled/{source}"
     ) + suffix
     return f"<{new}>" if angle else new
 
 
-def rewrite_links(lines, source: str, skill: str):
+def rewrite_links(lines, source: str, udir: str):
     """Reescreve links relativos fora de código para apontar ao vendor a partir de compiled/<fonte>/."""
     out = []
     for line, in_code in zip(lines, code_block_mask(lines)):
@@ -653,7 +667,7 @@ def rewrite_links(lines, source: str, skill: str):
         for m in list(_INLINE_LINK_RE.finditer(line)) + [r for r in [_REF_DEF_RE.match(line)] if r]:
             if any(a <= m.start() < b for a, b in code):
                 continue
-            new = rewrite_target(m.group(1), source, skill)
+            new = rewrite_target(m.group(1), source, udir)
             if new != m.group(1):
                 edits.append((m.start(1), m.end(1), new))
         for a, b, new in sorted(edits, reverse=True):
@@ -662,9 +676,9 @@ def rewrite_links(lines, source: str, skill: str):
     return out
 
 
-def host_mentions(root: Path, source: str, skill: str):
+def host_mentions(root: Path, source: str, udir: str):
     """Inventário (arquivo, padrão, contagem) de menções de host no SKILL.md e nas references."""
-    base = root / "vendor" / source / "skills" / skill
+    base = root / "vendor" / source / udir
     files = [base / "SKILL.md"] + sorted(p for p in (base / "references").rglob("*") if p.is_file())
     inventory = []
     for path in files:
@@ -684,13 +698,13 @@ def mentions_sha256(inventory) -> str:
 
 
 def license_lines(root: Path, entry: dict):
-    """(nome da licença, linha de copyright) lidos do LICENSE vendorizado."""
+    """(nome da licença, linhas de copyright unidas por '; ') lidos do LICENSE vendorizado."""
     lines = [l.strip() for l in (root / entry["license"]["path"]).read_text(encoding="utf-8").splitlines()]
     name = next((l for l in lines if l), "")
-    copyright_ = next((l for l in lines if l.startswith("Copyright")), None)
-    if not copyright_:
+    copyrights = [l for l in lines if l.startswith("Copyright")]
+    if not copyrights:
         raise OverlayError(f"{entry['license']['path']}: linha de copyright não encontrada")
-    return name, copyright_
+    return name, "; ".join(copyrights)
 
 
 def compile_source(root: Path, source: str, lock: dict, accept_mentions: bool = False):
@@ -742,7 +756,8 @@ def compile_source(root: Path, source: str, lock: dict, accept_mentions: bool = 
                                        f"≠ lock {lock_skill['version']}"))
             continue
 
-        inventory = host_mentions(root, source, skill)
+        udir = lock_skill["upstream_path"]
+        inventory = host_mentions(root, source, udir)
         inventories[skill] = inventory
         digest = mentions_sha256(inventory)
         if meta.get("host_mentions_sha256") != digest:
@@ -760,7 +775,7 @@ def compile_source(root: Path, source: str, lock: dict, accept_mentions: bool = 
             leftover = _OP_RE.sub("", overlay_body).strip()
             if leftover:
                 raise OverlayError(f"texto fora de operação: {leftover[:60]!r}")
-            upstream = (root / "vendor" / source / "skills" / skill / "SKILL.md").read_text(encoding="utf-8")
+            upstream = (root / "vendor" / source / udir / "SKILL.md").read_text(encoding="utf-8")
             fm, body = split_frontmatter(upstream)
             lines = body.split("\n")
             for n, m in enumerate(ops, start=1):
@@ -774,7 +789,7 @@ def compile_source(root: Path, source: str, lock: dict, accept_mentions: bool = 
                 raise OverlayError("upstream sem título H1")
             i = h1[0] + 1
             lines = lines[:i] + [""] + snippets["operating-rules"].split("\n") + _gap(lines, i) + lines[i:]
-            lines = rewrite_links(lines, source, skill)
+            lines = rewrite_links(lines, source, udir)
         except (OverlayError, OSError) as exc:
             problems.append(("OVERLAY", f"{rel}: {exc}"))
             continue
@@ -783,7 +798,7 @@ def compile_source(root: Path, source: str, lock: dict, accept_mentions: bool = 
             "<!-- STUDIO-COMPILED — gerado por scripts/vendor.py compile; não editar.",
             f"source: {entry['repo']}",
             f"commit: {entry['commit']}",
-            f"upstream_path: skills/{skill}/SKILL.md",
+            f"upstream_path: {udir}/SKILL.md",
             f"upstream_version: {lock_skill['version']}",
             f"overlay: {rel} sha256={sha256_bytes(text.encode('utf-8'))}",
             f"common: overlays/{source}/_common.md sha256={sha256_bytes(common_bytes)}",

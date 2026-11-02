@@ -6,13 +6,15 @@
 O alvo precisa ser um clone do Studio (com hosts/claude-code/ e agents/). O instalador gera:
   <alvo>/.claude/agents/<nome>.md   frontmatter do host.yaml + corpo de agents/<papel>.md
   <alvo>/.claude/settings.json      env, permissions.deny e o hook PreToolUse do guard
+  <alvo>/.claude/skills/marketing-content-studio/   cópia byte a byte da skill de entrada
+Agentes studio-*.md que não estão mais no host.yaml são removidos.
 
 O hook usa a forma exec do Claude Code (command + args, sem shell): caminhos absolutos do
 interpretador (sys.executable) e do guard, sem problema de aspas no Windows, e
 onFailure "block", para que um guard que não inicia ou trava bloqueie a ferramenta.
 
 A saída é determinística e reinstalar é idempotente. No fim, um teste de fumaça executa o
-comando exato do hook; se falhar, a instalação é desfeita. A skill de entrada é do PR 4.
+comando exato do hook; se falhar, a instalação é desfeita.
 Só biblioteca padrão.
 """
 
@@ -20,6 +22,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -27,6 +30,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 HOSTS = ("claude-code",)
 SMOKE_JOB = "install-smoke"
+SKILL_NAME = "marketing-content-studio"
 
 
 def load_host(target: Path) -> dict:
@@ -118,6 +122,26 @@ def smoke_test(target: Path, host: dict) -> list:
     return failures
 
 
+def install_skill(target: Path) -> Path:
+    """Espelha skills/marketing-content-studio/ em .claude/skills/, byte a byte."""
+    src = target / "skills" / SKILL_NAME
+    dst = target / ".claude" / "skills" / SKILL_NAME
+    wanted = {p.relative_to(src) for p in src.rglob("*") if p.is_file()}
+    if dst.exists():
+        for p in sorted(dst.rglob("*"), reverse=True):
+            if p.is_file() and p.relative_to(dst) not in wanted:
+                p.unlink()
+            elif p.is_dir() and not any(p.iterdir()):
+                p.rmdir()
+    for rel in sorted(wanted):
+        out = dst / rel
+        out.parent.mkdir(parents=True, exist_ok=True)
+        data = (src / rel).read_bytes()
+        if not out.exists() or out.read_bytes() != data:
+            out.write_bytes(data)
+    return dst
+
+
 def install(target: Path) -> int:
     host_file = target / "hosts" / "claude-code" / "host.yaml"
     guard = target / "hosts" / "claude-code" / "guard.py"
@@ -145,6 +169,9 @@ def install(target: Path) -> int:
             stale.unlink()
             print(f"removido (fora do host.yaml): {stale.relative_to(target).as_posix()}")
 
+    skill_dst = install_skill(target)
+    print(f"skill: {skill_dst.relative_to(target).as_posix()}/")
+
     settings_path = target / ".claude" / "settings.json"
     settings_path.write_bytes(dump_json(settings(host, guard.resolve())).encode("utf-8"))
     print(f"settings: {settings_path.relative_to(target).as_posix()}")
@@ -154,10 +181,11 @@ def install(target: Path) -> int:
         settings_path.unlink()
         for path in written:
             path.unlink()
+        shutil.rmtree(skill_dst)
         print("INSTALAÇÃO ABORTADA: o teste de fumaça do hook falhou (" + "; ".join(failures) + ").")
         print("settings.json e agentes gerados foram removidos.")
         return 1
-    print("OK: instalação concluída; teste de fumaça do hook passou. A skill de entrada entra no PR 4.")
+    print("OK: instalação concluída; teste de fumaça do hook passou.")
     return 0
 
 

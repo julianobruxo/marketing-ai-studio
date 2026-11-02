@@ -210,6 +210,16 @@ class GuardTest(unittest.TestCase):
         self.assertEqual(self.write(self.root / "README.md", tool="NotebookEdit"), "deny")
         self.assertEqual(self.write(self.root / "README.md", tool="Edit"), "deny")
 
+    def test_pathless_tools_follow_role_tool_list(self):
+        self.assertEqual(self.call("WebSearch", {"query": "x"}, "studio-strategist"), "allow")
+        self.assertEqual(self.call("WebFetch", {"url": "https://example.com"}, "studio-strategist"), "allow")
+        self.assertEqual(self.call("WebSearch", {"query": "x"}, "studio-critic"), "deny")
+        self.assertEqual(self.call("WebFetch", {"url": "https://example.com"}, "studio-writer"), "deny")
+        self.assertEqual(self.call("Bash", {"command": "ls"}, "studio-strategist"), "deny")
+        self.assertEqual(self.log()[0]["reason"], "WebSearch está na lista de ferramentas do papel")
+        (self.root / "runs/.active").unlink()
+        self.assertEqual(self.call("WebSearch", {"query": "x"}, "studio-strategist"), "deny")
+
     def test_report_tool_allowed_for_subagents(self):
         self.assertEqual(self.call("SubagentHandback", {"message": "relatório"}, "studio-critic"), "allow")
 

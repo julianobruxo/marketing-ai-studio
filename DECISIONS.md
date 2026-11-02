@@ -9,7 +9,13 @@ Registro canônico das decisões de arquitetura. As decisões foram fechadas no 
 
 **Estados usados:** `Aceito` · `Aceito, com verificação pendente` (a decisão vale, mas um teste previsto pode exigir ajuste de implementação) · `Substituído`.
 
-**Este arquivo registra decisões, não o estado da implementação** (que fica no `README.md`). Dos testes citados, foram implementados e executados o T14 (PR 1), o T-COMPILE (PR 2) e, no PR 3, o T-PATH, o T-HOOK, o T-WRITE, o T-ISO-W, o T-ISO-O, o T-SCOPE, o T-RO, o T-DEPTH e a etapa 1 do T-INSTALL. Os demais estão planejados.
+**Este arquivo registra decisões, não o estado da implementação** (que fica no `README.md`). Dos testes citados, foram implementados e executados:
+- o T14 (PR 1);
+- o T-COMPILE (PR 2);
+- no PR 3, o T-PATH, o T-HOOK, o T-WRITE, o T-ISO-W, o T-ISO-O, o T-SCOPE, o T-RO, o T-DEPTH e a etapa 1 do T-INSTALL;
+- na v1, o T01 (`tests/test_route.py`).
+
+Os demais saíram do plano ou ficam para o job real do operador (ADR-19).
 
 ---
 
@@ -109,15 +115,15 @@ Registro canônico das decisões de arquitetura. As decisões foram fechadas no 
 - **Decisão:**
   - Cada papel roda como execução separada, com contexto isolado e IDs rastreáveis de autoria e avaliação.
   - O Writer não aprova o próprio texto.
-  - Critic e Reviewer são **somente leitura** e devolvem veredito com evidência, nunca texto substituto.
-  - O Strategist não aprova o próprio ângulo: a checagem de estratégia é feita pelo Critic numa chamada separada com rubrica de estratégia.
-  - O Researcher não certifica a própria fonte: a checagem de evidência é feita pelo Reviewer.
+  - Critic e Reviewer são **somente leitura** e devolvem veredito com evidência, nunca texto substituto. *(Substituído por ADR-19: não há Reviewer; o Critic absorve fatos e fidelidade e continua somente leitura.)*
+  - O Strategist não aprova o próprio ângulo: a checagem de estratégia é feita pelo Critic numa chamada separada com rubrica de estratégia. *(Substituído por ADR-19: não há checagem de estratégia separada; quando o Critic reprova o candidato, o Strategist propõe outra abordagem com a evidência dele.)*
+  - O Researcher não certifica a própria fonte: a checagem de evidência é feita pelo Reviewer. *(Substituído por ADR-19: não há Researcher nem Reviewer; o Strategist pesquisa quando o operador pede e o Critic confere os fatos.)*
   - Sem subagentes reais no host, o job multiagente fica `BLOCKED`; a separação nunca é simulada num contexto só.
 - **Vocabulário de status:**
   - **andamento do job:** `ROUTED`, `IN_PROGRESS`, `BLOCKED`, `ELIGIBLE`, `CLOSED`;
   - **decisão editorial:** `candidate`, `critic-pass`, `operator-approved`, `published-confirmed`, `unknown`.
 - **Consequências:** nenhum PASS com avaliador igual ao autor (T03) e nenhum `critic-pass` em host sem subagentes (T04).
-- **Estado:** Aceito
+- **Estado:** Aceito; em parte substituído por ADR-19 (papéis Reviewer e Researcher e a checagem de estratégia separada)
 - **Data:** 2026-11-02
 
 ## ADR-08 — Orquestrador no modelo mais forte, sem produzir nem avaliar conteúdo
@@ -147,7 +153,7 @@ Registro canônico das decisões de arquitetura. As decisões foram fechadas no 
 ## ADR-10 — Loop editorial autônomo dentro de orçamento
 
 - **Contexto:** o operador quer um loop que recomece a partir da etapa causadora em caso de reprovação, sem pedir autorização a cada retry e sem cair em SKIP por falta de criatividade. O Brain registrou um loop de seis rodadas e cerca de 50 minutos, considerado longo demais.
-- **Decisão:**
+- **Decisão:** *(Substituído por ADR-19 o fluxo, o retorno pela causa, a troca de estratégia, o não-progresso, o orçamento global e os valores iniciais. Continuam valendo o escalonamento com diagnóstico e melhor candidato marcado, e a regra de nenhum PASS fabricado.)*
   - **Fluxo:** BRIEF → BRAINSTORM → DECISÃO → CRIAÇÃO → CRITIC ∥ REVIEWER → DECISÃO → ENTREGA.
   - **Retorno pela causa:**
     - problema de texto → Writer;
@@ -169,8 +175,8 @@ Registro canônico das decisões de arquitetura. As decisões foram fechadas no 
   | Newsletter | 2 por item | 2 por seção | 45 min |
 
   O teto de custo será fixado em p90 × 1,5 após medir os 10 primeiros jobs de cada perfil.
-- **Consequências:** a máquina de estados fica em `policies/editorial-loop.md` (PR 5). Testes T11, T12 e T13.
-- **Estado:** Aceito
+- **Consequências:** a máquina de estados fica em `policies/editorial-loop.md` (PR 5). Testes T11, T12 e T13. *(Substituído por ADR-19: o loop está em `agents/orchestrator.md` e o limite de rodadas em `catalog/routing.yaml`.)*
+- **Estado:** Aceito; em parte substituído por ADR-19
 - **Data:** 2026-11-02
 
 ## ADR-11 — Proveniência por claim
@@ -230,7 +236,7 @@ Registro canônico das decisões de arquitetura. As decisões foram fechadas no 
 ## ADR-15 — Ordem de entrega e definição de MVP funcional
 
 - **Contexto:** o operador quer PRs pequenos e verificáveis, e um produto que combine Corey e ByteDance desde a primeira versão declarada funcional.
-- **Decisão:**
+- **Decisão:** *(Substituído por ADR-19: a sequência de PRs abaixo foi trocada por uma entrega única, a v1.)*
 
   | PR | Conteúdo | Aceite |
   |---|---|---|
@@ -251,7 +257,7 @@ Registro canônico das decisões de arquitetura. As decisões foram fechadas no 
   - O T-INSTALL tem duas etapas. No PR 3 cobre instalação e descoberta. A execução de um job de fixture só é possível a partir do PR 6, quando existem entrada, schemas e o primeiro workflow.
   - **Ajuste (PR 3):** a skill de entrada só existe a partir do PR 4. Por isso a etapa 1 do T-INSTALL, no PR 3, confere a instalação dos agentes e das configurações, e que nenhuma skill do Corey aparece no host. A descoberta da skill do Studio passa para o PR 4.
   - Cada PR vira um prompt para o agente de código do operador e só é implementado depois da aprovação dele.
-- **Estado:** Aceito
+- **Estado:** Substituído por ADR-19 (PRs 0 a 3 foram entregues nesta sequência; o restante entra na v1)
 - **Data:** 2026-11-02
 
 ## ADR-16 — Precedência canônica de instruções
@@ -346,6 +352,34 @@ Registro canônico das decisões de arquitetura. As decisões foram fechadas no 
 - **Estado:** Aceito. V-01, V-02, V-03 e V-05 foram confirmadas no PR 3 com o Claude Code 2.1.303 (ver Verificações pendentes).
 - **Data:** 2026-11-02
 
+## ADR-19 — Simplificação v1
+
+- **Contexto:** depois dos PRs 0 a 3, o operador decidiu entregar um Studio utilizável sem PRs intermediários, sem over-engineering e sem gastar tokens à toa.
+- **Decisão (do operador):**
+  - **a) Entrega única.** Uma entrega, a v1, substitui a sequência de PRs do ADR-15.
+  - **b) Três papéis.** Os papéis são Strategist, Writer e Critic. O Critic absorve a checagem de fatos e de fidelidade que seria do Reviewer, o que substitui parte do ADR-07.
+  - **c) Loop simples.**
+    - Uma reprovação recomeça do Strategist, ou do Writer quando a intent não usa Strategist, com a evidência do Critic.
+    - São no máximo 3 rodadas, configuráveis em `max_rounds` no `catalog/routing.yaml`.
+    - Depois disso, o Studio entrega o melhor candidato marcado como não aprovado.
+    - Isso substitui os orçamentos do ADR-10.
+  - **d) Sem arquivos de workflow por formato.** A intent no `catalog/routing.yaml` define as skills por papel, se o Strategist roda, a skill de pesquisa e a fidelidade.
+  - **e) Web só quando o operador pede**, e só o Strategist tem `WebSearch` e `WebFetch`.
+  - **f) Testes ao vivo não rodam a cada mudança.** A validação final é um job real do operador.
+  - **g) Fora da v1:** golden dataset da Zazmic, schemas e campanha. A intent `campaign` fica `BLOCKED`.
+- **Implementação:**
+  - **Roteamento:** `scripts/route.py` é o roteador determinístico (ADR-08: rota em código). As regras de dono vêm em ordem e a primeira que casa vence. Zazmic × X fica `NEEDS_OPERATOR` até o operador definir o dono.
+  - **ByteDance:** `newsletter-generation` e `deep-research` estão em `vendor/bytedance/` (commit `12c304f`; a versão é o SHA), com overlays e compilados próprios. `vendor.py` passou a aceitar mais de uma fonte.
+  - **Guard:**
+    - para subagente, uma ferramenta sem caminho (`WebSearch`, `WebFetch`) só é liberada se estiver na lista `tools` daquele papel no `host.yaml`, e fica registrada;
+    - `Bash`, `PowerShell`, `Glob` e `Grep` nunca são liberadas para subagente, porque alcançam arquivos sem a checagem de caminho.
+  - **Instalador:** copia a skill de entrada para `.claude/skills/marketing-content-studio/` e remove agentes `studio-*` que saíram do `host.yaml` (o Reviewer antigo).
+- **Consequências:**
+  - A descoberta da skill de entrada no host (resto da V-04) e o comportamento do loop são validados no primeiro job real do operador, não por testes ao vivo nesta entrega.
+  - Os itens dos ADRs 07, 10 e 15 marcados como substituídos deixam de valer. Os demais ADRs continuam válidos.
+- **Estado:** Aceito
+- **Data:** 2026-11-02
+
 ---
 
 ## Verificações pendentes
@@ -357,7 +391,7 @@ São verificações de implementação, não decisões. Até agora foram executa
 | V-01 | Hooks PreToolUse disparam dentro de subagentes na versão instalada do Claude Code. **Confirmada (PR 3, Claude Code 2.1.303):** o tool-log tem as chamadas do `studio-writer` e do `studio-critic` com o `agent_id` de cada um | PR 3 · T-HOOK | 18 |
 | V-02 | `CLAUDE_CODE_FORK_SUBAGENT=0` elimina fork; subagentes não veem o histórico do orquestrador. **Confirmada (PR 3):** o canário da sessão principal não aparece nas respostas nem nas transcrições dos subagentes, e não estava em nenhum payload | PR 3 · T-ISO-O | 18 |
 | V-03 | Sem a ferramenta `Agent`, nenhum subagente consegue criar outro; profundidade 1 efetiva. **Confirmada (PR 3):** o writer foi instruído a lançar um subagente e não tinha a ferramenta; só os 2 subagentes lançados pelo orquestrador iniciaram | PR 3 · T-RO, T-DEPTH | 18 |
-| V-04 | A skill é descoberta em `.claude/skills/marketing-content-studio/` e nenhum `SKILL.md` de `vendor/` ou `compiled/` aparece no host. **Parcial (PR 3):** nenhuma das 9 skills do Corey aparece no host. A descoberta da skill do Studio fica para o PR 4 (ADR-15) | PR 3 · PR 4 · T-INSTALL | 03 |
+| V-04 | A skill é descoberta em `.claude/skills/marketing-content-studio/` e nenhum `SKILL.md` de `vendor/` ou `compiled/` aparece no host. **Parcial (PR 3):** nenhuma das 9 skills do Corey aparece no host. A skill do Studio é instalada na v1 (`tests/test_install.py`), e a descoberta no host fica para o primeiro job real do operador (ADR-19) | PR 3 · v1 · T-INSTALL | 03 |
 | V-05 | O guard resiste a caminhos relativos, `../`, symlinks e caminhos absolutos fora do escopo. **Confirmada (PR 3):** `tests/test_guard.py` passou no Windows (junction, `\\?\`, ADS, maiúsculas) e no Linux via WSL (symlink de arquivo e de diretório) | PR 3 · T-PATH | 18 |
 | V-06 | O teto nativo em dólar (`--max-budget-usd`) vale para a forma de cobrança do operador; se não valer, o orçamento fica só nos contadores do Studio | PR 5 | 10 |
 | V-07 | Experimento A/B do handoff ao Brain, pelos três critérios do ADR-04 | PR 7 | 04 |

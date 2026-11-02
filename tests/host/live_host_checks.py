@@ -39,7 +39,7 @@ JOB = "test-job"
 OTHER_JOB = "outra-tarefa"
 COREY_SKILLS = ["product-marketing", "copywriting", "copy-editing", "social", "ad-creative", "emails",
                 "content-strategy", "sales-enablement", "marketing-council"]
-STUDIO_AGENTS = ["studio-critic", "studio-reviewer", "studio-strategist", "studio-writer"]
+STUDIO_AGENTS = ["studio-critic", "studio-strategist", "studio-writer"]
 
 CAPTURE = r'''
 import json, sys
