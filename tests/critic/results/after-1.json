@@ -1,0 +1,1224 @@
+{
+ "S01": {
+  "decision": "REVISE",
+  "gates": [
+   {
+    "gate": "brief",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "editorial",
+    "status": "FAIL",
+    "evidence": [
+     {
+      "quote": "The kickoff went well. The slides were great. Everyone nodded. And then, silence.",
+      "severity": "blocking",
+      "criterion": "Hook",
+      "issue": "The opening carries no information, and it starts at a kickoff while the article's point is the stall after the first demo.",
+      "impact": "The reader gets a mood before any reason to read on, and the timeline does not match the next paragraph.",
+      "fix": "cut these lines and open on the stall after the first demo"
+     }
+    ],
+    "cause": "writing"
+   },
+   {
+    "gate": "facts",
+    "status": "FAIL",
+    "evidence": [
+     {
+      "quote": "The demo runs on a clean sample, while the live report depends on data that three departments maintain in different ways.",
+      "severity": "blocking",
+      "criterion": "Facts: claim not backed by inputs",
+      "issue": "Neither the clean sample nor the three departments appear in the input.",
+      "impact": "A specific detail reads as fact with nothing behind it.",
+      "fix": "source this detail from the operator or remove it"
+     },
+     {
+      "quote": "Reporting projects stall after the first demo",
+      "severity": "material",
+      "criterion": "Facts: claim scope",
+      "issue": "The input says projects often stall; the candidate states it as universal.",
+      "impact": "Overstates the claim to a skeptical reader.",
+      "fix": "restore the input's limited scope"
+     }
+    ],
+    "cause": "facts"
+   },
+   {
+    "gate": "voice",
+    "status": "N/A",
+    "evidence": []
+   },
+   {
+    "gate": "quality",
+    "status": "FAIL",
+    "evidence": [
+     {
+      "quote": "The kickoff went well. The slides were great. Everyone nodded. And then, silence.",
+      "severity": "blocking",
+      "criterion": "Naturalness: short dramatic sentences stacked for effect",
+      "issue": "Four clipped lines build drama in place of content, in the opening, against a brief that asks for plain language.",
+      "impact": "Reads as formula and costs trust at the first line.",
+      "fix": "remove the dramatic build"
+     }
+    ],
+    "cause": "writing"
+   },
+   {
+    "gate": "revision",
+    "status": "N/A",
+    "evidence": []
+   },
+   {
+    "gate": "fidelity",
+    "status": "N/A",
+    "evidence": []
+   }
+  ],
+  "keep": [
+   "nobody owns the numbers once the project team leaves"
+  ]
+ },
+ "S02": {
+  "decision": "REVISE",
+  "gates": [
+   {
+    "gate": "brief",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "editorial",
+    "status": "FAIL",
+    "evidence": [
+     {
+      "quote": "The Bottleneck Starts With Procurement",
+      "severity": "blocking",
+      "criterion": "Logic: a heading is a promise",
+      "issue": "The section under the heading never says how contract timing or renewal stalls a reporting project.",
+      "impact": "The heading's claim goes unanswered.",
+      "fix": "show the link from procurement to the stall, or drop the heading"
+     },
+     {
+      "quote": "Vendor contracts take months to sign. Most finance teams renew them yearly.",
+      "severity": "blocking",
+      "criterion": "Logic: jumps from fact to fact",
+      "issue": "The piece moves from demo data to contracts to renewals with no connection between them.",
+      "impact": "The reader cannot see why any of this explains a stall.",
+      "fix": "state how each fact leads to the next and to the stall, and cut any that does not"
+     }
+    ],
+    "cause": "approach"
+   },
+   {
+    "gate": "facts",
+    "status": "FAIL",
+    "evidence": [
+     {
+      "quote": "The Bottleneck Starts With Procurement",
+      "severity": "blocking",
+      "criterion": "Evidence: conclusion follows from the data",
+      "issue": "The inputs say contracts take months, not that procurement is the bottleneck or where it starts.",
+      "impact": "The section's main claim has no support.",
+      "fix": "get support for this claim or narrow it to what the inputs say"
+     },
+     {
+      "quote": "so they rarely expose missing fields",
+      "severity": "blocking",
+      "criterion": "Facts: claim not backed by inputs",
+      "issue": "The input says demos use clean samples and nothing about missing fields or how rarely they show up.",
+      "impact": "An added consequence reads as sourced fact.",
+      "fix": "source this consequence or remove it"
+     }
+    ],
+    "cause": "facts"
+   },
+   {
+    "gate": "voice",
+    "status": "N/A",
+    "evidence": []
+   },
+   {
+    "gate": "quality",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "revision",
+    "status": "N/A",
+    "evidence": []
+   },
+   {
+    "gate": "fidelity",
+    "status": "N/A",
+    "evidence": []
+   }
+  ],
+  "keep": []
+ },
+ "S03": {
+  "decision": "REVISE",
+  "gates": [
+   {
+    "gate": "brief",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "editorial",
+    "status": "FAIL",
+    "evidence": [
+     {
+      "quote": "Most projects get lost in this bridge.",
+      "severity": "blocking",
+      "criterion": "Reference: metaphor with no referent",
+      "issue": "No bridge has been introduced, and a project cannot logically get lost in one. The reader has to guess it means the step from test to rollout.",
+      "impact": "The paragraph's conclusion fails on the first read.",
+      "fix": "name the step from pilot to every region in plain terms and say what goes wrong there"
+     }
+    ],
+    "cause": "writing"
+   },
+   {
+    "gate": "facts",
+    "status": "FAIL",
+    "evidence": [
+     {
+      "quote": "Most projects get lost in this bridge.",
+      "severity": "blocking",
+      "criterion": "Evidence: a number says who and out of what",
+      "issue": "No input supports \"most projects\".",
+      "impact": "An unbacked prevalence claim carries the paragraph's point.",
+      "fix": "source the proportion or make the statement bounded"
+     },
+     {
+      "quote": "Teams test a report on one quarter of data and then roll it out to every region.",
+      "severity": "blocking",
+      "criterion": "Evidence: claim about what the audience does",
+      "issue": "This pattern is not in the inputs.",
+      "impact": "The setup of the paragraph is stated as fact with no support.",
+      "fix": "source it or present it as a bounded example"
+     }
+    ],
+    "cause": "facts"
+   },
+   {
+    "gate": "voice",
+    "status": "N/A",
+    "evidence": []
+   },
+   {
+    "gate": "quality",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "revision",
+    "status": "N/A",
+    "evidence": []
+   },
+   {
+    "gate": "fidelity",
+    "status": "N/A",
+    "evidence": []
+   }
+  ],
+  "keep": [
+   "Regional definitions of revenue differ, and sign-off rules change by country."
+  ]
+ },
+ "S04": {
+  "decision": "REVISE",
+  "gates": [
+   {
+    "gate": "brief",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "editorial",
+    "status": "FAIL",
+    "evidence": [
+     {
+      "quote": "Por isso, o próximo passo é decidir quais processos automatizar primeiro.",
+      "severity": "blocking",
+      "criterion": "Logic: conclusion does not follow",
+      "issue": "Trust in reports for the month-end close does not lead to choosing which processes to automate. \"Por isso\" stands in for a connection that is missing.",
+      "impact": "The reader gets a recommendation with no reason behind it.",
+      "fix": "state why this finding leads to that step, or draw a conclusion the finding supports"
+     }
+    ],
+    "cause": "approach"
+   },
+   {
+    "gate": "facts",
+    "status": "FAIL",
+    "evidence": [
+     {
+      "quote": "e 72% já confiam neles para fechar o mês",
+      "severity": "blocking",
+      "criterion": "Evidence: a number says who and out of what",
+      "issue": "The number loses its source and base: 72% of 240 operations managers interviewed in Brazil, Northwind 2025 survey. As written it reads as 72% of operations areas.",
+      "impact": "The reader cannot weigh the number and may take it as market-wide.",
+      "fix": "state who was asked, how many, where and in which survey"
+     },
+     {
+      "quote": "Relatórios automatizados ganharam espaço nas áreas de operações",
+      "severity": "blocking",
+      "criterion": "Evidence: conclusion follows from the data",
+      "issue": "One survey is a snapshot; it does not show growth over time.",
+      "impact": "A trend is claimed that the data does not show.",
+      "fix": "remove the trend or source it"
+     }
+    ],
+    "cause": "facts"
+   },
+   {
+    "gate": "voice",
+    "status": "N/A",
+    "evidence": []
+   },
+   {
+    "gate": "quality",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "revision",
+    "status": "N/A",
+    "evidence": []
+   },
+   {
+    "gate": "fidelity",
+    "status": "N/A",
+    "evidence": []
+   }
+  ],
+  "keep": []
+ },
+ "S05": {
+  "decision": "REVISE",
+  "gates": [
+   {
+    "gate": "brief",
+    "status": "FAIL",
+    "evidence": [
+     {
+      "quote": "Data projects fail because ownership is unclear.",
+      "severity": "blocking",
+      "criterion": "Brief: reader leaves knowing how to move forward",
+      "issue": "The text only repeats the causes. There is no step forward anywhere.",
+      "impact": "The stated goal of the closing is not met.",
+      "fix": "add a way forward that answers these causes before the CTA"
+     }
+    ],
+    "cause": "approach"
+   },
+   {
+    "gate": "editorial",
+    "status": "FAIL",
+    "evidence": [
+     {
+      "quote": "Book a consultation with Northwind Data.",
+      "severity": "blocking",
+      "criterion": "Resolution and CTA",
+      "issue": "The CTA follows a list of failures with nothing that shows what a consultation would address.",
+      "impact": "The action does not follow from the piece, so the reader has no reason to take it.",
+      "fix": "move from causes to understanding to a possible way forward, then let the CTA follow"
+     }
+    ],
+    "cause": "approach"
+   },
+   {
+    "gate": "facts",
+    "status": "FAIL",
+    "evidence": [
+     {
+      "quote": "each of these problems gets worse as the project grows",
+      "severity": "blocking",
+      "criterion": "Facts: claim not backed by inputs",
+      "issue": "The inputs name common causes and say nothing about them worsening with project size.",
+      "impact": "An added claim reads as sourced.",
+      "fix": "source it or remove it"
+     }
+    ],
+    "cause": "facts"
+   },
+   {
+    "gate": "voice",
+    "status": "N/A",
+    "evidence": []
+   },
+   {
+    "gate": "quality",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "revision",
+    "status": "N/A",
+    "evidence": []
+   },
+   {
+    "gate": "fidelity",
+    "status": "N/A",
+    "evidence": []
+   }
+  ],
+  "keep": [
+   "Book a consultation with Northwind Data."
+  ]
+ },
+ "S06": {
+  "decision": "REVISE",
+  "gates": [
+   {
+    "gate": "brief",
+    "status": "FAIL",
+    "evidence": [
+     {
+      "quote": "- Trusted data\n- Clean architecture\n- Strong governance",
+      "severity": "blocking",
+      "criterion": "Brief: show that Northwind helps clients build these capabilities",
+      "issue": "The services became three labels. Building, designing and setting up have disappeared.",
+      "impact": "The reader never sees what Northwind actually does.",
+      "fix": "state each service as work Northwind does with the client"
+     }
+    ],
+    "cause": "writing"
+   },
+   {
+    "gate": "editorial",
+    "status": "FAIL",
+    "evidence": [
+     {
+      "quote": "- Trusted data\n- Clean architecture\n- Strong governance",
+      "severity": "blocking",
+      "criterion": "Positioning",
+      "issue": "These are qualities, not offerings: the list says what a company might have, not what Northwind sells or delivers.",
+      "impact": "Nothing here shows a service or why it matters to this reader.",
+      "fix": "separate the offering from the outcome and show both"
+     }
+    ],
+    "cause": "approach"
+   },
+   {
+    "gate": "facts",
+    "status": "FAIL",
+    "evidence": [
+     {
+      "quote": "Northwind Data helps your company reach production",
+      "severity": "blocking",
+      "criterion": "Positioning: capabilities the inputs do not show",
+      "issue": "Reaching production is not in the inputs, and production of what is left unsaid.",
+      "impact": "An outcome is promised with no support.",
+      "fix": "tie the promise to the listed services or remove it"
+     }
+    ],
+    "cause": "facts"
+   },
+   {
+    "gate": "voice",
+    "status": "N/A",
+    "evidence": []
+   },
+   {
+    "gate": "quality",
+    "status": "PASS",
+    "evidence": [
+     {
+      "quote": "Strong governance",
+      "severity": "material",
+      "criterion": "copy-page line test",
+      "issue": "The labels cannot be pictured or proven, and any competitor could write them.",
+      "impact": "The section does not set Northwind apart.",
+      "fix": "make each line specific to what Northwind does"
+     }
+    ]
+   },
+   {
+    "gate": "revision",
+    "status": "N/A",
+    "evidence": []
+   },
+   {
+    "gate": "fidelity",
+    "status": "N/A",
+    "evidence": []
+   }
+  ],
+  "keep": []
+ },
+ "S07": {
+  "decision": "KEEP AS IS",
+  "gates": [
+   {
+    "gate": "brief",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "editorial",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "facts",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "voice",
+    "status": "N/A",
+    "evidence": []
+   },
+   {
+    "gate": "quality",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "revision",
+    "status": "N/A",
+    "evidence": []
+   },
+   {
+    "gate": "fidelity",
+    "status": "N/A",
+    "evidence": []
+   }
+  ],
+  "keep": [
+   "If your team is tired of rebuilding the same monthly report by hand, you already know what it costs.",
+   "The next step is deciding which report to fix first.",
+   "Book a 30-minute review with Northwind Data."
+  ]
+ },
+ "S08": {
+  "decision": "KEEP AS IS",
+  "gates": [
+   {
+    "gate": "brief",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "editorial",
+    "status": "PASS",
+    "evidence": [
+     {
+      "quote": "[See how the restore drill works](https://example.com/restore-drill)",
+      "severity": "polish",
+      "criterion": "CTA",
+      "issue": "The destination page's content is not in the pack, so the promise could not be compared with it.",
+      "impact": "Unknown until checked.",
+      "fix": "confirm the page delivers what the link says"
+     }
+    ]
+   },
+   {
+    "gate": "facts",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "voice",
+    "status": "N/A",
+    "evidence": []
+   },
+   {
+    "gate": "quality",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "revision",
+    "status": "N/A",
+    "evidence": []
+   },
+   {
+    "gate": "fidelity",
+    "status": "N/A",
+    "evidence": []
+   }
+  ],
+  "keep": [
+   "Backups You Can Actually Restore",
+   "A backup only counts on the day you restore it."
+  ]
+ },
+ "S09": {
+  "decision": "IMPROVE",
+  "gates": [
+   {
+    "gate": "brief",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "editorial",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "facts",
+    "status": "PASS",
+    "evidence": [
+     {
+      "quote": "those teams said they went back not because they rejected automation",
+      "severity": "material",
+      "criterion": "Facts: the text really says it",
+      "issue": "The input reports only that teams said the tool removed a manual check. Their denial of rejecting automation is put in their mouths, and the input does not say the interviewees were the 41.",
+      "impact": "The contrast is a fair reading, but attributed to interviewees it overstates the evidence.",
+      "fix": "confirm the interview notes, or present this contrast as the author's reading"
+     }
+    ]
+   },
+   {
+    "gate": "voice",
+    "status": "N/A",
+    "evidence": []
+   },
+   {
+    "gate": "quality",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "revision",
+    "status": "N/A",
+    "evidence": []
+   },
+   {
+    "gate": "fidelity",
+    "status": "N/A",
+    "evidence": []
+   }
+  ],
+  "keep": [
+   "That return is easy to misread.",
+   "So a rollout plan should find that check before launch.",
+   "Northwind's 2025 survey of 120 finance teams found that 41 of them went back to spreadsheets within six months of adopting an automated close."
+  ]
+ },
+ "S10": {
+  "decision": "REVISE",
+  "gates": [
+   {
+    "gate": "brief",
+    "status": "FAIL",
+    "evidence": [
+     {
+      "quote": "[Get your free audit](https://example.com/pricing)",
+      "severity": "blocking",
+      "criterion": "Brief: the link must deliver what the block promises",
+      "issue": "The link goes to the price list, which has no audit offer. The request form is at the audit URL in the inputs.",
+      "impact": "The reader clicks for a free audit and lands on prices.",
+      "fix": "point the link to the audit request form"
+     }
+    ],
+    "cause": "writing"
+   },
+   {
+    "gate": "editorial",
+    "status": "FAIL",
+    "evidence": [
+     {
+      "quote": "[Get your free audit](https://example.com/pricing)",
+      "severity": "blocking",
+      "criterion": "CTA: promise against destination",
+      "issue": "The promise and the destination do not match.",
+      "impact": "Breaks trust at the moment of action.",
+      "fix": "match the destination to the promise"
+     }
+    ],
+    "cause": "writing"
+   },
+   {
+    "gate": "facts",
+    "status": "FAIL",
+    "evidence": [
+     {
+      "quote": "Our free data audit shows where your reports break before your auditors find out.",
+      "severity": "blocking",
+      "criterion": "Facts: claim not backed by inputs",
+      "issue": "The inputs say nothing about what the audit shows.",
+      "impact": "The block's central promise has no support.",
+      "fix": "get the audit's actual output from the operator and state only that"
+     }
+    ],
+    "cause": "facts"
+   },
+   {
+    "gate": "voice",
+    "status": "N/A",
+    "evidence": []
+   },
+   {
+    "gate": "quality",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "revision",
+    "status": "N/A",
+    "evidence": []
+   },
+   {
+    "gate": "fidelity",
+    "status": "N/A",
+    "evidence": []
+   }
+  ],
+  "keep": [
+   "Is Your Data Ready for Audit Season?"
+  ]
+ },
+ "S11": {
+  "decision": "REVISE",
+  "gates": [
+   {
+    "gate": "brief",
+    "status": "FAIL",
+    "evidence": [
+     {
+      "quote": "Northwind helps companies optimize their reporting processes and unlock better outcomes across the business.",
+      "severity": "blocking",
+      "criterion": "Brief: light edit, keep the voice and every specific detail",
+      "issue": "This is a new sentence, not an edit. The month-end close, the one person and the right spreadsheet are all gone.",
+      "impact": "The operator's instruction is not met.",
+      "fix": "go back to the original and change only what needs it"
+     }
+    ],
+    "cause": "approach"
+   },
+   {
+    "gate": "editorial",
+    "status": "FAIL",
+    "evidence": [
+     {
+      "quote": "unlock better outcomes across the business",
+      "severity": "blocking",
+      "criterion": "Value",
+      "issue": "The sentence states no problem or concrete benefit.",
+      "impact": "An operations leader has no reason to care.",
+      "fix": "restore the concrete problem from the original"
+     }
+    ],
+    "cause": "approach"
+   },
+   {
+    "gate": "facts",
+    "status": "FAIL",
+    "evidence": [
+     {
+      "quote": "unlock better outcomes across the business",
+      "severity": "blocking",
+      "criterion": "Facts: claim not backed by inputs",
+      "issue": "The original makes no claim about outcomes across the business.",
+      "impact": "Adds an unsupported promise.",
+      "fix": "remove it"
+     }
+    ],
+    "cause": "facts"
+   },
+   {
+    "gate": "voice",
+    "status": "N/A",
+    "evidence": []
+   },
+   {
+    "gate": "quality",
+    "status": "FAIL",
+    "evidence": [
+     {
+      "quote": "optimize their reporting processes and unlock better outcomes",
+      "severity": "blocking",
+      "criterion": "copy-edit: voice and message preserved; corporate phrases with no content",
+      "issue": "The author's direct address became stock corporate language, and the core message changed.",
+      "impact": "A reader would stop trusting the text.",
+      "fix": "keep the author's second-person voice"
+     }
+    ],
+    "cause": "writing"
+   },
+   {
+    "gate": "revision",
+    "status": "FAIL",
+    "evidence": [
+     {
+      "quote": "Northwind helps companies optimize their reporting processes and unlock better outcomes across the business.",
+      "severity": "blocking",
+      "criterion": "Revision: loses clarity, personality, specificity and commercial force",
+      "issue": "It loses all four against the original.",
+      "impact": "The text is much weaker than what it replaced.",
+      "fix": "restore the original as the base"
+     }
+    ],
+    "cause": "approach"
+   },
+   {
+    "gate": "fidelity",
+    "status": "N/A",
+    "evidence": []
+   }
+  ],
+  "keep": []
+ },
+ "S12": {
+  "decision": "REVISE",
+  "gates": [
+   {
+    "gate": "brief",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "editorial",
+    "status": "FAIL",
+    "evidence": [
+     {
+      "quote": "Three problems stall most reporting projects.",
+      "severity": "blocking",
+      "criterion": "Logic: a count that changes",
+      "issue": "The section announces three problems and lists four.",
+      "impact": "The reader sees the error at once and doubts the rest.",
+      "fix": "make the count match the list"
+     }
+    ],
+    "cause": "writing"
+   },
+   {
+    "gate": "facts",
+    "status": "FAIL",
+    "evidence": [
+     {
+      "quote": "The fourth is weak executive sponsorship, which is the main cause of failure.",
+      "severity": "blocking",
+      "criterion": "Facts: claim not backed by inputs",
+      "issue": "The inputs list common problems and rank none of them as the main cause.",
+      "impact": "The section's strongest claim has no support.",
+      "fix": "source the ranking or remove it"
+     },
+     {
+      "quote": "stall most reporting projects",
+      "severity": "blocking",
+      "criterion": "Evidence: a number says who and out of what",
+      "issue": "The input says \"common problems\", not most projects.",
+      "impact": "Overstates how widespread they are.",
+      "fix": "stay within what the input says"
+     }
+    ],
+    "cause": "facts"
+   },
+   {
+    "gate": "voice",
+    "status": "N/A",
+    "evidence": []
+   },
+   {
+    "gate": "quality",
+    "status": "PASS",
+    "evidence": [
+     {
+      "quote": "The first is unclear data ownership. The second is conflicting definitions. The third is missing maintenance plans.",
+      "severity": "material",
+      "criterion": "article: develops one argument; mechanical symmetry",
+      "issue": "The section is a list of labels. Nothing says how any of these stalls a project.",
+      "impact": "The reader learns the names of the problems and not why they matter.",
+      "fix": "say what each problem does to a project"
+     }
+    ]
+   },
+   {
+    "gate": "revision",
+    "status": "N/A",
+    "evidence": []
+   },
+   {
+    "gate": "fidelity",
+    "status": "N/A",
+    "evidence": []
+   }
+  ],
+  "keep": []
+ },
+ "S13": {
+  "decision": "REVISE",
+  "gates": [
+   {
+    "gate": "brief",
+    "status": "FAIL",
+    "evidence": [
+     {
+      "quote": "Northwind's voice search uses a neural speech model with streaming transcription and low-latency retrieval across indexed documents.",
+      "severity": "blocking",
+      "criterion": "Brief: show why a business should care",
+      "issue": "The block only describes how the feature is built. The inputs contain no business benefit either.",
+      "impact": "The requirement is unmet for business leaders.",
+      "fix": "state the business consequence, and ask the operator for it if the inputs cannot support one"
+     }
+    ],
+    "cause": "approach"
+   },
+   {
+    "gate": "editorial",
+    "status": "FAIL",
+    "evidence": [
+     {
+      "quote": "neural speech model with streaming transcription and low-latency retrieval",
+      "severity": "blocking",
+      "criterion": "Value: describing a technology is not stating its value",
+      "issue": "Jargon with no problem, benefit or opportunity attached.",
+      "impact": "This reader has no reason to care or click.",
+      "fix": "replace the technical description with what it changes for the business"
+     },
+     {
+      "quote": "[Read the release notes](https://example.com/voice)",
+      "severity": "material",
+      "criterion": "CTA",
+      "issue": "Release notes are an odd next step for business leaders, and the destination's content is not in the pack.",
+      "impact": "The click does not follow from any interest the block created.",
+      "fix": "align the CTA with the business angle and confirm the destination"
+     }
+    ],
+    "cause": "approach"
+   },
+   {
+    "gate": "facts",
+    "status": "PASS",
+    "evidence": [
+     {
+      "quote": "across indexed documents",
+      "severity": "material",
+      "criterion": "Facts: the text really says it",
+      "issue": "The input stops at low-latency retrieval; what gets searched is not stated.",
+      "impact": "A small added detail reads as sourced.",
+      "fix": "confirm the scope or remove it"
+     }
+    ]
+   },
+   {
+    "gate": "voice",
+    "status": "N/A",
+    "evidence": []
+   },
+   {
+    "gate": "quality",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "revision",
+    "status": "N/A",
+    "evidence": []
+   },
+   {
+    "gate": "fidelity",
+    "status": "N/A",
+    "evidence": []
+   }
+  ],
+  "keep": []
+ },
+ "S14": {
+  "decision": "REVISE",
+  "gates": [
+   {
+    "gate": "brief",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "editorial",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "facts",
+    "status": "FAIL",
+    "evidence": [
+     {
+      "quote": "Data quality is worse than most people assume.",
+      "severity": "blocking",
+      "criterion": "Evidence: claim about what the audience believes",
+      "issue": "There is no evidence for either how bad data quality is or what most people assume.",
+      "impact": "The paragraph opens on an unprovable generalization.",
+      "fix": "source it, or open on a bounded statement or real question"
+     }
+    ],
+    "cause": "facts"
+   },
+   {
+    "gate": "voice",
+    "status": "N/A",
+    "evidence": []
+   },
+   {
+    "gate": "quality",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "revision",
+    "status": "N/A",
+    "evidence": []
+   },
+   {
+    "gate": "fidelity",
+    "status": "N/A",
+    "evidence": []
+   }
+  ],
+  "keep": [
+   "naming one owner for each source system and publishing how often each source is updated"
+  ]
+ },
+ "S15": {
+  "decision": "REVISE",
+  "gates": [
+   {
+    "gate": "brief",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "editorial",
+    "status": "FAIL",
+    "evidence": [
+     {
+      "quote": "# Outages Made Headlines. Rules Kept Moving.",
+      "severity": "blocking",
+      "criterion": "Hook: a two-part headline must make sense as a whole",
+      "issue": "The second half does not explain the first, and no link between outages and rules is given.",
+      "impact": "The reader is left asking \"and?\" and skips it.",
+      "fix": "state what the two stories mean together for this reader"
+     },
+     {
+      "quote": "October brought a wave of cloud outages and new compliance rules.",
+      "severity": "blocking",
+      "criterion": "Restraint: in a short block, a line that adds nothing",
+      "issue": "The opening only restates the headline and gives no consequence.",
+      "impact": "There is no reason to keep reading.",
+      "fix": "give the opening a reason for this reader to care"
+     }
+    ],
+    "cause": "approach"
+   },
+   {
+    "gate": "facts",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "voice",
+    "status": "N/A",
+    "evidence": []
+   },
+   {
+    "gate": "quality",
+    "status": "PASS",
+    "evidence": [
+     {
+      "quote": "Outages Made Headlines. Rules Kept Moving.",
+      "severity": "material",
+      "criterion": "Naturalness: mechanical symmetry",
+      "issue": "Two mirrored clipped sentences make a pattern in place of a point.",
+      "impact": "Reads as formula.",
+      "fix": "let the headline carry the point rather than the rhythm"
+     }
+    ]
+   },
+   {
+    "gate": "revision",
+    "status": "N/A",
+    "evidence": []
+   },
+   {
+    "gate": "fidelity",
+    "status": "N/A",
+    "evidence": []
+   }
+  ],
+  "keep": []
+ },
+ "S16": {
+  "decision": "KEEP AS IS",
+  "gates": [
+   {
+    "gate": "brief",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "editorial",
+    "status": "PASS",
+    "evidence": [
+     {
+      "quote": "Veja como funciona: https://example.com/painel",
+      "severity": "polish",
+      "criterion": "CTA",
+      "issue": "The destination page's content is not in the pack, so the promise could not be compared with it.",
+      "impact": "Unknown until checked.",
+      "fix": "confirm the page delivers what the link says"
+     }
+    ]
+   },
+   {
+    "gate": "facts",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "voice",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "quality",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "revision",
+    "status": "N/A",
+    "evidence": []
+   },
+   {
+    "gate": "fidelity",
+    "status": "N/A",
+    "evidence": []
+   }
+  ],
+  "keep": [
+   "O novo painel da Northwind Data já está no ar.",
+   "Ele mostra três coisas: quem é dono de cada fonte, quando ela foi atualizada e quais relatórios dependem dela."
+  ]
+ },
+ "S17": {
+  "decision": "REVISE",
+  "gates": [
+   {
+    "gate": "brief",
+    "status": "FAIL",
+    "evidence": [
+     {
+      "quote": "Northwind helps organizations improve invoice processing efficiency through automated matching capabilities that reduce manual effort.",
+      "severity": "blocking",
+      "criterion": "Brief: keep the voice, the specifics and the commercial force",
+      "issue": "Friday, three hours, minutes and the five percent are all gone, and the direct address with them.",
+      "impact": "The instruction is not met, and the text is harder to read than the original.",
+      "fix": "go back to the original and edit only for readability"
+     }
+    ],
+    "cause": "approach"
+   },
+   {
+    "gate": "editorial",
+    "status": "FAIL",
+    "evidence": [
+     {
+      "quote": "improve invoice processing efficiency through automated matching capabilities",
+      "severity": "blocking",
+      "criterion": "Value",
+      "issue": "The concrete problem and result became abstract nouns.",
+      "impact": "The reader can no longer see the problem or the benefit.",
+      "fix": "restore the concrete scene and result"
+     }
+    ],
+    "cause": "approach"
+   },
+   {
+    "gate": "facts",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "voice",
+    "status": "N/A",
+    "evidence": []
+   },
+   {
+    "gate": "quality",
+    "status": "FAIL",
+    "evidence": [
+     {
+      "quote": "automated matching capabilities that reduce manual effort",
+      "severity": "blocking",
+      "criterion": "copy-edit: voice preserved; corporate phrases with no content",
+      "issue": "The author's voice was replaced by generic corporate language.",
+      "impact": "Any vendor could have written it, and the reader stops trusting it.",
+      "fix": "keep the original's voice"
+     }
+    ],
+    "cause": "writing"
+   },
+   {
+    "gate": "revision",
+    "status": "FAIL",
+    "evidence": [
+     {
+      "quote": "Northwind helps organizations improve invoice processing efficiency through automated matching capabilities that reduce manual effort.",
+      "severity": "blocking",
+      "criterion": "Revision: loses specificity, personality and commercial force",
+      "issue": "It is weaker than the original on all three.",
+      "impact": "The edit removes what made the original sell.",
+      "fix": "restore the original as the base"
+     }
+    ],
+    "cause": "approach"
+   },
+   {
+    "gate": "fidelity",
+    "status": "N/A",
+    "evidence": []
+   }
+  ],
+  "keep": []
+ },
+ "S18": {
+  "decision": "KEEP AS IS",
+  "gates": [
+   {
+    "gate": "brief",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "editorial",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "facts",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "voice",
+    "status": "N/A",
+    "evidence": []
+   },
+   {
+    "gate": "quality",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "revision",
+    "status": "PASS",
+    "evidence": []
+   },
+   {
+    "gate": "fidelity",
+    "status": "N/A",
+    "evidence": []
+   }
+  ],
+  "keep": [
+   "Every Friday, someone on your team spends three hours matching invoices by hand.",
+   "Northwind's matching rules do that in minutes, and they flag the five percent that still need a person."
+  ]
+ }
+}
