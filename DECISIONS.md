@@ -324,5 +324,5 @@ São verificações de implementação, não decisões. Nenhuma foi executada.
 | V-07 | Experimento A/B do handoff ao Brain, pelos três critérios do ADR-04 | PR 7 | 04 |
 | V-08 | Baseline de falso PASS e falso FAIL do Critic por modalidade | PR 8 · T15 | 09 |
 | V-09 | Valores iniciais de orçamento do ADR-10 confirmados ou ajustados com 10 jobs reais por perfil | PR 8 | 10 |
-| V-10 | Commits previstos (`88c79f6` no Corey, `12c304f` na ByteDance) reconfirmados ou atualizados no momento da importação | PR 1 · PR 9 | 02 |
+| V-10 | Commits previstos (`88c79f6` no Corey, `12c304f` na ByteDance) reconfirmados ou atualizados no momento da importação. Corey: `88c79f6` confirmado no PR 1 | PR 1 · PR 9 | 02 |
 | V-11 | Local do material não público de marcas (perfil Zazmic, versões rejeitadas) fora do git, sem prejudicar os testes | PR 8 | 14 |

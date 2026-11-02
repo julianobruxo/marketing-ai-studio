@@ -1,0 +1,44 @@
+{
+  "lock_version": 1,
+  "sources": {
+    "synthetic": {
+      "commit": "0000000000000000000000000000000000000000",
+      "extra_files": {
+        "vendor/synthetic/skills/shared/notes.md": {
+          "reason": "transitiva",
+          "required_by": [
+            "demo"
+          ],
+          "sha256": "3bfe3d8767b2a27af40b2148a539e29a8d9a8239dbd537c36b6a54e963a193b9",
+          "upstream_path": "skills/shared/notes.md"
+        }
+      },
+      "license": {
+        "path": "vendor/synthetic/LICENSE",
+        "sha256": "8fdcc76645804178bc701707e02646db5f78b7d171174be794c06cb1c5c415f3",
+        "upstream_path": "LICENSE"
+      },
+      "repo": "https://example.invalid/synthetic",
+      "retrieved_at": "2026-11-02",
+      "selection": {
+        "extra_files": [
+          "skills/shared/notes.md"
+        ],
+        "skills": [
+          "demo"
+        ]
+      },
+      "skills": {
+        "demo": {
+          "files": {
+            "vendor/synthetic/skills/demo/SKILL.md": "0c78b435cdfc22c6c763a700af162e4dae77184da7fd8888251fabc3d7967226",
+            "vendor/synthetic/skills/demo/references/guide.md": "8f97fb1532a73577c18f264506f9d549537fc64e54fcb3f7f05b8fbbd0fcf387"
+          },
+          "reason": "selecionada",
+          "upstream_path": "skills/demo",
+          "version": "0.0.1"
+        }
+      }
+    }
+  }
+}

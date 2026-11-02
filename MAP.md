@@ -2,7 +2,7 @@
 
 Mapa da estrutura aprovada no manifesto R4. Leia este arquivo antes de abrir qualquer outro. Ele diz o que existe, para que serve e em qual PR cada item entra.
 
-**Hoje (PR 0) existem apenas:** `README.md`, `MAP.md`, `DECISIONS.md`, `THIRD_PARTY_NOTICES.md` e `.gitignore`. Todos os outros itens estão planejados.
+**Hoje (PR 1) existem apenas:** `README.md`, `MAP.md`, `DECISIONS.md`, `THIRD_PARTY_NOTICES.md`, `.gitignore`, `.gitattributes`, `vendor/corey/`, `provenance/upstream-lock.json`, `scripts/vendor.py` (`sync` e `verify`) e `tests/` (`test_vendor.py` e fixtures sintéticas). Todos os outros itens estão planejados.
 
 ## Legenda
 
@@ -24,6 +24,7 @@ marketing-ai-studio/                                              [público · r
 ├── DECISIONS.md                                MVP · PR 0   canônico
 ├── THIRD_PARTY_NOTICES.md                      MVP · PR 0   canônico (atualizado nos PRs 1 e 9)
 ├── .gitignore                                  MVP · PR 0   canônico
+├── .gitattributes                              MVP · PR 1   canônico
 │
 ├── skills/marketing-content-studio/
 │   ├── SKILL.md                                MVP · PR 4   canônico — única entrada; roteamento; fail-closed
