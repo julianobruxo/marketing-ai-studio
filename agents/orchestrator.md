@@ -28,29 +28,29 @@ If you cannot write files, keep the same record in the conversation as labeled b
 
 ## The loop
 
-One round runs through Strategist, Writer and Critic. The maximum is `max_rounds` from the routing section: **3 rounds**. Count them and state the round number to the operator.
+A failed candidate restarts **the entire configured workflow**, not just the Writer. For intents with a Strategist, each round is a fresh independent **Strategist → Writer → Critic** cycle; translation and copy-edit retain their explicitly configured Writer → Critic route. The maximum is `max_rounds` from the routing section: **3 rounds**. Count them and state the round number to the operator. The Critic determines whether a candidate passes or needs another full cycle; the orchestrator executes that verdict without overriding it.
 
-1. **Strategist** (when the intent uses it): give it the brief, the inputs, the job context and its skills. If research was requested, also give it the research skill; save its research notes. From round 2 on, it runs only when step 4 sends the job back to it.
+1. **Strategist** (every round when the intent uses it): launch a **new independent sub-agent** with the brief, the inputs, the job context and its skills. If research was requested, also give it the research skill; save its research notes. From round 2 on, give it the prior approach and the Critic's exact evidence so it actively reconsiders the editorial direction, even when the immediate cause is `writing` or `facts`. For a writing-only failure it may reaffirm the approach with a reason; for an `approach` failure it must propose a meaningfully different angle, not cosmetic edits. Never ask the Critic to write a replacement. Search remains restricted to research explicitly requested by the operator.
    If the Strategist reports a `[NEED]` without which the brief cannot be met (for example, the link a required CTA points to), pause and ask the operator before the Writer. No round can supply it. The pause does not count as a round. If the operator is not there, continue and report the gap.
 2. **Writer**: give it the brief, the approach, the inputs, the job context and its skills. From round 2 on, also give it the Critic's evidence and `keep` list and the previous candidate.
 3. **Critic**: give it the eval pack, the job context, the intent and the fidelity mode, and nothing else. From round 2 on, add the previous candidate and the `keep` list to the pack. For `copy-edit` and `translation`, add the original from round 1. It never sees the Writer's notes or reasoning, the Strategist's reasoning or earlier verdicts.
-4. **Decide**: every gate PASS or N/A → the candidate is `critic-pass`; deliver it with any material findings for the operator, and do not start another round to polish it. Any FAIL or UNVERIFIED → start the next round according to the `cause`:
+4. **Decide**: every gate PASS or N/A → the candidate is `critic-pass`; deliver it with any material findings for the operator, and do not start another round to polish it. Any FAIL or UNVERIFIED → **do not deliver it as passed**. Unless an operator-dependent blocker exists, start a fresh full round (step 1, then 2, then 3) within the three-round cap. Do not skip the Strategist for a `writing` or `facts` failure when the intent uses it.
 
-   | Cause | Next round |
+   | Cause | Direction supplied to the *new* cycle |
    |---|---|
    | `brief` | Pause and ask the operator first, even when other causes also fail. No retry while clarification is missing; the pause does not count as a round |
-   | `approach` | Strategist proposes a different approach, then Writer and Critic |
-   | `writing` | Same approach: Writer and Critic |
-   | `facts` | If research was requested, the Strategist researches the gap, then Writer and Critic. Otherwise the Writer corrects or removes the claim. If the piece needs data only the operator has, pause and ask |
+   | `approach` | The fresh Strategist must propose a substantially different editorial angle/structure; then a fresh Writer and Critic |
+   | `writing` | The fresh Strategist re-examines the current angle and may reaffirm it; the fresh Writer addresses the diagnosis; a fresh Critic judges |
+   | `facts` | The fresh Strategist checks allowed evidence, researching only if requested. The Writer corrects/removes unsupported claims, and a fresh Critic judges. Ask the operator when required data is unavailable |
 
-   **Operator-dependent blockers take precedence over every automatic retry.** If any failed gate has `cause: brief` because the request is incomplete or contradictory, pause and ask the operator for the missing decision first, even if another gate also reports `writing`, `approach` or `facts`. Do not send the Writer or Strategist to retry while that blocker remains. The pause does not count as an additional round; once clarified, choose the appropriate restart stage for the remaining causes. If the operator is unavailable, report `BLOCKED` and the exact question, rather than spending the remaining rounds.
+   **Operator-dependent blockers take precedence over every automatic retry.** If any failed gate has `cause: brief` because the request is incomplete or contradictory, pause and ask the operator for the missing decision first, even if another gate also reports `writing`, `approach` or `facts`. Do not send the Writer or Strategist to retry while that blocker remains. The pause does not count as an additional round; once clarified, restart the full configured cycle. If the operator is unavailable, report `BLOCKED` and the exact question, rather than spending the remaining rounds.
 
-   If there is no `brief` blocker, use the first applicable retry cause in the table above. A `revision` FAIL counts as `writing`. An UNVERIFIED gate counts as `facts`; when resolving the fact requires data only the operator can supply, pause instead of retrying.
+   If there is no `brief` blocker, run the full next round and use the causes only to guide the new Strategist and Writer. A `revision` FAIL counts as `writing`. An UNVERIFIED gate counts as `facts`; when resolving a fact requires data only the operator can supply, pause instead of retrying.
 
 After round 3 without a pass, stop. Deliver the best candidate clearly marked as not passed, with the Critic's evidence, and let the operator decide. The best candidate is a count, not a judgment: the one with the fewest gates in FAIL or UNVERIFIED; on a tie, the later round. Never start more rounds on your own.
 
 ## Hard rules
 
 - Use only sub-agents for the three roles. Never play a role yourself. If you cannot start them, the job is BLOCKED.
-- Never declare PASS while any gate is FAIL or UNVERIFIED. Never edit a verdict or a candidate.
+- Never declare PASS while any gate is FAIL or UNVERIFIED. Never edit a verdict or a candidate. Never silently skip a configured role on retries.
 - A `critic-pass` is not approval. Only the operator approves and publishes.
