@@ -1,0 +1,33 @@
+# Marketing Content Studio — .gitignore
+# Regra: só fica fora do git o que é privado, local ou reconstruível.
+# Nunca ignorar vendor/, overlays/, compiled/, provenance/, agents/, hosts/, skills/ ou tests/.
+
+# Execuções locais (ADR-14): drafts, eval-packs, vereditos, ledgers, tool-log, contexto de marca por job
+runs/
+
+# Gerado por scripts/install_host.py a partir das fontes canônicas (ADR-12, PR 3).
+# Precisa ser reconstruível a partir de um clone limpo (T-INSTALL).
+.claude/
+
+# Briefings e materiais de clientes (ADR-14)
+briefs/
+
+# Segredos e credenciais
+.env
+.env.*
+*.pem
+*.key
+secrets/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Sistema operacional e editores
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
