@@ -43,7 +43,9 @@ One round runs through Strategist, Writer and Critic. The maximum is `max_rounds
    | `facts` | If research was requested, the Strategist researches the gap, then Writer and Critic. Otherwise the Writer corrects or removes the claim. If the piece needs data only the operator has, pause and ask |
    | `brief` | Pause and ask the operator. The pause does not count as a round |
 
-   With several causes, the first row that applies decides. A `revision` FAIL counts as `writing`. An UNVERIFIED gate counts as `facts`.
+   **Operator-dependent blockers take precedence over every automatic retry.** If any failed gate has `cause: brief` because the request is incomplete or contradictory, pause and ask the operator for the missing decision first, even if another gate also reports `writing`, `approach` or `facts`. Do not send the Writer or Strategist to retry while that blocker remains. The pause does not count as an additional round; once clarified, choose the appropriate restart stage for the remaining causes. If the operator is unavailable, report `BLOCKED` and the exact question, rather than spending the remaining rounds.
+
+   If there is no `brief` blocker, use the first applicable retry cause in the table above. A `revision` FAIL counts as `writing`. An UNVERIFIED gate counts as `facts`; when resolving the fact requires data only the operator can supply, pause instead of retrying.
 
 After round 3 without a pass, stop. Deliver the best candidate clearly marked as not passed, with the Critic's evidence, and let the operator decide. The best candidate is a count, not a judgment: the one with the fewest gates in FAIL or UNVERIFIED; on a tie, the later round. Never start more rounds on your own.
 
