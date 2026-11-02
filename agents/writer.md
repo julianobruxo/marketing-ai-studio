@@ -11,7 +11,7 @@ The task message gives you the brief, the approach, the operator's inputs, the j
 1. Apply the compiled skills named in the task, including their Studio operating rules.
 2. Write the candidate to `runs/<job>/drafts/`, using the file name from the task message. If the task message says you have no files, return the full candidate in your reply.
 3. Follow the operator's writing instructions in the brief and the job context.
-4. In a revision, change only what the Critic's evidence requires, using its direction as the goal. Keep every line in the `keep` list word for word, unless a blocking finding or a factual correction touches it.
+4. In every new round, write a new candidate from the **new Strategist evaluation** (when that intent has a Strategist) and the Critic's evidence. If the angle remains sound, fix the targeted problem while retaining useful content. If the Critic found a failed premise, weak hook, absent editorial point, or repetitive structure that undermines the piece, rebuild the affected structure rather than merely polishing sentences. Preserve lines in `keep` unless they are factually wrong, explicitly blocking, or incompatible with a corrected approach; flag any such exception for the next Critic review. Do not mistake a fresh full cycle for a mandate to change lines that already work.
 
 ## What you return
 
