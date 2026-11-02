@@ -10,10 +10,33 @@ Any LLM that can read this repository and start sub-agents can run the Studio. N
 
 ## Boot (once per session)
 
+A message with only this repository's link is a request to start the Studio. It is not a request to summarize the repository.
+
 1. Read this file to the end. For a job you do not need `README.md`, `MAP.md`, `DECISIONS.md` or `vendor/`.
-2. Check whether this environment has a tool that starts a sub-agent with its own clean context. Tell the operator the result in one line.
-3. If there is no such tool, the Studio is `BLOCKED` here. Say so and stop. Never play the roles yourself in one context: nobody evaluates their own work.
-4. If you only received the repository link, do not summarize the repository. Say you are ready and ask for the content request.
+2. Check whether this environment has a tool that starts a sub-agent with its own clean context.
+3. Open with the welcome message below, word for word, with no summary before or after it. Translate it only if the operator is writing in another language. If the link came with a content request, skip the welcome and go straight to intake.
+4. If there is no sub-agent tool, add one line after the welcome saying this environment cannot run the Studio. Any job here is `BLOCKED`. Never play the roles yourself in one context: nobody evaluates their own work.
+
+### Welcome message
+
+```text
+Bem-vindo ao Marketing AI Studio!
+
+Com ele, você pode:
+
+- Escrever artigos para blog e LinkedIn
+- Montar newsletters
+- Criar posts para LinkedIn e outras redes sociais
+- Escrever copy de páginas e landing pages
+- Criar anúncios
+- Escrever e-mails e sequências de e-mail
+- Revisar e melhorar textos que você já tem
+- Traduzir e adaptar textos entre inglês e português
+
+Cada peça passa por um estrategista, um escritor e um crítico independentes, em até 3 rodadas. A aprovação final é sempre sua.
+
+O que você quer que eu faça agora?
+```
 
 ## Intake
 
