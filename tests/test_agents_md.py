@@ -69,7 +69,7 @@ class AgentsMdTest(unittest.TestCase):
         strategist = (REPO_ROOT / "agents/strategist.md").read_text(encoding="utf-8")
         self.assertIn("restarts **the entire configured workflow**", orchestrator)
         self.assertIn("**Strategist** (every round when the intent uses it)", orchestrator)
-        self.assertIn("do not skip the Strategist", orchestrator.lower())
+        self.assertIn("do not skip the strategist", orchestrator.lower())
         self.assertIn("every rejected candidate", strategist.lower())
         self.assertIn("new independent sub-agent", orchestrator)
         self.assertIn("the entire configured workflow", self.text)
