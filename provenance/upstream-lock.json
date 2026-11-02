@@ -1,0 +1,185 @@
+{
+  "lock_version": 1,
+  "sources": {
+    "corey": {
+      "commit": "88c79f6528a9347420e57ceb1fff9a60de651768",
+      "extra_files": {
+        "vendor/corey/skills/ads/references/abm-playbook.md": {
+          "reason": "transitiva",
+          "required_by": [
+            "ad-creative"
+          ],
+          "sha256": "acb5c89ced4497674d012d015504a5c8e17c619bd2fc1f0191d833a9957eb44a",
+          "upstream_path": "skills/ads/references/abm-playbook.md"
+        },
+        "vendor/corey/skills/ads/references/meta-decision-system.md": {
+          "reason": "transitiva",
+          "required_by": [
+            "ad-creative"
+          ],
+          "sha256": "861709bcc4e7467eac7d4de63f0bdd6709eb3c12a1d72b3855dce313ca15407f",
+          "upstream_path": "skills/ads/references/meta-decision-system.md"
+        }
+      },
+      "license": {
+        "path": "vendor/corey/LICENSE",
+        "sha256": "b70d71e24e40fce5da8f4b6f9cd862096a048e433db7f3c8cac5e348e6d34591",
+        "upstream_path": "LICENSE"
+      },
+      "repo": "https://github.com/coreyhaines31/marketingskills",
+      "retrieved_at": "2026-11-02",
+      "selection": {
+        "extra_files": [
+          "skills/ads/references/abm-playbook.md",
+          "skills/ads/references/meta-decision-system.md"
+        ],
+        "skills": [
+          "ad-creative",
+          "content-strategy",
+          "copy-editing",
+          "copywriting",
+          "emails",
+          "marketing-council",
+          "product-marketing",
+          "sales-enablement",
+          "social"
+        ]
+      },
+      "skills": {
+        "ad-creative": {
+          "files": {
+            "vendor/corey/skills/ad-creative/SKILL.md": "7af23285e4ac6df65f2f23e940279cdc9a70280a908a34214e86954ab7b0b000",
+            "vendor/corey/skills/ad-creative/assets/creative-review-template.html": "0ca7cce4fa809235aee776606205925d8dc01bde8a8325e2af7197d86394d3b7",
+            "vendor/corey/skills/ad-creative/evals/evals.json": "a688328a32f7ff3ffd975a2e4a31b5bc2a2c5dae86af0656f8b0ec61e9f8c916",
+            "vendor/corey/skills/ad-creative/references/awareness-headlines.md": "0f9b2408e402ad03956ff84bf31e5c594371dd3e2974c5390c42af4e3c60ed4d",
+            "vendor/corey/skills/ad-creative/references/creative-review-page.md": "03518911b1648bce12a3d579c5979b97442af50de24ff74809a43ba3395dcb3a",
+            "vendor/corey/skills/ad-creative/references/creative-roadmap.md": "a0be737841d8a73f0cf02094c9ed1e3f7c050e1c6f867794b1fa8b64dbf3b50e",
+            "vendor/corey/skills/ad-creative/references/generative-tools.md": "9c977cb5a0e5c841ebf98bc1fd531aa0fb1b949aef14093d4a0146f19606f7a5",
+            "vendor/corey/skills/ad-creative/references/hook-system.md": "2967ecbf32423bbb70ca9587b0af8d257466c852106fe909f6447bbab9a18002",
+            "vendor/corey/skills/ad-creative/references/imessage-video-ads.md": "99627f4a43f9ee8394be49c95bb865496037cf9901dfcdc1d1b0af9d86396aec",
+            "vendor/corey/skills/ad-creative/references/meta-creative-formats.md": "09720c4550761365a8c93c8587fe629c87718dbb331677312d93e5b2faa9761f",
+            "vendor/corey/skills/ad-creative/references/motion-video-ads.md": "c64e83199f0316e12e7811667f09a6475a34044c8eec2e3ba549faf9c33fc28c",
+            "vendor/corey/skills/ad-creative/references/platform-specs.md": "de69753161071a8d3e4d244280562810a6c4d6ae2696c5a21940f983abd0aa8e",
+            "vendor/corey/skills/ad-creative/references/short-form-video-specs.md": "1aa1cc498e350ed00ec4783b60d2eddee5bc98f25750761f6086742d0758f953",
+            "vendor/corey/skills/ad-creative/references/static-ad-templates.md": "fc93d3f5fa6b3442cc1c6785eda05979da0d299c640d5f0a277033209d68e651"
+          },
+          "reason": "selecionada",
+          "upstream_path": "skills/ad-creative",
+          "version": "2.12.2"
+        },
+        "content-strategy": {
+          "files": {
+            "vendor/corey/skills/content-strategy/SKILL.md": "5e74201646b8ae0b7ddfd2f4a4a14149096f490667b32bcb9e3a35e7326d88b0",
+            "vendor/corey/skills/content-strategy/evals/evals.json": "10167e7125ee77cbabe4f03953750dd99ea147f7461027fdbb0cf8e089e5506d",
+            "vendor/corey/skills/content-strategy/references/content-distribution.md": "1861a1aab0627ab29c279000879a9889242da1ba85e677acdc759c66a6241778",
+            "vendor/corey/skills/content-strategy/references/headless-cms.md": "efc796ae9596d1efcb876683db2d9b7c10c83e76e1cb69e527097907d5b4fc3f"
+          },
+          "reason": "selecionada",
+          "upstream_path": "skills/content-strategy",
+          "version": "2.1.5"
+        },
+        "copy-editing": {
+          "files": {
+            "vendor/corey/skills/copy-editing/SKILL.md": "cec5a771ce37ade292f7f1f6b418e8a6ce6ec3f50163fa5e664afbcb03e085fc",
+            "vendor/corey/skills/copy-editing/evals/evals.json": "cc18c9f51094058759267d465cfcc50da65f248f66b923326781aa642d622ca7",
+            "vendor/corey/skills/copy-editing/references/checklist.md": "4cf94c922286223681fc53721fcc65ae7299f1e36e797e7397d369d674580c60",
+            "vendor/corey/skills/copy-editing/references/content-refresh.md": "ba73cdf278fe6b552eee27eb1452494f11f9d17ef67d720657e0982f76fb961b",
+            "vendor/corey/skills/copy-editing/references/plain-english-alternatives.md": "df4f820d4c63ae8a517c64a243c101658352cd07d002355bf3c97de0a00f3775"
+          },
+          "reason": "selecionada",
+          "upstream_path": "skills/copy-editing",
+          "version": "2.2.1"
+        },
+        "copywriting": {
+          "files": {
+            "vendor/corey/skills/copywriting/SKILL.md": "02f0ab1ddd41d95b3c230d4bcff3de6578c8f2e45776c8ef2e4b931636af5bee",
+            "vendor/corey/skills/copywriting/evals/evals.json": "ccec86052a0edd8646d0e50e63c08e0e971f443d8f6e9178843a1629f79efdb0",
+            "vendor/corey/skills/copywriting/references/ai-tells.md": "b98c3a19b3a75c714d69e80a0076e4c07244b0e833c2ce81ff2631224fb7f7b2",
+            "vendor/corey/skills/copywriting/references/copy-frameworks.md": "4db06c481a904be3e4571ad8f671532c97ec186ddf0fb8aee3e3a56ef8e3d441",
+            "vendor/corey/skills/copywriting/references/natural-transitions.md": "9bd61b0de5be2c4de4ce130c68236b4f290b12737823827a458bb2b4c8584683"
+          },
+          "reason": "selecionada",
+          "upstream_path": "skills/copywriting",
+          "version": "2.3.2"
+        },
+        "emails": {
+          "files": {
+            "vendor/corey/skills/emails/SKILL.md": "8709631cc21717d17db9bb7e787ea44768d77182daf9846de8718a2ae7433b91",
+            "vendor/corey/skills/emails/evals/evals.json": "b90182c8b6edbb866ef82ad022db3d2fe8598e7329469117fb39edd9ab069f67",
+            "vendor/corey/skills/emails/references/copy-guidelines.md": "02f08897e4aa99ecc4ec1893d61d0c26d0c5e62e09af26f175087455e9b68e01",
+            "vendor/corey/skills/emails/references/email-types.md": "a5dd4f0555a7b21d2ff426948d15657825b9d16265652563f5e272d2e1879bfd",
+            "vendor/corey/skills/emails/references/sequence-templates.md": "f8f318f10e29abcd009cbee29e2bd178981d96c973099b508d30af6c10ab8d79"
+          },
+          "reason": "selecionada",
+          "upstream_path": "skills/emails",
+          "version": "2.1.4"
+        },
+        "marketing-council": {
+          "files": {
+            "vendor/corey/skills/marketing-council/SKILL.md": "0b94358427c344e1f5f50169770cce44e0b065ec8b05fc887a800daed008ac31",
+            "vendor/corey/skills/marketing-council/evals/evals.json": "c95d3d8cdaafb6ad178d5a72ee87f2ba655f41c1c7046c83705c93b2b9afa291",
+            "vendor/corey/skills/marketing-council/references/advisor-template.md": "e748d9f91d5b663c3cc0165c83a117833b0392fbf6c77b5a2107c49b0edd3c51",
+            "vendor/corey/skills/marketing-council/references/advisors/alex-hormozi.md": "18975ae41e73d1a95779f0bcffde5bd42f91bbb96a208d55a3fa4c0095a421da",
+            "vendor/corey/skills/marketing-council/references/advisors/ann-handley.md": "b0ad24ef9ee2965a1ee35a2208ea65897ef684baafb65557e2cc3b0aa9e5ca4e",
+            "vendor/corey/skills/marketing-council/references/advisors/april-dunford.md": "7abc28f3d3043f72bf8ca710c0390de4014486cffb1e6e82029581aa7ef5212f",
+            "vendor/corey/skills/marketing-council/references/advisors/byron-sharp.md": "fe99260a03ca0123ae1075108cb6466b0bd60ccac1b0b8d64d7b7bf1a78e17af",
+            "vendor/corey/skills/marketing-council/references/advisors/claude-hopkins.md": "93366c6d6b51407fdf33308537f31e7e8667a89fecd9fa1b8ea9ac398fb80942",
+            "vendor/corey/skills/marketing-council/references/advisors/david-ogilvy.md": "868d96f850eff22a923224bf7f3b5344abdb5d4c130b77e46e4142c630c6edba",
+            "vendor/corey/skills/marketing-council/references/advisors/eugene-schwartz.md": "fef9cc5ece0ad84d5542721f9346b18e5aa44e9f1a10e62f1ed5b7e05f6ba5a5",
+            "vendor/corey/skills/marketing-council/references/advisors/gary-halbert.md": "0db92e69da50a6372a5dc1feae2a6824fff9f1b53df92094745810c3d8375d8b",
+            "vendor/corey/skills/marketing-council/references/advisors/gary-vaynerchuk.md": "256f5425b602375c83d4a6e677c7ecc97e60f3dead83f8192802b6c0c65e57e4",
+            "vendor/corey/skills/marketing-council/references/advisors/rory-sutherland.md": "07a726d3f66def9722b5b3c52acc37173edc50ac880f8d1cb072424bd9b5f235",
+            "vendor/corey/skills/marketing-council/references/advisors/russell-brunson.md": "ae0cb018f48a734ec64fd087fd469a7e8170f5d2a2fea7623dfd58f35cfe739e",
+            "vendor/corey/skills/marketing-council/references/advisors/seth-godin.md": "02cb1b64b1fff7eecc6ff9769b60c23ef68b03017fd3d82b1a5b544009dd79c0"
+          },
+          "reason": "selecionada",
+          "upstream_path": "skills/marketing-council",
+          "version": "1.0.0"
+        },
+        "product-marketing": {
+          "files": {
+            "vendor/corey/skills/product-marketing/SKILL.md": "19ece0fa75c72a5a8b6e90db80f506586f54cc93bae6bffbb1bd2ef4ae7d603c",
+            "vendor/corey/skills/product-marketing/evals/evals.json": "0c6599b88f50ec1be91096a36ba6c5a15cf8312151394e3469e5ddb991b19afb",
+            "vendor/corey/skills/product-marketing/references/brand-voice.md": "932f3453db2761f03050792e39800150495dab449750b40913a4314ea97e7672"
+          },
+          "reason": "selecionada",
+          "upstream_path": "skills/product-marketing",
+          "version": "2.2.0"
+        },
+        "sales-enablement": {
+          "files": {
+            "vendor/corey/skills/sales-enablement/SKILL.md": "d30008d34e6a314b422e0a35cacf38aea39d39d2c48683e1ef6edcbdfca30ebd",
+            "vendor/corey/skills/sales-enablement/evals/evals.json": "5a051cfa1225515da3176a93ddb907b8efd091f9c4a485ebcdb867eea1cb7bf0",
+            "vendor/corey/skills/sales-enablement/references/cold-call-scripts.md": "cc4e3248070804539f8c1de01fd63918d8e40a6ad858dea2a519d50a060e268f",
+            "vendor/corey/skills/sales-enablement/references/deck-frameworks.md": "265eea6c1b358d10f2dd22fd987789a9d115c14d30bf77a9086734ac60659336",
+            "vendor/corey/skills/sales-enablement/references/demo-scripts.md": "505616ebf73d30fe84a844540727ab8f3aeae29ebcda8c8ace28a18ada003da3",
+            "vendor/corey/skills/sales-enablement/references/objection-library.md": "e0cdfeffc41afbdbe2c014bcd9b3c024318eac9bd23159e871ec796aba29e0b2",
+            "vendor/corey/skills/sales-enablement/references/one-pager-templates.md": "2197326faff4ede03fb40e332e9c80a4e084d8efd48c74df8720d70817ac5ded",
+            "vendor/corey/skills/sales-enablement/references/win-loss-analysis.md": "f6f34c503f4cc506a8f24bfea6e75b260e3eff661da206399e162960141f090a"
+          },
+          "reason": "selecionada",
+          "upstream_path": "skills/sales-enablement",
+          "version": "2.4.0"
+        },
+        "social": {
+          "files": {
+            "vendor/corey/skills/social/SKILL.md": "861f5b2175dee2726696fc1b91085c9fcbbcdc281c0d5e70235cd84f083b5d90",
+            "vendor/corey/skills/social/evals/evals.json": "1d2592a0cfc6378ba8742ce6e19f5974663b1d8018c4f136e5f529373bf17198",
+            "vendor/corey/skills/social/references/carousel-frameworks.md": "e703aa530ec9f68cdf5b58e8e0d4d1a5cc3f22b9e2d3e3222f16a9763d423247",
+            "vendor/corey/skills/social/references/listening-sources-template.md": "c68bc6f57b0a48c432b1ce72c9324d41a04d0e7784d0bab91afb4a6065a43e38",
+            "vendor/corey/skills/social/references/listening.md": "52cf68aaaa57a69b69b3587ffd9b848a6f1ca7e0d51378f566339ad7f2b730e0",
+            "vendor/corey/skills/social/references/platform-limits.md": "6ecc6b40ff82b95c48906341f7d3c58337671d4d94f624c858764f1ed5a77c3c",
+            "vendor/corey/skills/social/references/platforms.md": "a070eda1f54bdba103a9c89613d83331fc5c53c9e8a48543e0198f1a2995cb0c",
+            "vendor/corey/skills/social/references/post-templates.md": "9cca4680c95801daedfd8acadf9089d0083784c2567784888807569896f71d9b",
+            "vendor/corey/skills/social/references/reverse-engineering.md": "c27bef59d463b3b11331c1770f4a23e9e6bbce7d7c8db1e7f7f4f14ba206243f",
+            "vendor/corey/skills/social/references/short-form-video.md": "ed0976bd7ac1f85b7b8c162087e346118f2cf0ef46b3ccafc6a7a329118987d1",
+            "vendor/corey/skills/social/references/x-algorithm.md": "943b2c5a819aad53ebf62a1652adc47956d6fdf738e18cd98eeb609819a66180"
+          },
+          "reason": "selecionada",
+          "upstream_path": "skills/social",
+          "version": "2.4.1"
+        }
+      }
+    }
+  }
+}

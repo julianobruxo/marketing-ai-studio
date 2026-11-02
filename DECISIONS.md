@@ -9,7 +9,7 @@ Registro canônico das decisões de arquitetura. As decisões foram fechadas no 
 
 **Estados usados:** `Aceito` · `Aceito, com verificação pendente` (a decisão vale, mas um teste previsto pode exigir ajuste de implementação) · `Substituído`.
 
-**Nada neste arquivo descreve recurso implementado.** Todos os testes citados estão planejados e não foram executados.
+**Este arquivo registra decisões, não o estado da implementação** (que fica no `README.md`). Dos testes citados, só o T14 foi implementado e executado (PR 1); os demais estão planejados.
 
 ---
 
@@ -311,7 +311,7 @@ Registro canônico das decisões de arquitetura. As decisões foram fechadas no 
 
 ## Verificações pendentes
 
-São verificações de implementação, não decisões. Nenhuma foi executada.
+São verificações de implementação, não decisões. Até agora só a V-10 foi executada, e apenas para o Corey (PR 1); as demais estão pendentes.
 
 | ID | Verificação | Onde | ADR |
 |---|---|---|---|
@@ -324,5 +324,5 @@ São verificações de implementação, não decisões. Nenhuma foi executada.
 | V-07 | Experimento A/B do handoff ao Brain, pelos três critérios do ADR-04 | PR 7 | 04 |
 | V-08 | Baseline de falso PASS e falso FAIL do Critic por modalidade | PR 8 · T15 | 09 |
 | V-09 | Valores iniciais de orçamento do ADR-10 confirmados ou ajustados com 10 jobs reais por perfil | PR 8 | 10 |
-| V-10 | Commits previstos (`88c79f6` no Corey, `12c304f` na ByteDance) reconfirmados ou atualizados no momento da importação | PR 1 · PR 9 | 02 |
+| V-10 | Commits previstos (`88c79f6` no Corey, `12c304f` na ByteDance) reconfirmados ou atualizados no momento da importação. Corey: `88c79f6` confirmado no PR 1 | PR 1 · PR 9 | 02 |
 | V-11 | Local do material não público de marcas (perfil Zazmic, versões rejeitadas) fora do git, sem prejudicar os testes | PR 8 | 14 |

@@ -1,19 +1,20 @@
 # THIRD_PARTY_NOTICES
 
-> **Estado (PR 0): nenhum arquivo de terceiros foi importado ainda.** Este documento registra as fontes previstas, suas licenças e as regras de atribuição que valerão a partir dos PRs 1 e 9.
+> **Estado (PR 1): o material do Corey Haines foi importado no PR 1. Nenhum arquivo da ByteDance foi importado ainda (previsto para o PR 9).** Este documento registra as fontes, suas licenças e as regras de atribuição.
 
-## Fontes previstas
+## Fontes
 
 ### 1. Marketing Skills — Corey Haines
 
 - **Repositório:** https://github.com/coreyhaines31/marketingskills
 - **Licença:** MIT
 - **Aviso de copyright do upstream:** `Copyright (c) 2025 Corey Haines`
-- **Commit previsto:** `88c79f6` (reconfirmado no PR 1)
-- **Importação prevista (PR 1):**
-  - `skills/product-marketing/`, `skills/copywriting/`, `skills/copy-editing/`, `skills/social/`, `skills/ad-creative/`, `skills/emails/`, `skills/content-strategy/`, `skills/sales-enablement/`, `skills/marketing-council/`, cada diretório na íntegra (SKILL.md, references, assets e evals);
-  - `skills/ads/references/meta-decision-system.md` e `skills/ads/references/abm-playbook.md` (dependências transitivas do `ad-creative`);
-  - `LICENSE`.
+- **Commit importado:** `88c79f6528a9347420e57ceb1fff9a60de651768`
+- **Importado no PR 1 (73 arquivos, em `vendor/corey/`):**
+  - `skills/product-marketing/` (2.2.0, 3 arquivos), `skills/copywriting/` (2.3.2, 5), `skills/copy-editing/` (2.2.1, 5), `skills/social/` (2.4.1, 11), `skills/ad-creative/` (2.12.2, 14), `skills/emails/` (2.1.4, 5), `skills/content-strategy/` (2.1.5, 4), `skills/sales-enablement/` (2.4.0, 8), `skills/marketing-council/` (1.0.0, 15), cada diretório na íntegra (SKILL.md, references, assets e evals): 70 arquivos;
+  - `skills/ads/references/meta-decision-system.md` e `skills/ads/references/abm-playbook.md` (dependências transitivas do `ad-creative`): 2 arquivos;
+  - `LICENSE`: 1 arquivo.
+  - A lista por arquivo, com sha256, está em `provenance/upstream-lock.json`.
 - **Fora do escopo:** a pasta `tools/` (CLIs e integrações de plataforma) não é importada.
 - **Observação:** a skill `marketing-council` simula conselheiros com base em obras publicadas de profissionais reais. A própria skill exige que essa saída seja rotulada como simulação, e o Studio mantém essa exigência.
 
@@ -42,4 +43,4 @@
 
 ## Texto da licença MIT
 
-A licença MIT de cada fonte será reproduzida integralmente, como publicada no upstream, em `vendor/corey/LICENSE` (PR 1) e `vendor/bytedance/LICENSE` (PR 9).
+A licença MIT de cada fonte é reproduzida integralmente, como publicada no upstream: `vendor/corey/LICENSE` (importada no PR 1) e `vendor/bytedance/LICENSE` (prevista para o PR 9).
