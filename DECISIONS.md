@@ -363,7 +363,7 @@ Os demais saíram do plano ou ficam para o job real do operador (ADR-19).
   - **a) Entrega única.** Uma entrega, a v1, substitui a sequência de PRs do ADR-15.
   - **b) Três papéis.** Os papéis são Strategist, Writer e Critic. O Critic absorve a checagem de fatos e de fidelidade que seria do Reviewer, o que substitui parte do ADR-07.
   - **c) Loop simples.**
-    - Uma reprovação recomeça do Strategist, ou do Writer quando a intent não usa Strategist, com a evidência do Critic.
+    - Uma reprovação recomeça do Strategist, ou do Writer quando a intent não usa Strategist, com a evidência do Critic. *(Substituído por ADR-21: a causa da reprovação define de onde a rodada recomeça.)*
     - São no máximo 3 rodadas, configuráveis em `max_rounds` no `catalog/routing.yaml`.
     - Depois disso, o Studio entrega o melhor candidato marcado como não aprovado.
     - Isso substitui os orçamentos do ADR-10.
@@ -392,13 +392,35 @@ Os demais saíram do plano ou ficam para o job real do operador (ADR-19).
   - **b) Qualquer host com subagentes.** O requisito é a capacidade, não o produto. Sem ferramenta de subagente, o job segue `BLOCKED` e nunca é simulado.
   - **c) Dois modos.** No modo portátil, a separação vem de contextos limpos e de o orquestrador entregar a cada papel só o seu material. No modo reforçado, o guard do Claude Code (ADR-18) soma o bloqueio por caminho. O modo reforçado é opcional.
   - **d) Sem shell ou sem arquivos.** O roteamento usa as tabelas do `AGENTS.md`, geradas do mesmo catálogo, e o registro do job fica em blocos rotulados na conversa.
-  - **e) Loop.** Continua o do ADR-19: Strategist → Writer → Critic, recomeçando a cada reprovação, até 3 rodadas. O "melhor candidato" passa a ser uma contagem: menos gates em `FAIL` ou `UNVERIFIED` e, no empate, a rodada mais recente.
-  - **f) Critic explícito.** Os critérios de `quality` saem de "os critérios das skills" para uma lista em `agents/critic.md`, explicada em `CRITIC.md`. O status `N/A` passa a existir para `voice` sem instrução e para `fidelity` fora de `strict-source`.
+  - **e) Loop.** Continua o do ADR-19: Strategist → Writer → Critic, recomeçando a cada reprovação, até 3 rodadas. *(Recomeço substituído por ADR-21.)* O "melhor candidato" passa a ser uma contagem: menos gates em `FAIL` ou `UNVERIFIED` e, no empate, a rodada mais recente.
+  - **f) Critic explícito.** Os critérios de `quality` saem de "os critérios das skills" para uma lista em `agents/critic.md`, explicada em `CRITIC.md`. *(Marcas de IA como reprovação automática: substituído por ADR-21.)* O status `N/A` passa a existir para `voice` sem instrução e para `fidelity` fora de `strict-source`.
 - **Consequências:**
   - O mesmo critério do modo portátil vale para o Brain: nada impede tecnicamente um subagente de ler um arquivo que não recebeu.
   - Sem shell, o roteamento depende de o modelo aplicar as tabelas, inclusive a regra Yann × X → Brain.
   - O registro de handoff do ADR-04 (`brain_ref`) não está implementado: o Studio só encaminha o operador para uma sessão do Brain.
   - Cada host ainda precisa de um job real para contar como testado.
+- **Estado:** Aceito
+- **Data:** 2026-11-02
+
+## ADR-21 — Critic editorial
+
+- **Contexto:** o operador recebeu revisões humanas de uma editora profissional em um artigo e uma newsletter. Elas mostraram que o problema mais frequente é de lógica, clareza e relevância, não de linguagem artificial. O baseline do Critic anterior deixou passar parte desses problemas e reprovou construções legítimas.
+- **Decisão (do operador):**
+  - **a) Sem novo agente.** O julgamento editorial entra no Critic existente, por um novo gate `editorial`, avaliado antes dos gates de estilo.
+  - **b) Sinais, não proibições.** Marcas de IA deixam de reprovar automaticamente. Elas só bloqueiam quando substituem conteúdo, se acumulam ou tiram a confiança do leitor.
+  - **c) Severidade.** Achados são `blocking`, `material` ou `polish`. Só `blocking` reprova. Achado `material` vai ao operador e não abre rodada sozinho.
+  - **d) Diagnóstico, não redação.** O Critic dá a direção da correção e nunca a versão substituta.
+  - **e) `KEEP AS IS` e `keep`.** Não encontrar problema é um resultado válido. A lista `keep` protege o que funciona, sem bloquear correção factual ou obrigatória.
+  - **f) Regressão editorial.** O gate `revision` reprova uma revisão que perde clareza, personalidade, especificidade ou força comercial.
+  - **g) Loop.** Continuam 3 rodadas. A causa define o recomeço, e o Strategist só revê a abordagem quando a causa for `approach`.
+  - **h) Avaliação.** Mudança no Critic é medida antes e depois com `scripts/eval_critic.py`, sobre os mesmos casos cegos. Nos casos reais, o resultado esperado vem da revisora.
+  - **i) Material real fora do repo.** Comentários identificáveis e materiais internos de marcas ficam em corpus privado, sujeito às autorizações necessárias. No repositório entram só critérios genéricos e casos sintéticos (ADR-14).
+- **Consequências:**
+  - Um Critic mais exigente em lógica pode aumentar o uso das 3 rodadas.
+  - A base de calibração ainda é pequena, com poucos exemplos positivos explícitos, então a medição atual serve de direção, não de taxa de erro.
+  - Num conjunto de controle com comentários reais não usados no ajuste, nenhuma versão reproduziu o diagnóstico da revisora. O contrato só muda de novo com casos independentes e documentos inteiros.
+  - `material` não vira `blocking` por categoria. A severidade depende de quanto o problema compromete a função da peça.
+  - Aprovação humana não anula objeção factual: um texto elogiado ainda pode ter um problema de fato.
 - **Estado:** Aceito
 - **Data:** 2026-11-02
 

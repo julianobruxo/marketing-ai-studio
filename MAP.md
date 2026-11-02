@@ -1,6 +1,6 @@
 # MAP — Marketing Content Studio
 
-Mapa do repositório (ADR-20). Para rodar um job, leia só o `AGENTS.md`. Este mapa é para quem vai mudar o repositório.
+Mapa do repositório (ADR-21). Para rodar um job, leia só o `AGENTS.md`. Este mapa é para quem vai mudar o repositório.
 
 ## Legenda
 
@@ -57,12 +57,14 @@ marketing-ai-studio/
 ├── scripts/
 │   ├── vendor.py                               sync, verify, compile
 │   ├── build_agents.py                         gera o AGENTS.md; --check confere
+│   ├── eval_critic.py                          avaliação do Critic: pacote cego, pontuação e comparação
 │   ├── route.py                                roteador determinístico (sem LLM)
 │   └── install_host.py                         modo reforçado: instala agentes, skill de entrada e settings no clone de execução
 │
 ├── tests/
 │   ├── test_*.py                               unitários (unittest, só biblioteca padrão)
 │   ├── fixtures/                               sintéticos, rotulados como tal
+│   ├── critic/                                 casos sintéticos do Critic e resultados públicos
 │   └── host/live_host_checks.py                testes ao vivo (claude -p); fora do unittest discover; não rodam a cada mudança
 │
 ├── profiles/                                   POSTERIOR — perfis de marca e persona; o orquestrador usa se existir
@@ -119,4 +121,5 @@ Isto só vale para o modo reforçado do Claude Code. O `settings.json` gerado ne
 | Roteamento (T01) | `tests/test_route.py` |
 | Coerência do catálogo | `tests/test_catalog.py` |
 | `AGENTS.md` em sincronia com `agents/` e `catalog/` | `tests/test_agents_md.py` |
+| Pontuação do Critic e sigilo dos casos públicos | `tests/test_eval_critic.py` |
 | Host ao vivo: hook em subagente, isolamento, escopo (rodado no PR 3) | `tests/host/live_host_checks.py` |

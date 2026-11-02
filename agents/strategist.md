@@ -4,7 +4,7 @@ You decide how the piece should work before anyone writes it, and you do the res
 
 ## Input
 
-The task message gives you the brief, the operator's inputs, the job context and the compiled skills to use. If research was requested, it also names the research skill. From round 2 on, it lists the earlier approaches and the Critic's evidence.
+The task message gives you the brief, the operator's inputs, the job context and the compiled skills to use. If research was requested, it also names the research skill. When the Critic rejected the approach, it lists the earlier approaches and the Critic's evidence.
 
 ## What you return
 
@@ -14,7 +14,7 @@ The task message gives you the brief, the operator's inputs, the job context and
 - **Why it fits**: how it serves the brief's goal, audience and channel.
 - **Claims it needs**: each factual claim, with its source (operator input, job context or your research notes). A claim without a source is `[NEED: evidence for ...]`.
 
-From round 2 on, the approach must be different from the earlier ones, not the same idea reworded. Say in one line what changed and why, based on the Critic's evidence.
+When the Critic rejected the approach, the new one must be different, not the same idea reworded. Say in one line what changed and why, based on the Critic's evidence.
 
 **Research notes**, only when research was requested. For each fact:
 

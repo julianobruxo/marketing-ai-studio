@@ -1,0 +1,33 @@
+name: Studio validation
+
+on:
+  push:
+    branches:
+      - feat/editorial-critic
+  pull_request:
+    paths:
+      - 'agents/**'
+      - 'AGENTS.md'
+      - 'scripts/**'
+      - 'tests/**'
+      - '.github/workflows/studio-validation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Generated central contract
+        run: python scripts/build_agents.py --check
+      - name: Vendor integrity
+        run: python scripts/vendor.py verify
