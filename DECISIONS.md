@@ -412,7 +412,7 @@ Os demais saíram do plano ou ficam para o job real do operador (ADR-19).
   - **d) Diagnóstico, não redação.** O Critic dá a direção da correção e nunca a versão substituta.
   - **e) `KEEP AS IS` e `keep`.** Não encontrar problema é um resultado válido. A lista `keep` protege o que funciona, sem bloquear correção factual ou obrigatória.
   - **f) Regressão editorial.** O gate `revision` reprova uma revisão que perde clareza, personalidade, especificidade ou força comercial.
-  - **g) Loop.** Continuam 3 rodadas. A causa define o recomeço, e o Strategist só revê a abordagem quando a causa for `approach`.
+  - **g) Loop.** Continuam 3 rodadas. A causa define o recomeço, e o Strategist só revê a abordagem quando a causa for `approach`. *(Substituído por ADR-22: cada reprovação reinicia o ciclo configurado completo.)*
   - **h) Avaliação.** Mudança no Critic é medida antes e depois com `scripts/eval_critic.py`, sobre os mesmos casos cegos. Nos casos reais, o resultado esperado vem da revisora.
   - **i) Material real fora do repo.** Comentários identificáveis e materiais internos de marcas ficam em corpus privado, sujeito às autorizações necessárias. No repositório entram só critérios genéricos e casos sintéticos (ADR-14).
 - **Consequências:**
@@ -422,6 +422,22 @@ Os demais saíram do plano ou ficam para o job real do operador (ADR-19).
   - `material` não vira `blocking` por categoria. A severidade depende de quanto o problema compromete a função da peça.
   - Aprovação humana não anula objeção factual: um texto elogiado ainda pode ter um problema de fato.
 - **Estado:** Aceito
+- **Data:** 2026-11-02
+
+
+## ADR-22 — Critic como gate editorial e reinício integral por reprovação
+
+- **Contexto:** no primeiro teste real de um post para líderes de tecnologia, o Critic devolveu `KEEP AS IS` para um texto tecnicamente útil, mas com abertura burocrática, sequência repetitiva de perguntas/instruções e ausência de ideia editorial que justificasse a leitura. O operador rejeitou explicitamente a qualidade do resultado e esclareceu que o **Critic decide se passa ou se o workflow inteiro recomeça**.
+- **Decisão (do operador):**
+  - **a) Gate editorial efetivo.** Cumprir briefing, fatos e utilidade não basta para conteúdo destinado à atenção pública. O Critic verifica se há razão contextual para o leitor continuar, tese/ângulo identificável, evolução da ideia e payoff adequado ao canal. Se o propósito editorial essencial falha, classifica `editorial: FAIL` (`blocking`, `cause: approach`), com evidência concreta; não pode aprovar apenas por correção técnica.
+  - **b) Contexto em vez de fórmula.** Listas e checklists são válidos quando pedidos ou realmente úteis e específicos. Não obrigar controvérsia, gancho sensacionalista, autobiografia, estatísticas ou narrativa dramática. Repetição estrutural não reprova automaticamente: o problema é não cumprir o objetivo editorial para o público e canal.
+  - **c) Reinício integral.** Toda reprovação (`FAIL`/`UNVERIFIED`) reinicia **todas as etapas previstas na rota da intent**. Para intents com Strategist: novo Strategist independente → novo Writer → novo Critic independente, em até 3 rodadas. Intents sem Strategist (tradução e copy-edit) continuam com novo Writer → novo Critic.
+  - **d) Causa orienta, não salta etapas.** `approach` obriga um novo ângulo/estrutura; `writing` e `facts` exigem que o novo Strategist reavalie o ângulo, podendo justificadamente mantê-lo. `keep` preserva linhas boas sem impedir correções bloqueantes ou mudanças estruturais necessárias.
+  - **e) Bloqueio humano tem precedência.** Falta de requisito imprescindível fornecível apenas pelo operador pausa o ciclo antes do retry e não consome rodada. Sem dados/fonte, ninguém inventa fatos; pesquisa só quando autorizada.
+  - **f) Limites do pass.** `critic-pass` torna a peça elegível, não a publica; aprovação final é do operador. Após 3 reprovações, entregar melhor candidato claramente não aprovado.
+  - **g) Validação.** O post rejeitado pelo operador é um **contraexemplo real** de falso `critic-pass`, mas não é automaticamente uma medição de que a nova instrução consegue detectá-lo. Testes sintéticos verificam coerência de contratos; a capacidade editorial exige nova execução independente e revisão humana. Material real permanece fora do repo público.
+- **Consequências:** substitui o reinício por causa no ADR-21(g), sem alterar a separação de papéis, o limite de 3 rodadas, as regras de evidência, a exceção para intents sem Strategist ou a aprovação humana.
+- **Estado:** Proposto para revisão.
 - **Data:** 2026-11-02
 
 ---
