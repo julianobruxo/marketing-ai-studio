@@ -2,7 +2,7 @@
 
 Mapa da estrutura aprovada no manifesto R4. Leia este arquivo antes de abrir qualquer outro. Ele diz o que existe, para que serve e em qual PR cada item entra.
 
-**Hoje (PR 1) existem apenas:** `README.md`, `MAP.md`, `DECISIONS.md`, `THIRD_PARTY_NOTICES.md`, `.gitignore`, `.gitattributes`, `vendor/corey/`, `provenance/upstream-lock.json`, `scripts/vendor.py` (`sync` e `verify`) e `tests/` (`test_vendor.py` e fixtures sintéticas). Todos os outros itens estão planejados.
+**Hoje (PR 2) existem apenas:** `README.md`, `MAP.md`, `DECISIONS.md`, `THIRD_PARTY_NOTICES.md`, `.gitignore`, `.gitattributes`, `vendor/corey/`, `provenance/upstream-lock.json`, `overlays/corey/` (`_common.md` e 6 overlays), `compiled/corey/` (6 compilados), `scripts/vendor.py` (`sync`, `verify` e `compile`) e `tests/` (`test_vendor.py`, `test_compile.py` e fixtures sintéticas). Todos os outros itens estão planejados.
 
 ## Legenda
 
@@ -22,7 +22,7 @@ marketing-ai-studio/                                              [público · r
 ├── README.md                                   MVP · PR 0   canônico
 ├── MAP.md                                      MVP · PR 0   canônico (atualizado a cada PR)
 ├── DECISIONS.md                                MVP · PR 0   canônico
-├── THIRD_PARTY_NOTICES.md                      MVP · PR 0   canônico (atualizado nos PRs 1 e 9)
+├── THIRD_PARTY_NOTICES.md                      MVP · PR 0   canônico (atualizado nos PRs 1, 2 e 9)
 ├── .gitignore                                  MVP · PR 0   canônico
 ├── .gitattributes                              MVP · PR 1   canônico
 │
@@ -57,10 +57,18 @@ marketing-ai-studio/                                              [público · r
 │           └── deep-research/                  MVP · PR 9
 │
 ├── overlays/                                                canônico — operações declarativas por âncora
+│   ├── corey/_common.md                        MVP · PR 2   canônico — snippets comuns (regras de operação, vínculo de contexto)
 │   ├── corey/<skill>.md                        MVP · PR 2   só as 6 skills roteadas no MVP
 │   └── bytedance/<skill>.md                    MVP · PR 9
 │
 ├── compiled/                                   MVP · PR 2 / PR 9   gerado — vendor + overlay; commitado para revisão de diff
+│   └── corey/
+│       ├── product-marketing.md                MVP · PR 2   gerado
+│       ├── copywriting.md                      MVP · PR 2   gerado
+│       ├── copy-editing.md                     MVP · PR 2   gerado
+│       ├── social.md                           MVP · PR 2   gerado
+│       ├── ad-creative.md                      MVP · PR 2   gerado
+│       └── emails.md                           MVP · PR 2   gerado
 │
 ├── profiles/
 │   ├── brands/_template.yaml                   MVP · PR 6   canônico — fatos, posicionamento, claims permitidos, proibições
@@ -114,6 +122,8 @@ marketing-ai-studio/                                              [público · r
 └── runtime/                                    POSTERIOR    só com ADR específico de runtime fino
 ```
 
+**Skills sem compilado:** `content-strategy`, `sales-enablement` e `marketing-council` estão em `vendor/corey/`, mas não têm overlay nem compilado. Por isso não são carregáveis pelo Studio até ganharem overlay.
+
 ### Gerados localmente, fora do git
 
 | Caminho | Produzido por | Observação |
@@ -140,7 +150,7 @@ O conteúdo de cada um foi absorvido por outro arquivo da árvore, conforme a R4
 
 ## Testes de aceitação previstos
 
-**Só o T14 foi implementado e executado (PR 1, `tests/test_vendor.py`).** Os demais testes da tabela estão planejados.
+**Implementados e executados: T14 (PR 1, `tests/test_vendor.py`) e T-COMPILE (PR 2, `tests/test_compile.py`).** Os demais testes da tabela estão planejados.
 
 | ID | O que verifica | PR |
 |---|---|---|

@@ -1,0 +1,33 @@
+{
+  "lock_version": 1,
+  "sources": {
+    "synthetic": {
+      "commit": "1111111111111111111111111111111111111111",
+      "extra_files": {},
+      "license": {
+        "path": "vendor/synthetic/LICENSE",
+        "sha256": "cfbb88e780bb72f1de4424ddc4b207a2f96cdc2cb64e8e22e89d1ee041823a27",
+        "upstream_path": "LICENSE"
+      },
+      "repo": "https://example.invalid/synthetic",
+      "retrieved_at": "2026-11-02",
+      "selection": {
+        "extra_files": [],
+        "skills": [
+          "demo"
+        ]
+      },
+      "skills": {
+        "demo": {
+          "files": {
+            "vendor/synthetic/skills/demo/SKILL.md": "fee6b871f998a32541a6fe67f802533b41e3e7af3dae425f52770e0f0e2fe726",
+            "vendor/synthetic/skills/demo/references/guide.md": "fa843b0dbcbc358169d144eae7861e1f63e77cfe93de8007f660e60b9d4233df"
+          },
+          "reason": "selecionada",
+          "upstream_path": "skills/demo",
+          "version": "1.0.0"
+        }
+      }
+    }
+  }
+}
