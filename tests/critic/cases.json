@@ -118,7 +118,7 @@
     "brief": "Paragraph of a technical article that develops one argument in depth.",
     "job_context": "Brand: Northwind Data, a fictional data platform company. Audience: operations leaders at mid-sized companies. No brand profile.",
     "inputs": "Northwind 2025 survey: 41 of 120 finance teams returned to spreadsheets within six months of adopting an automated close. Interviews: teams said the new tool removed a manual check they relied on.",
-    "candidate": "Northwind's 2025 survey of 120 finance teams found that 41 of them went back to spreadsheets within six months of adopting an automated close. That return is easy to misread. Teams usually go back not because they reject automation, but because the new tool removes a manual check they relied on. So fixing the rollout means finding that check before launch, and that work belongs to process design more than to training.",
+    "candidate": "Northwind's 2025 survey of 120 finance teams found that 41 of them went back to spreadsheets within six months of adopting an automated close. That return is easy to misread. In interviews, those teams said they went back not because they rejected automation, but because the new tool removed a manual check they relied on. So a rollout plan should find that check before launch.",
     "expected": {
       "verdict": "pass"
     }
@@ -216,9 +216,39 @@
     "brief": "LinkedIn post em português anunciando o novo painel. Tom direto, sem emojis, até 600 caracteres, com o link no final.",
     "job_context": "Marca: Northwind Data, empresa fictícia. Voz pedida: direta, sem emojis.",
     "inputs": "O painel mostra: dono de cada fonte, data da última atualização, relatórios que dependem dela. Link: https://example.com/painel",
-    "candidate": "O novo painel da Northwind Data já está no ar. Ele mostra três coisas que os times de operações pediam: quem é dono de cada fonte, quando ela foi atualizada e quais relatórios dependem dela.\n\nAssim, quando um número parece errado, dá para descobrir a origem sem abrir chamado.\n\nVeja como funciona: https://example.com/painel",
+    "candidate": "O novo painel da Northwind Data já está no ar. Ele mostra três coisas: quem é dono de cada fonte, quando ela foi atualizada e quais relatórios dependem dela.\n\nVeja como funciona: https://example.com/painel",
     "expected": {
       "verdict": "pass"
+    }
+  },
+  {
+    "id": "S17",
+    "test": "regression-worse",
+    "intent": "copy-edit",
+    "fidelity": "grounded-creative",
+    "brief": "Edit the original so it is easier to read. Keep the author's voice, the specifics and the commercial force.",
+    "job_context": "Brand: Northwind Data, a fictional data platform company. Audience: operations leaders at mid-sized companies. No brand profile.",
+    "inputs": "",
+    "original": "Every Friday, someone on your team spends three hours matching invoices by hand. Northwind's matching rules do that in minutes, and they flag the five percent that still need a person.",
+    "candidate": "Northwind helps organizations improve invoice processing efficiency through automated matching capabilities that reduce manual effort.",
+    "expected": {
+      "verdict": "reject",
+      "target": "helps organizations improve"
+    }
+  },
+  {
+    "id": "S18",
+    "test": "regression-better",
+    "intent": "copy-edit",
+    "fidelity": "grounded-creative",
+    "brief": "Edit the original so it is easier to read. Keep the author's voice, the specifics and the commercial force.",
+    "job_context": "Brand: Northwind Data, a fictional data platform company. Audience: operations leaders at mid-sized companies. No brand profile.",
+    "inputs": "",
+    "original": "Every Friday, someone on your team spends three hours matching invoices by hand, which is a process that Northwind's matching rules are able to complete in minutes, while also flagging the five percent that still need a person.",
+    "candidate": "Every Friday, someone on your team spends three hours matching invoices by hand. Northwind's matching rules do that in minutes, and they flag the five percent that still need a person.",
+    "expected": {
+      "verdict": "pass",
+      "keep": "Every Friday, someone on your team spends three hours"
     }
   }
 ]

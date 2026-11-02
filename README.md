@@ -36,7 +36,7 @@ Não é uma biblioteca nova de copywriting, nem um fork das skills upstream (ela
 ## Como usar
 
 1. Cole o link do repositório. Se o agente não tiver subagentes, ele avisa e o job fica `BLOCKED`.
-2. Faça o pedido em linguagem natural. O orquestrador faz o intake, roteia e delega a Strategist, Writer e Critic. Se o Critic reprovar, a rodada recomeça, até 3 vezes.
+2. Faça o pedido em linguagem natural. O orquestrador faz o intake, roteia e delega a Strategist, Writer e Critic. Se o Critic reprovar, nova rodada, até 3 no total. Ele protege o que já funciona, e o Strategist só muda a abordagem quando ela é o problema.
 3. O Studio entrega a peça, diz se ela passou no Critic (`critic-pass`), mostra a evidência e as fontes e lista o que faltou (`[NEED: ...]`). Se não passar em 3 rodadas, entrega o melhor candidato marcado como não aprovado. Aprovar e publicar é sempre com você.
 
 Exemplos de pedido:
@@ -85,7 +85,7 @@ Este repositório é **público** e é um projeto pessoal do operador (ADR-14). 
 
 ## Decisões e licenças
 
-- `DECISIONS.md` é o registro canônico (ADR-01 a ADR-20). Mudanças entram por PR aprovado pelo operador; não há merge automático.
+- `DECISIONS.md` é o registro canônico (ADR-01 a ADR-21). Mudanças entram por PR aprovado pelo operador; não há merge automático.
 - O conteúdo próprio do Studio ainda não tem licença de uso definida (todos os direitos reservados ao autor). O material de terceiros está em `THIRD_PARTY_NOTICES.md`.
 - `MAP.md` descreve a estrutura do repositório.
 - `AGENTS.md` é gerado: edite `agents/` ou `catalog/` e rode `python scripts/build_agents.py`.

@@ -4,13 +4,14 @@ You write the content. You never evaluate it: an independent Critic does that.
 
 ## Input
 
-The task message gives you the brief, the approach, the operator's inputs, the job context, the compiled skills to apply and, from round 2 on, the Critic's evidence.
+The task message gives you the brief, the approach, the operator's inputs, the job context, the compiled skills to apply and, from round 2 on, the Critic's evidence, its `keep` list and the previous candidate.
 
 ## What you do
 
 1. Apply the compiled skills named in the task, including their Studio operating rules.
 2. Write the candidate to `runs/<job>/drafts/`, using the file name from the task message. If the task message says you have no files, return the full candidate in your reply.
 3. Follow the operator's writing instructions in the brief and the job context.
+4. In a revision, change only what the Critic's evidence requires, using its direction as the goal. Keep every line in the `keep` list word for word, unless a blocking finding or a factual correction touches it.
 
 ## What you return
 

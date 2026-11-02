@@ -28,13 +28,22 @@ If you cannot write files, keep the same record in the conversation as labeled b
 
 ## The loop
 
-One round is **Strategist → Writer → Critic**. The maximum is `max_rounds` from the routing section: **3 rounds**. Count them and state the round number to the operator.
+One round runs through Strategist, Writer and Critic. The maximum is `max_rounds` from the routing section: **3 rounds**. Count them and state the round number to the operator.
 
-1. **Strategist** (when the intent uses it): give it the brief, the inputs, the job context and its skills. If research was requested, also give it the research skill; save its research notes. From round 2 on, also give it the previous approaches and the Critic's evidence: it must propose a different approach.
+1. **Strategist** (when the intent uses it): give it the brief, the inputs, the job context and its skills. If research was requested, also give it the research skill; save its research notes. From round 2 on, it runs only when step 4 sends the job back to it.
    If the Strategist reports a `[NEED]` without which the brief cannot be met (for example, the link a required CTA points to), pause and ask the operator before the Writer. No round can supply it. The pause does not count as a round. If the operator is not there, continue and report the gap.
-2. **Writer**: give it the brief, the approach, the inputs, the job context and its skills. From round 2 on, also give it the Critic's evidence.
-3. **Critic**: give it the eval pack, the job context, the intent and the fidelity mode, and nothing else. It never sees the Writer's notes or reasoning, the Strategist's reasoning or earlier verdicts.
-4. **Decide**: every gate PASS or N/A → the candidate is `critic-pass`; deliver it. Any FAIL or UNVERIFIED → start the next round from step 1 (from step 2 when the intent has no Strategist), passing the Critic's evidence.
+2. **Writer**: give it the brief, the approach, the inputs, the job context and its skills. From round 2 on, also give it the Critic's evidence and `keep` list and the previous candidate.
+3. **Critic**: give it the eval pack, the job context, the intent and the fidelity mode, and nothing else. From round 2 on, add the previous candidate and the `keep` list to the pack. For `copy-edit` and `translation`, add the original from round 1. It never sees the Writer's notes or reasoning, the Strategist's reasoning or earlier verdicts.
+4. **Decide**: every gate PASS or N/A → the candidate is `critic-pass`; deliver it with any material findings for the operator, and do not start another round to polish it. Any FAIL or UNVERIFIED → start the next round according to the `cause`:
+
+   | Cause | Next round |
+   |---|---|
+   | `approach` | Strategist proposes a different approach, then Writer and Critic |
+   | `writing` | Same approach: Writer and Critic |
+   | `facts` | If research was requested, the Strategist researches the gap, then Writer and Critic. Otherwise the Writer corrects or removes the claim. If the piece needs data only the operator has, pause and ask |
+   | `brief` | Pause and ask the operator. The pause does not count as a round |
+
+   With several causes, the first row that applies decides. A `revision` FAIL counts as `writing`. An UNVERIFIED gate counts as `facts`.
 
 After round 3 without a pass, stop. Deliver the best candidate clearly marked as not passed, with the Critic's evidence, and let the operator decide. The best candidate is a count, not a judgment: the one with the fewest gates in FAIL or UNVERIFIED; on a tie, the later round. Never start more rounds on your own.
 
