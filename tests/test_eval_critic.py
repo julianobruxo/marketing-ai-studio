@@ -43,6 +43,32 @@ class CasesTest(unittest.TestCase):
             text = (Path(tmp) / "cases.json").read_text(encoding="utf-8")
             self.assertNotIn('"expected"', text)
             self.assertTrue((Path(tmp) / "contract.md").is_file())
+            self.assertEqual(len(json.loads((Path(tmp) / "manifest.json").read_text())["contract_sha256"]), 64)
+
+    def test_pack_does_not_expose_human_feedback_or_annotations(self):
+        private = [{
+            "id": "D01", "intent": "article", "brief": "Independent review",
+            "candidate": "Full original document. It has two paragraphs.",
+            "source_comment": "This writing is terrible", "reviewer": "PRIVATE PERSON",
+            "adjudication": {"diagnosis": "aligned"},
+            "expected": {"issues": [{"id": "c1", "source_comment": "Fix this"}]},
+            "research_notes": ["A fact from an ordinary source"]
+        }]
+        with tempfile.TemporaryDirectory() as tmp:
+            eval_critic.pack(private, Path(tmp))
+            blind = json.loads((Path(tmp) / "cases.json").read_text(encoding="utf-8"))
+            self.assertEqual(blind[0]["candidate"], private[0]["candidate"])
+            self.assertEqual(blind[0]["research_notes"], private[0]["research_notes"])
+            for forbidden in ("source_comment", "reviewer", "adjudication", "expected"):
+                self.assertNotIn(forbidden, blind[0])
+            packet = (Path(tmp) / "cases.json").read_text(encoding="utf-8")
+            self.assertNotIn("PRIVATE PERSON", packet)
+            self.assertNotIn("Fix this", packet)
+
+    def test_pack_rejects_duplicate_case_ids(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            with self.assertRaises(ValueError):
+                eval_critic.pack([{"id": "D"}, {"id": "D"}], Path(tmp))
 
 
 class ScoreTest(unittest.TestCase):
@@ -102,6 +128,90 @@ class ScoreTest(unittest.TestCase):
         case = {"id": "C", "expected": {"verdict": "reject", "needs_context": True}}
         result = eval_critic.score([REJECT, case], {})
         self.assertEqual(result["without_context_cases"]["caught"]["total"], 1)
+
+
+
+class DocumentScoreTest(unittest.TestCase):
+    def setUp(self):
+        self.case = {
+            "id": "D01", "candidate": "A complete synthetic editorial article.",
+            "expected": {"issues": [
+                {"id": "p1", "kind": "problem", "source_comment": "No causal connection"},
+                {"id": "p2", "kind": "problem", "source_comment": "Heading not answered"},
+                {"id": "ok", "kind": "praise", "source_comment": "Keep the strong CTA"},
+            ]}
+        }
+        self.verdict = {
+            "decision": "REVISE", "gates": [
+                {"gate": "editorial", "status": "FAIL", "evidence": [
+                    {"quote": "First line", "severity": "blocking", "issue": "Missing argument"},
+                    {"quote": "Second line", "severity": "material", "issue": "Unclear wording"},
+                    {"quote": "Third line", "severity": "material", "issue": "Other observation"}
+                ]}
+            ]
+        }
+        self.adjudication = {"matches": [
+            {"issue_id": "p1", "finding_index": 0, "diagnosis": "aligned",
+             "category_ok": True, "severity_ok": True},
+            {"issue_id": "p2", "finding_index": None, "diagnosis": "missed"},
+        ]}
+
+    def test_each_human_issue_is_scored_separately(self):
+        row = eval_critic.score_document_case(self.case, self.verdict, self.adjudication)
+        self.assertEqual(row["expected_issues"], 2)
+        self.assertEqual(row["aligned"], 1)
+        self.assertEqual(row["missed"], 1)
+        self.assertEqual(row["unmatched_findings"], 2)
+        self.assertTrue(row["document_rejected"])
+
+    def test_aggregates_without_claiming_unmatched_findings_are_false_positives(self):
+        result = eval_critic.score_documents([self.case], {"D01": self.verdict},
+                                               {"D01": self.adjudication})
+        self.assertEqual(result["totals"]["aligned"], 1)
+        self.assertEqual(result["totals"]["unmatched_findings"], 2)
+        self.assertEqual(result["totals"]["documents"], 1)
+
+    def test_explicit_human_judgment_is_required(self):
+        with self.assertRaises(ValueError):
+            eval_critic.score_documents([self.case], {"D01": self.verdict}, {})
+        with self.assertRaises(ValueError):
+            eval_critic.score_document_case(self.case, self.verdict, {"matches": []})
+
+    def test_rejects_mapping_two_issues_to_one_finding(self):
+        bad = {"matches": [
+            {"issue_id": "p1", "finding_index": 0, "diagnosis": "aligned",
+             "category_ok": True, "severity_ok": True},
+            {"issue_id": "p2", "finding_index": 0, "diagnosis": "partial",
+             "category_ok": False, "severity_ok": False},
+        ]}
+        with self.assertRaises(ValueError):
+            eval_critic.score_document_case(self.case, self.verdict, bad)
+
+    def test_bad_judgment_cannot_receive_credit(self):
+        bad = {"matches": [
+            {"issue_id": "p1", "finding_index": 0, "diagnosis": "different",
+             "category_ok": False, "severity_ok": False},
+            {"issue_id": "p2", "finding_index": None, "diagnosis": "missed"}
+        ]}
+        row = eval_critic.score_document_case(self.case, self.verdict, bad)
+        self.assertEqual(row["aligned"], 0)
+        self.assertEqual(row["category_ok"], 0)
+
+    def test_missing_model_verdict_counts_as_missed(self):
+        result = eval_critic.score_document_case(self.case, None, {
+            "matches": [{"issue_id": "p1", "finding_index": None, "diagnosis": "missed"},
+                        {"issue_id": "p2", "finding_index": None, "diagnosis": "missed"}]})
+        self.assertEqual(result["missed"], 2)
+        self.assertFalse(result["document_rejected"])
+
+    def test_non_boolean_adjudication_is_rejected(self):
+        bad = {"matches": [
+            {"issue_id": "p1", "finding_index": 0, "diagnosis": "aligned",
+             "category_ok": "yes", "severity_ok": True},
+            {"issue_id": "p2", "finding_index": None, "diagnosis": "missed"}
+        ]}
+        with self.assertRaises(ValueError):
+            eval_critic.score_document_case(self.case, self.verdict, bad)
 
 
 if __name__ == "__main__":
