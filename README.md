@@ -42,7 +42,7 @@ As fontes integradas são:
 
 ## Estado e roteiro
 
-Nada abaixo está implementado. Os PRs seguem a ordem aprovada no ADR-15.
+Só existe no repositório o que está marcado como concluído ou em revisão; o restante está planejado. Os PRs seguem a ordem aprovada no ADR-15.
 
 | PR | Escopo | Estado |
 |---|---|---|

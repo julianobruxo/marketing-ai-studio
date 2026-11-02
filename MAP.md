@@ -140,7 +140,7 @@ O conteúdo de cada um foi absorvido por outro arquivo da árvore, conforme a R4
 
 ## Testes de aceitação previstos
 
-**Nenhum teste foi executado.** A tabela abaixo registra o plano.
+**Só o T14 foi implementado e executado (PR 1, `tests/test_vendor.py`).** Os demais testes da tabela estão planejados.
 
 | ID | O que verifica | PR |
 |---|---|---|
