@@ -1,6 +1,9 @@
 name: Critic evaluation tests
 
 on:
+  push:
+    branches:
+      - feat/critic-full-document-evaluation
   pull_request:
     paths:
       - 'scripts/eval_critic.py'
