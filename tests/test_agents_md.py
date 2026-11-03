@@ -131,7 +131,7 @@ class AgentsMdTest(unittest.TestCase):
         self.assertIn("allowed-read-request", orchestrator)
         self.assertIn("PreToolUse", orchestrator)
         self.assertIn("profiles/", orchestrator)
-        self.assertIn("the exact deliverable", strategist)
+        self.assertIn("caption inviting reading of an infographic", strategist)
         self.assertIn("promotional caption", critic)
         self.assertIn("cause: writing", critic)
         self.assertIn("Brain without copying it", orchestrator)
