@@ -109,7 +109,7 @@ def critic_skills_for_case(case: dict) -> tuple[list, list]:
             "heading": section["heading"],
             "start_line": section["start_line"],
             "end_line": section["end_line"],
-            "excerpt": "\\n".join(text_lines[section["start_line"] - 1:section["end_line"]])
+            "excerpt": "\n".join(text_lines[section["start_line"] - 1:section["end_line"]])
         } for section in ref["sections"]]
         context.append({
             "name": ref["name"], "path": ref["path"], "sha256": ref["sha256"],
