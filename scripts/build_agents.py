@@ -46,7 +46,7 @@ def names(items: list[str]) -> str:
 def routing(catalog: dict, skill_catalog: dict) -> str:
     lines = ["## Routing", ""]
     lines.append("If you have a shell, run this and follow its JSON exactly; use `-` for a field that does not apply:")
-    lines += ["", "```", "python scripts/route.py --persona <persona> --brand <brand> --channel <channel> --intent <intent>", "```", ""]
+    lines += ["", "```", "python scripts/route.py --persona <persona> --brand <brand> --channel <channel> --intent <intent> --with-skill-context", "```", ""]
     lines += ["Without a shell, apply the tables below, which come from the same catalog. Never change a route by judgment.", ""]
 
     lines += ["**Aliases.** Normalize these values first, ignoring case:", ""]
