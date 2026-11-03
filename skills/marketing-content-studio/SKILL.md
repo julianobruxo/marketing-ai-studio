@@ -22,14 +22,14 @@ Ask the operator only when persona, brand, channel or intent is genuinely unclea
 Run the router and follow its result exactly:
 
 ```
-python scripts/route.py --persona <persona> --brand <brand> --channel <channel> --intent <intent>
+python scripts/route.py --persona <persona> --brand <brand> --channel <channel> --intent <intent> --with-skill-context
 ```
 
 Use `-` for a field that does not apply. The router prints JSON.
 
 - `owner: brain` → do not start any subagent. Tell the operator this belongs to the X Content Brain and must run in a Brain session.
 - `status: NEEDS_OPERATOR` or `BLOCKED` → show the reason to the operator and stop.
-- `status: ROUTED` → run the loop in `agents/orchestrator.md` with the **role-specific `skill_manifest`** (paths, content SHA-256 and focused reading ranges), `strategist` flag, conditional research skill and `max_rounds`. Each actual agent must receive/access these skill sections. A route entry alone does not mean the skills were used.
+- `status: ROUTED` → run the loop in `agents/orchestrator.md` with the **role-specific `skill_manifest`** (paths, content SHA-256 and focused reading ranges), `strategist` flag, conditional research skill and `max_rounds`. Use `skill_context` from the router as the preferred exact source excerpts; add `--research` only for explicitly requested active research. Each actual agent must receive/access these skill sections. A route entry alone does not mean the skills were used.
 
 Never change the route by judgment. If it looks wrong, stop and tell the operator.
 
