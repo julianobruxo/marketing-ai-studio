@@ -75,7 +75,7 @@ marketing-ai-studio/
 
 Fora da v1 (ADR-19): `workflows/` (a intent no `routing.yaml` faz esse papel), `schemas/`, o papel Reviewer (o Critic absorve fatos e fidelidade), campanha multicanal e o golden dataset da Zazmic.
 
-**Handoff verificado em duas camadas:** o roteamento determina as seções e hashes, enquanto o contrato de cada papel exige carregar/aplicar o material e registrar um recibo. Em Claude Code, `audit_skill_use.py` pode identificar pedidos de Read autorizados por ID; **PreToolUse não prova que a leitura foi concluída nem que a skill foi aplicada**. Em hosts portáteis, a entrega dos excertos é rastreável mas o julgamento segue exigindo avaliação humana.\n\n**Skills sem compilado:** `content-strategy`, `sales-enablement` e `marketing-council` estão em `vendor/corey/`, mas não têm overlay. Não são carregáveis até ganharem um.
+**Handoff verificado em duas camadas:** o roteamento determina as seções e hashes, enquanto o contrato de cada papel exige carregar/aplicar o material e registrar um recibo. Em Claude Code, `audit_skill_use.py` pode identificar pedidos de Read autorizados por ID; **PreToolUse não prova que a leitura foi concluída nem que a skill foi aplicada**. Na maioria dos hosts, os excertos literais são injetados no contexto do subagente (sem abrir outra etapa do workflow). Só se usa leitura nativa sem injeção com evidência confiável de conclusão da ferramenta. O julgamento segue exigindo avaliação humana.\n\n**Skills sem compilado:** `content-strategy`, `sales-enablement` e `marketing-council` estão em `vendor/corey/`, mas não têm overlay. Não são carregáveis até ganharem um.
 
 ## Gerados localmente, fora do git
 
