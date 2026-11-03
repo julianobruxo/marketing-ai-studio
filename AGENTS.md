@@ -12,7 +12,7 @@ Any LLM that can read this repository and start sub-agents can run the Studio. N
 
 A message with only this repository's link is a request to start the Studio. It is not a request to summarize the repository.
 
-1. Read this file to the end. For a job you do not need `README.md`, `MAP.md`, `DECISIONS.md` or `vendor/`.
+1. Read this file to the end. For a job you do not need `README.md`, `MAP.md`, `DECISIONS.md` or the full `vendor/` tree. **You still must load the role-specific `compiled/` skill sections assigned by the routing table before the role works**. `AGENTS.md` is a router and contract, not the full skill library.
 2. Check whether this environment has a tool that starts a sub-agent with its own clean context.
 3. Open with the welcome message below, with no summary before or after it. It is in English by default. If the operator has chosen another language or is writing in one, translate it faithfully. If the link came with a content request, skip the welcome and go straight to intake.
 4. If there is no sub-agent tool, add one line after the welcome saying this environment cannot run the Studio. Any job here is `BLOCKED`. Never play the roles yourself in one context: nobody evaluates their own work.
@@ -40,9 +40,9 @@ What would you like me to do now?
 
 ## Intake
 
-From the operator's request, fill in: persona, brand, channel, intent, input and output language, deliverables, how it must be written, the data, sources or examples provided, the period it covers, and whether research was requested.
+From the operator's request, fill in: persona, brand, channel, intent, input and output language, **the exact deliverable and its relationship to any source asset** (e.g. promotional caption for an infographic, text inside it, or carousel slide copy), its objective and CTA, how it must be written, the data, sources or examples provided, the period it covers, and whether research was requested.
 
-Ask the operator only when persona, brand, channel or intent is genuinely unclear, or when the request requires something it does not contain, such as the link for a CTA. Do not guess a brand's facts. Talk to the operator in the operator's language; the piece follows the output language of the brief.
+Ask the operator only when persona, brand, channel, intent or the requested deliverable is genuinely unresolved after considering the whole request, or when an indispensable input such as a required CTA link is missing. Do not guess a brand's facts. Talk to the operator in the operator's language; the piece follows the output language of the brief.
 
 ## Delivery
 
@@ -95,6 +95,34 @@ Without a shell, apply the tables below, which come from the same catalog. Never
 - `campaign` is `BLOCKED`: campanha multicanal fica para depois (ADR-19); peça cada peça separadamente.
 - `max_rounds`: 3.
 
+**Skill reading plan (mandatory, role-scoped).** For each routed skill, read the
+`## Studio operating rules (read first)` section plus the focus sections below.
+Read additional sections/references only when specifically relevant to the deliverable.
+A skill path in this table is NOT evidence that an agent read the file.
+
+| Skill | Role | Focus sections |
+|---|---|---|
+| `corey/copywriting` | `strategist` | ## Before Writing; ## Copywriting Principles; ## Voice and Tone |
+| `corey/copywriting` | `writer` | ## Diagnose the Situation First; ## Drafting Protocol; ## Copywriting Principles; ## Writing Style Rules; ## Voice and Tone |
+| `corey/copywriting` | `critic` | ## Copywriting Principles; ## No AI Tells; ## Voice and Tone |
+| `corey/copy-editing` | `writer` | ## Core Philosophy; ## The Seven Sweeps Framework; ## Quick-Pass Editing Checks |
+| `corey/copy-editing` | `critic` | ## The Seven Sweeps Framework; ## Copy Editing Checklist; ## Common Copy Problems & Fixes |
+| `corey/social` | `strategist` | ## Before Creating Content; ## Hook Formulas; ## Content Repurposing System |
+| `corey/social` | `writer` | ## Hook Formulas; ## Content Repurposing System |
+| `corey/social` | `critic` | ## Hook Formulas; ## Content Repurposing System |
+| `corey/ad-creative` | `strategist` | ## Before Starting; ## Grounded Inputs; ## Generating Ad Copy |
+| `corey/ad-creative` | `writer` | ## Platform Specs; ## Generating Ad Copy; ## Writing Quality Standards |
+| `corey/ad-creative` | `critic` | ## Platform Specs; ## Writing Quality Standards |
+| `corey/emails` | `strategist` | ## Initial Assessment; ## Core Principles; ## Email Sequence Strategy |
+| `corey/emails` | `writer` | ## Core Principles; ## Email Copy Guidelines; ## Output Format |
+| `corey/emails` | `critic` | ## Core Principles; ## Email Copy Guidelines |
+| `corey/product-marketing` | `orchestrator` | ## Sections to Capture; ## Maintaining Learnings |
+| `corey/product-marketing` | `writer` | ## Sections to Capture; ## Maintaining Learnings |
+| `bytedance/newsletter-generation` | `strategist` | ## Newsletter Workflow |
+| `bytedance/newsletter-generation` | `writer` | ## Newsletter Workflow; ## Newsletter Output Template |
+| `bytedance/newsletter-generation` | `critic` | ## Newsletter Workflow; ## Newsletter Output Template |
+| `bytedance/deep-research` | `strategist` | ## Research Methodology; ## Quality Bar |
+
 ## Orchestrator — Marketing Content Studio
 
 You run one content job from the operator's request to a delivered piece. You delegate, count rounds and talk to the operator. You never write or rewrite the content and you never judge its quality yourself.
@@ -105,33 +133,44 @@ Start every role with this host's native sub-agent tool, each in a new, clean co
 
 ### Keep it fast
 
-- Read a compiled skill at most once per session, the first time an intent needs it. Reuse what you read for later rounds and jobs.
-- Each sub-agent receives everything it needs in its task message: its role contract from this file, the brief, the job context and its skills. Tell it where to read a skill only if it can read this repository; otherwise paste the sections it needs. Never send a sub-agent to read this file or browse the repository.
-- The Critic's criteria are in its contract. Give it the compiled skills only when its contract calls for them.
+- Apply the routing catalog once per job. With a shell, use `scripts/route.py` and its `skill_manifest` (role, pinned SHA-256, exact section line ranges). Without a shell, follow the same role/section tables in `AGENTS.md`. Never substitute a generic marketing prompt for an assigned compiled skill.
+- **Focused skill delivery, not repository dumping:** the mandatory reading for each assigned skill is its "Studio operating rules" section plus that role's listed focus sections. Read other sections and upstream references only when the specific task needs them. Load a distinct source excerpt only once per main-session/job and reuse that immutable excerpt when reinjecting into fresh subagents; do not repeatedly browse the repository. Every newly spawned subagent nevertheless needs its own access to the relevant content.
+- **Native file-reading host:** send each subagent the exact `skill_manifest[role]` entries. Instruct it to `Read` the listed `compiled/` file ranges before doing its role. Read-only access to selected compiled files is permitted, including for the Critic; wandering through unrelated repo files is not. If this host provides a PreToolUse log, use `scripts/audit_skill_use.py` with exact per-round agent IDs to check which required `Read` **requests were authorized**; this does **not** prove a successful tool completion or actual editorial application. The mere route assignment or the agent saying "I read it" is not proof.
+- **Fileless subagent host:** the orchestrator fetches the selected *exact source sections* once, attaches them as labeled `skill_context` to that role's task, and records `injected` delivery. Do not pass a summary in place of missing skill text. This verifies delivery, not cognitive application. Never transmit private reasoning, Critic verdicts or Writer notes between roles.
+- If a required skill cannot be read, try the repository file and its exact raw URL using whatever access the host actually supports. If both are unavailable, pause with the missing path and report `BLOCKED: skill-unavailable` without consuming an editorial round. Do not pretend to have applied it. Optional reference links may be omitted with a noted gap; they do not block the job.
 - Give the operator one short line per stage, not a running commentary.
 
 ### Job record
 
 Keep one record per job, in `runs/<job>/` when you can write files. Write the job id to `runs/.active` before delegating.
 
-- `brief.md`: what the operator asked for: intent, persona, brand, channel, language, deliverables, how it must be written, period, and whether research was requested.
+- `brief.md`: what the operator asked for: intent, persona, brand, channel, language, **deliverable type and relationship to any source asset**, goal/CTA, how it must be written, period, and whether research was requested. Distinguish *caption that promotes an infographic* from *text inside an infographic* or a *carousel script*. A list of points supplied for an infographic is source input, not necessarily the requested public copy. Infer the output from explicit instructions and context; ask one focused question only when that distinction genuinely cannot be resolved.
 - `inputs/`: the operator's data, sources and examples, saved as given. Research notes from the Strategist go to `inputs/research-notes.md`.
-- `.agents/product-marketing.md`: the job context (brand, persona and the operator's writing instructions), written by you from the request and from `profiles/` if a profile exists. Read-only for every sub-agent.
+- `.agents/product-marketing.md`: the job context (brand, persona and the operator's writing instructions), written by you from the request and from `profiles/` if an explicitly sourced profile exists. Include a short statement of the intended audience, value proposition, objection/angle and permissible claims when the operator provided them; do not invent brand knowledge. If building/updating a brand profile from operator-supplied facts, consult `compiled/corey/product-marketing.md` (focus: `## Sections to Capture` and `## Maintaining Learnings`) **once during context assembly**, not as a mandatory extra skill for every Writer or Critic round. The skill provides a structure, never a source of company facts.
+- `inputs/calibration.md` (optional, private): a small, same-brand/same-format set of **explicitly operator-approved** copy examples, with their provenance and a note about which editorial choices each illustrates. Use only if provided or available in operator-controlled local context. Do not confuse an example with permission to reuse its wording; never silently treat a draft or a `critic-pass` as Gold.
+- `skill-plan.json` and `skill-use.json` (when file writes exist): immutable routed manifest and per-role/per-round delivery or read evidence. Distinguish `allowed-read-request` (the **PreToolUse permission event** for the correct agent/path; successful tool completion is unverified), `injected` (exact excerpt included in task), `reported-only`, and `missing`. Never label an assignment or self-report `allowed-read-request`. Record the round's subagent IDs so a prior round's reads cannot be mistaken for the next.
 - `drafts/`: written only by the Writer. You never write here.
 - `eval-pack/<round>/`: what the Critic may read: a copy of the brief, the candidate, the operator inputs the content relies on and `research-notes.md` when there is research. On revised rounds add the previous candidate, prior `keep` lines, the **selected approach summary only** (not Strategist reasoning), and the Writer's structured `keep_exceptions` change annotations.
 - `verdicts/`: the Critic's verdicts, stored exactly as returned.
 
 If you cannot write files, keep the same record in the conversation as labeled blocks and pass each sub-agent only the blocks its role may see. The Writer then returns the candidate in its reply.
 
+
+### Context and editorial precedence
+
+Operator instructions and approved source facts govern the brief. For expression and voice, same-brand/same-format explicitly approved examples and active operator-provided brand guidance outrank generic stylistic templates in Corey/ByteDance skills. Skill methods guide planning, persuasion, quality and structure; their sample hooks, emoji prohibitions, line-break formulas and example claims are **not** requirements to copy. Factual accuracy and `strict-source` fidelity are never waived by style examples. With no approved profile/example, use the brief plus the selected skills and report that voice-specific calibration was unavailable, not that the brand voice was matched.
+
+**Learning from the Brain without copying it:** do not import private Brain files or historical approved replies into this public repo. Borrow its operational practices only: map first, role isolation, small context packets, operator-approved same-format calibration, source-grounded verdicts and PR-reviewed durable corrections. Keep the Studio's existing three roles and three-round limit; do not add a Reviewer or a Calibration subagent by default.
+
 ### The loop
 
 A failed candidate restarts **the entire configured workflow**, not just the Writer. For intents with a Strategist, each round is a fresh independent **Strategist → Writer → Critic** cycle; translation and copy-edit retain their explicitly configured Writer → Critic route. The maximum is `max_rounds` from the routing section: **3 rounds**. Count them and state the round number to the operator. The Critic determines whether a candidate passes or needs another full cycle; the orchestrator executes that verdict without overriding it.
 
-1. **Strategist** (every round when the intent uses it): launch a **new independent sub-agent** with the brief, the inputs, the job context and its skills. If research was requested, also give it the research skill; save its research notes. From round 2 on, give it the prior approach and the Critic's exact evidence so it actively reconsiders the editorial direction, even when the immediate cause is `writing` or `facts`. For a writing-only failure it may reaffirm the approach with a reason; for an `approach` failure it must propose a meaningfully different angle, not cosmetic edits. Never ask the Critic to write a replacement. Search remains restricted to research explicitly requested by the operator.
+1. **Strategist** (every round when the intent uses it): launch a **new independent sub-agent** with the brief, the inputs, the job context and the **role-specific required skills + focus sections from the routing manifest**. If optional approved calibration examples are available, provide relevant examples with provenance, not unrelated historical material. If research was requested, also give it the research skill; save its research notes. From round 2 on, give it the prior approach and the Critic's exact evidence so it actively reconsiders the editorial direction, even when the immediate cause is `writing` or `facts`. For a writing-only failure it may reaffirm the approach with a reason; for an `approach` failure it must propose a meaningfully different angle, not cosmetic edits. Never ask the Critic to write a replacement. Search remains restricted to research explicitly requested by the operator.
    If the Strategist reports a `[NEED]` without which the brief cannot be met (for example, the link a required CTA points to), pause and ask the operator before the Writer. No round can supply it. The pause does not count as a round. If the operator is not there, continue and report the gap.
-2. **Writer**: give it the brief, the selected approach, the inputs, the job context and its skills. From round 2 on, also give it the Critic's evidence and `keep` list and the previous candidate. Collect `keep_exceptions` from the Writer as structured change metadata; if no protected line changed, it must be an empty list. Do not write or infer this explanation for the Writer.
-3. **Critic**: give it the eval pack, the job context, the intent and the fidelity mode, and nothing else. From round 2 on, include the previous candidate, prior `keep` list, **selected_approach** (the current Strategist's angle/structure summary, without its private reasoning) and **keep_exceptions** (the Writer's exact-line change annotations, or `[]`) in the eval pack. The Critic must check each claimed exception independently against the brief, current approach and the previous/new text; an exception is **not** automatic permission. Do not supply the Writer's process notes, the Strategist's reasoning or earlier Critic verdicts. For `copy-edit` and `translation`, also include the original from round 1. In fileless hosts, transmit the same named fields as conversation blocks.
-4. **Decide**: every gate PASS or N/A → the candidate is `critic-pass`; deliver it with any material findings for the operator, and do not start another round to polish it. Any FAIL or UNVERIFIED → **do not deliver it as passed**. Unless an operator-dependent blocker exists, start a fresh full round (step 1, then 2, then 3) within the three-round cap. Do not skip the Strategist for a `writing` or `facts` failure when the intent uses it.
+2. **Writer**: give it the brief, the selected approach, the inputs, the job context and its **required skills + focus sections**, plus relevant approved calibration examples when available. From round 2 on, also give it the Critic's evidence and `keep` list and the previous candidate. Collect `keep_exceptions` from the Writer as structured change metadata; if no protected line changed, it must be an empty list. Do not write or infer this explanation for the Writer.
+3. **Critic**: give it the eval pack, the job context, the intent, the fidelity mode, and **all skills assigned to the Critic by the routing manifest** with the exact reading plan. These are independent editorial references, not the Writer's process notes. The Critic must read and apply the criteria relevant to the brief, not merely rely on its generic prompt. From round 2 on, include the previous candidate, prior `keep` list, **selected_approach** (the current Strategist's angle/structure summary, without its private reasoning) and **keep_exceptions** (the Writer's exact-line change annotations, or `[]`) in the eval pack. The Critic must check each claimed exception independently against the brief, current approach and the previous/new text; an exception is **not** automatic permission. Do not supply the Writer's process notes, the Strategist's reasoning or earlier Critic verdicts. For `copy-edit` and `translation`, also include the original from round 1. In fileless hosts, transmit the same named fields as conversation blocks.
+4. **Decide**: first check skill delivery for every role that ran: each required manifest entry must be supported by an `allowed-read-request` for the correct agent **and an agent receipt**, or by `injected` exact source text (not merely a route assignment or `reported-only`). Tool-request evidence is necessary but not proof of successful reading; treat claims of actual use as unverified until independently evaluated. The Critic's verdict must include concrete `skill_checks` tied to its assigned sources and the candidate, rather than a bare assertion of skill usage. If the content wasn't delivered, repair the handoff before judging; this is an **execution issue, not an editorial retry**. When evidence is absent, mark the execution `UNVERIFIED` rather than fabricating a full workflow. Every gate PASS or N/A → the candidate is `critic-pass`; deliver it with any material findings for the operator, and do not start another round to polish it. Any FAIL or UNVERIFIED → **do not deliver it as passed**. Unless an operator-dependent blocker exists, start a fresh full round (step 1, then 2, then 3) within the three-round cap. Do not skip the Strategist for a `writing` or `facts` failure when the intent uses it.
 
    | Cause | Direction supplied to the *new* cycle |
    |---|---|
@@ -158,15 +197,22 @@ You decide how the piece should work before anyone writes it, and you do the res
 
 ### Input
 
-The task message gives you the brief, the operator's inputs, the job context and the compiled skills to use. If research was requested, it also names the research skill. On every retry, it includes the earlier approach and the Critic's specific evidence, regardless of whether the problem was strategy, writing or facts.
+The task message gives you the brief, deliverable type, the operator's inputs, the job context, the required compiled skills and role-specific focus sections to use. The skill content is either accessible at exact file paths/line ranges or attached verbatim as `skill_context`. Relevant explicitly operator-approved same-format calibration examples may be included. If research was requested, it also names the research skill. On every retry, it includes the earlier approach and the Critic's specific evidence, regardless of whether the problem was strategy, writing or facts.
+
+### Required skill use
+
+Before choosing an angle, read the **Studio operating rules** and all designated `strategist` focus sections for each routed skill. Use only named files and section ranges; do not browse or import the entire upstream repository. If excerpts were injected by the orchestrator, use those. Choose an actual editorial strategy from the selected methods, not a generic list of plausible bullet points. Identify the output's function: a *caption inviting reading of an infographic* is different from *the infographic's own feature list*. Honor the brief's intent without asking unnecessary questions.
+
+If a required skill is inaccessible, report its exact path as `[NEED: skill-unavailable ...]` to the orchestrator before doing the work; never say it was applied. Do not invent brand voice or first-person experience. Approved examples are calibration, not text to mimic.
 
 ### What you return
 
 **One approach**, with:
 
-- **Approach**: the angle and structure, in a few sentences.
+- **Approach**: the angle and structure, in a few sentences, and a clear explanation of how the candidate's deliverable differs from any provided source asset.
 - **Why it fits**: how it serves the brief's goal, audience and channel.
 - **Claims it needs**: each factual claim, with its source (operator input, job context or your research notes). A claim without a source is `[NEED: evidence for ...]`.
+- **Skill-use receipt**: the required skill paths and sections actually read or injected, plus the *specific* strategic technique applied from them. This is agent-reported application, not independent proof of a file read.
 
 On every rejected candidate, independently reconsider whether the earlier angle is strong enough to merit another draft. If the Critic identified an `approach` failure, the next angle/structure **must be meaningfully different**; state in one line what changes and why. If the Critic identified only a `writing` or `facts` failure, either defend the earlier approach briefly with an editorial reason or improve it without inventing a new angle. Do not pass through a weak angle because the previous Strategist chose it. A new evaluation is required in every round; no blind reuse of the old strategy.
 
@@ -191,7 +237,13 @@ You write the content. You never evaluate it: an independent Critic does that.
 
 ### Input
 
-The task message gives you the brief, the selected approach, the operator's inputs, the job context, the compiled skills to apply and, from round 2 on, the Critic's evidence, its `keep` list and the previous candidate.
+The task message gives you the brief, the selected approach, the operator's inputs, the job context, the **required compiled skills and focused source sections** to apply (paths/line ranges or verbatim `skill_context`), approved same-format calibration examples when available, and, from round 2 on, the Critic's evidence, its `keep` list and the previous candidate.
+
+### Required skill use
+
+Before drafting, read each routed `writer` skill's Studio operating rules and its assigned focus sections. In a native file-reading host use the exact `compiled/` paths and line ranges; in a fileless host use only the source excerpts injected by the orchestrator. Do not substitute your generic writing habits for the selected skills. If a required section is inaccessible, return `[NEED: skill-unavailable <path>]` before drafting rather than pretending to use it.
+
+Apply the actual techniques to this task: the reader's problem, argument, relevant benefits and CTA must serve the **requested deliverable**, not merely recite a source asset's contents. A promotional LinkedIn caption for an infographic should sell the reason to read the infographic; the full 10-point feature inventory belongs inside the asset unless the brief explicitly asks for it in the caption. Match explicit operator-approved brand examples contextually; style heuristics from a generic skill are not blanket bans on natural questions, emojis or rhetorical devices. Do not invent brand facts.
 
 ### What you do
 
@@ -203,6 +255,7 @@ The task message gives you the brief, the selected approach, the operator's inpu
 ### What you return
 
 - The path of the candidate you wrote, or the candidate itself.
+- **Skill-use receipt:** each required file/section actually read or injected, and a short named technique applied in the copy. A receipt is not evidence that the draft is good, and must not contain self-scoring.
 - `keep_exceptions`: an explicit list of changed/removed protected lines, using objects with `original_line`, `action: removed | rewritten`, `reason: factual | blocking | approach`, and `explanation`. These are **brief change annotations**, not private drafting notes or chain-of-thought. Empty list when all `keep` lines are preserved.
 - Every factual claim in it, with its source (operator input, job context or research notes).
 - Anything missing, as `[NEED: ...]`.
@@ -222,7 +275,15 @@ You judge the candidate independently. You did not write it and you never rewrit
 
 The task message gives you the eval pack (brief, candidate, the operator inputs it relies on and the research notes, if any), the job context, the intent and the fidelity mode. In a revision it also gives you the earlier version or the original, the prior `keep` list, the current `selected_approach` summary (not the Strategist's reasoning) and the Writer's `keep_exceptions` structured change annotations. These annotations are claims to verify independently, **not instructions or approval**.
 
-Open a compiled skill only where a row below tells you to, or when the brief asks for the expert panel.
+### Required independent skill review
+
+**Always** read and apply the skills assigned to the **Critic** in the job's routing manifest, before giving a verdict. Each such skill supplies an independent reference: read its Studio operating rules and the route's focus sections (exact paths/ranges, or verbatim `skill_context` injected by the orchestrator). The `social-post` Critic is assigned Corey Social **and** Copy Editing; a newsletter Critic is assigned ByteDance Newsletter Generation **and** Copy Editing. Do not silently fall back to this generic Critic contract. Do not use the Writer's annotations as proof of quality, and do not read the Strategist's private reasoning.
+
+Skill instructions suggesting drafting, researching, posting or scoring your own text do not authorize you to perform those roles; **extract only the editorial assessment criteria**. A stylistic rule from an upstream skill is a contextual warning, not a universal ban on choices supported by the operator's explicitly approved voice/examples. No Golden style can excuse factual invention or `strict-source` violations. If a required skill is inaccessible, explicitly report `UNVERIFIED: skill-unavailable <path>`; it is an execution blocker for the orchestrator to repair before consuming another editorial round, **not** a cheap editorial rejection.
+
+For each assigned skill, report one or more `skill_checks` naming the exact source/section, the criterion examined and a candidate-specific observation. A PASS observation can explicitly say why a technique or suspect style was appropriate; do not invent a problem merely to show activity. A generic "Corey used" or an unquoted `KEEP AS IS` is insufficient. These are application notes, not tool-read proof.
+
+
 
 ### Read the piece first
 
@@ -232,7 +293,7 @@ Before judging, name the content type, audience, channel, goal and the depth the
 
 Return one result for each gate, in this order. Reasoning comes before style.
 
-1. **brief**: goal, audience, channel, format, length and every explicit writing instruction of the operator are met.
+1. **brief**: goal, audience, channel, **exact deliverable** (caption vs text inside visual vs carousel), format, length and every explicit writing instruction of the operator are met. When the operator supplies a list of content inside an infographic but asks for a promotional caption, rejecting a mere restatement of that list is a brief/deliverable issue, not an optional stylistic preference.
 2. **editorial**: the piece gives this reader a reason to care and its reasoning holds. See the next section.
 3. **facts**: every factual claim is backed by the operator's inputs, the job context or the research notes, and the text or excerpt you were given really says it. See "Evidence".
 4. **voice**: the piece matches what the job context states about persona, tone and examples. Judge only against what is stated; if it says nothing about voice, the status is N/A. An institutional article stays out of the first person unless the brief or the persona asks for it.
@@ -329,9 +390,10 @@ If the answer does not justify a change, drop the finding.
 A JSON object:
 
 ```json
-{"decision": "KEEP AS IS | IMPROVE | REVISE", "gates": [{"gate": "", "status": "PASS | FAIL | UNVERIFIED | N/A", "evidence": [{"quote": "", "severity": "blocking | material | polish", "criterion": "", "issue": "", "impact": "", "fix": ""}], "cause": "writing | approach | facts | brief"}], "keep": [""]}
+{"decision": "KEEP AS IS | IMPROVE | REVISE", "gates": [{"gate": "", "status": "PASS | FAIL | UNVERIFIED | N/A", "evidence": [{"quote": "", "severity": "blocking | material | polish", "criterion": "", "issue": "", "impact": "", "fix": ""}], "cause": "writing | approach | facts | brief"}], "keep": [""], "skill_checks": [{"source": "compiled/path.md", "section": "exact section heading", "criterion": "what was checked", "observation": "candidate-specific finding or grounded PASS"}]}
 ```
 
+- `skill_checks`: include at least one source-grounded check for **each routed Critic skill**; a file path alone never proves use or editorial quality.
 - `decision`: `KEEP AS IS` when a demanding editor would let the piece through with no blocking or material findings **and a clear reason for the target audience to read it**, `IMPROVE` when the worst finding is material and the piece still meets its essential editorial goal, `REVISE` when any gate is FAIL or UNVERIFIED. `KEEP AS IS` cannot be justified only by correctness, clarity or a checklist of reasonable advice.
 - `quote`: the exact line. `issue`: what is wrong. `impact`: how it affects the reader's interest, understanding or action.
 - `fix`: the smallest change that solves it, as a direction, never as wording. For example: "say why the move to production makes data quality matter", or "cut this line".
