@@ -8,6 +8,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SCRIPT = REPO_ROOT / "scripts" / "route.py"
+sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
 
 def route(persona="-", brand="-", channel="-", intent="-"):
