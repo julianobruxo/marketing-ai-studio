@@ -5,7 +5,7 @@
 
 Use "-" para campo que não se aplica. Lê catalog/routing.yaml e catalog/skills.yaml (sintaxe
 JSON) e imprime JSON com owner, status, rule_id, intent, fidelity, strategist, research_skill,
-skills {papel: [caminhos compilados]}, max_rounds e reason.
+skills {papel: [caminhos compilados]}, skill_manifest {papel: [refs/sha/foco]},\nresearch_manifest, max_rounds e reason.
 
 Exit 0 para ROUTED, BLOCKED e NEEDS_OPERATOR; 2 para erro de uso; 3 para catálogo inválido.
 Só biblioteca padrão.
@@ -14,6 +14,7 @@ Só biblioteca padrão.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -60,6 +61,27 @@ def compiled_path(name: str, role: str, skills: dict, root: Path) -> str:
     return spec["compiled"]
 
 
+def skill_ref(name: str, role: str, skills: dict, root: Path) -> dict:
+    """Pinned, role-scoped reading plan. This is an assignment, not evidence of a tool read."""
+    path = compiled_path(name, role, skills, root)
+    spec = skills[name]
+    headings = spec.get("focus", {}).get(role)
+    if not isinstance(headings, list) or not headings or len(set(headings)) != len(headings):
+        raise CatalogError(f"skill {name!r} sem foco válido para {role!r}")
+    data = (root / path).read_bytes()
+    content = data.decode("utf-8")
+    for heading in ["## Studio operating rules (read first)", *headings]:
+        count = sum(1 for line in content.splitlines() if line == heading)
+        if count != 1:
+            raise CatalogError(f"heading ausente/ambíguo em {path}: {heading!r} ({count})")
+    return {
+        "name": name,
+        "path": path,
+        "sha256": hashlib.sha256(data).hexdigest(),
+        "focus": headings,
+    }
+
+
 def route(persona, brand, channel, intent, root: Path = REPO_ROOT) -> dict:
     routing, skills = load(root)
     aliases = routing.get("aliases", {})
@@ -77,6 +99,7 @@ def route(persona, brand, channel, intent, root: Path = REPO_ROOT) -> dict:
 
     out = {"owner": rule.get("owner"), "status": rule["status"], "rule_id": rule["id"], "intent": intent,
            "fidelity": None, "strategist": False, "research_skill": None, "skills": {},
+           "skill_manifest": {}, "research_manifest": None,
            "max_rounds": routing.get("max_rounds", 3), "reason": rule.get("reason", "")}
     if rule.get("owner") != "studio" or rule["status"] != "ROUTED":
         return out
@@ -97,6 +120,9 @@ def route(persona, brand, channel, intent, root: Path = REPO_ROOT) -> dict:
         research_skill=compiled_path(research, "strategist", skills, root) if research else None,
         skills={role: [compiled_path(s, role, skills, root) for s in names]
                 for role, names in sorted(spec.get("skills", {}).items())},
+        skill_manifest={role: [skill_ref(s, role, skills, root) for s in names]
+                        for role, names in sorted(spec.get("skills", {}).items())},
+        research_manifest=skill_ref(research, "strategist", skills, root) if research else None,
         max_rounds=spec.get("max_rounds", out["max_rounds"]),
         reason=f"{rule.get('reason', '')}; intent {intent}",
     )
