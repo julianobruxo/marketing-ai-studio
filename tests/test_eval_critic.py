@@ -120,6 +120,46 @@ class CasesTest(unittest.TestCase):
             "id": "REV03", "keep": ["Sentence retained."], "keep_exceptions": []
         })
 
+    def test_blind_pack_includes_exact_role_specific_critic_skills(self):
+        import hashlib
+        fixture = {
+            "id": "COREY-SOCIAL", "intent": "social-post", "brief": "LinkedIn caption",
+            "candidate": "An original social post.", "expected": {"verdict": "pass"},
+            "source_comment": "PRIVATE REVIEWER FEEDBACK",
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            eval_critic.pack([fixture], Path(tmp))
+            entry = json.loads((Path(tmp) / "cases.json").read_text(encoding="utf-8"))[0]
+            self.assertEqual([ref["name"] for ref in entry["skill_manifest"]],
+                             ["corey/social", "corey/copy-editing"])
+            self.assertEqual(len(entry["skill_context"]), 2)
+            self.assertNotIn("source_comment", entry)
+            self.assertNotIn("expected", entry)
+            for ref, pack in zip(entry["skill_manifest"], entry["skill_context"]):
+                source = REPO_ROOT / ref["path"]
+                lines = source.read_text(encoding="utf-8").splitlines()
+                self.assertEqual(ref["sha256"], hashlib.sha256(source.read_bytes()).hexdigest())
+                self.assertEqual(pack["sha256"], ref["sha256"])
+                for section in pack["sections"]:
+                    self.assertEqual(section["excerpt"],
+                                     "\\n".join(lines[section["start_line"] - 1:section["end_line"]]))
+                    self.assertTrue(section["excerpt"].startswith(section["heading"]))
+
+    def test_deerflow_is_included_in_newsletter_critic_blind_pack(self):
+        refs, text = eval_critic.critic_skills_for_case({"id": "B", "intent": "newsletter"})
+        self.assertEqual([x["name"] for x in refs],
+                         ["bytedance/newsletter-generation", "corey/copy-editing"])
+        self.assertIn("## Newsletter Workflow", text[0]["sections"][1]["excerpt"])
+        self.assertFalse(any(x["name"] == "bytedance/deep-research" for x in refs))
+
+    def test_explicit_blind_skill_context_must_match_hash_and_path(self):
+        item = {"id": "X", "intent": "social-post", "candidate": "Some copy",
+                "skill_manifest": [{"path": "compiled/corey/social.md", "sha256": "correct"}],
+                "skill_context": [{"path": "compiled/corey/social.md", "sha256": "wrong"}]}
+        with tempfile.TemporaryDirectory() as tmp:
+            with self.assertRaises(ValueError):
+                eval_critic.pack([item], Path(tmp))
+
     def test_pack_rejects_duplicate_case_ids(self):
         with tempfile.TemporaryDirectory() as tmp:
             with self.assertRaises(ValueError):
