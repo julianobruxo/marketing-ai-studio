@@ -1,5 +1,14 @@
 # Whole-document Critic evaluation (synthetic example only)
 
+## Critic skill parity (ADR-23)
+
+The blind `pack` command now includes the **same role-selected Critic skills** as the Studio route. For a case with a known intent, `scripts/eval_critic.py` resolves `skill_manifest.critic`, copies the relevant **exact excerpts** from the pinned compiled files into `skill_context`, and carries the source SHA and line spans. It does **not** copy Writer/Strategist notes, reviewer comments, labels or expected verdicts.
+
+A case may supply both `skill_manifest` and `skill_context` explicitly to pin an exact evaluation packet, but **both must match the full Critic route for the declared intent**, including every assigned skill, every required section and every byte of source excerpts. Omitting one skill, dropping any section, altering source text, or supplying a partial/unknown intent is an error, not a fallback. For a deliberately different skill configuration, define a proper catalog/intent revision and freeze its corresponding route, rather than silently bypassing the real contract. Reviewer labels and private annotations remain excluded.
+
+These are **inputs for a real model evaluation**, not proof that a model has run or that its editorial decisions improved. The scoring commands remain deterministic, with no model involved.
+
+
 The editorial Critic is not validated by passing a sentence-level style benchmark. The
 next evaluation uses **whole documents** in a blind pass, followed by review-issue-level
 adjudication. These public examples are entirely fictional. **Never commit internal

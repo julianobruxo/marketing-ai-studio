@@ -1,6 +1,6 @@
 # MAP — Marketing Content Studio
 
-Mapa do repositório (ADR-21). Para rodar um job, leia só o `AGENTS.md`. Este mapa é para quem vai mudar o repositório.
+Mapa do repositório (ADR-21/23). Para rodar um job, leia só o `AGENTS.md`. Este mapa é para quem vai mudar o repositório.
 
 ## Legenda
 
@@ -27,7 +27,7 @@ marketing-ai-studio/
 │
 ├── catalog/                                                 canônico — sintaxe JSON (YAML válido), lido com json
 │   ├── routing.yaml                            dono por persona × marca × canal; intents com skills por papel, Strategist, pesquisa, fidelidade; max_rounds
-│   └── skills.yaml                             skill → compilado, papéis, se é carregável
+│   └── skills.yaml                             skill → compilado, papéis, foco de leitura por papel
 │
 ├── agents/                                                  canônico — prompt de cada papel, neutro em relação ao host; fonte do AGENTS.md
 │   ├── boot.md                                 início do AGENTS.md: boot, intake, entrega
@@ -58,7 +58,8 @@ marketing-ai-studio/
 │   ├── vendor.py                               sync, verify, compile
 │   ├── build_agents.py                         gera o AGENTS.md; --check confere
 │   ├── eval_critic.py                          avaliação do Critic: pacote cego, pontuação e comparação
-│   ├── route.py                                roteador determinístico (sem LLM)
+│   ├── route.py                                roteador determinístico + manifest de skill/hashes/seções (sem LLM)
+│   ├── audit_skill_use.py                      audita pedidos Read autorizados por agente/rodada, sem alegar conclusão
 │   └── install_host.py                         modo reforçado: instala agentes, skill de entrada e settings no clone de execução
 │
 ├── tests/
@@ -67,14 +68,14 @@ marketing-ai-studio/
 │   ├── critic/                                 casos sintéticos do Critic e resultados públicos
 │   └── host/live_host_checks.py                testes ao vivo (claude -p); fora do unittest discover; não rodam a cada mudança
 │
-├── profiles/                                   POSTERIOR — perfis de marca e persona; o orquestrador usa se existir
+├── profiles/README.md                         canônico — contrato para perfis locais privados (arquivos reais ignorados)
 ├── policies/, integrations/                    POSTERIOR
-└── examples/                                   POSTERIOR — nasce com o primeiro item aprovado pelo operador
+└── examples/README.md                         canônico — goldens aprovados apenas com proveniência; conteúdo real ignorado
 ```
 
 Fora da v1 (ADR-19): `workflows/` (a intent no `routing.yaml` faz esse papel), `schemas/`, o papel Reviewer (o Critic absorve fatos e fidelidade), campanha multicanal e o golden dataset da Zazmic.
 
-**Skills sem compilado:** `content-strategy`, `sales-enablement` e `marketing-council` estão em `vendor/corey/`, mas não têm overlay. Não são carregáveis até ganharem um.
+**Handoff verificado em duas camadas:** o roteamento determina as seções e hashes, enquanto o contrato de cada papel exige carregar/aplicar o material e registrar um recibo. Em Claude Code, `audit_skill_use.py` pode identificar pedidos de Read autorizados por ID; **PreToolUse não prova que a leitura foi concluída nem que a skill foi aplicada**. Na maioria dos hosts, os excertos literais são injetados no contexto do subagente (sem abrir outra etapa do workflow). Só se usa leitura nativa sem injeção com evidência confiável de conclusão da ferramenta. O julgamento segue exigindo avaliação humana.\n\n**Skills sem compilado:** `content-strategy`, `sales-enablement` e `marketing-council` estão em `vendor/corey/`, mas não têm overlay. Não são carregáveis até ganharem um.
 
 ## Gerados localmente, fora do git
 

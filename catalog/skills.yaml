@@ -1,17 +1,199 @@
 {
   "_format": "JSON, que também é YAML válido; lido com o módulo json da biblioteca padrão.",
-  "version": 2,
+  "version": 3,
   "skills": {
-    "corey/copywriting": {"compiled": "compiled/corey/copywriting.md", "loadable": true, "roles": ["strategist", "writer", "critic"], "use_for": "page and web copy, articles: headlines, structure, claims"},
-    "corey/copy-editing": {"compiled": "compiled/corey/copy-editing.md", "loadable": true, "roles": ["writer", "critic"], "use_for": "editing existing copy; quality sweeps; expert panel (Critic only)"},
-    "corey/social": {"compiled": "compiled/corey/social.md", "loadable": true, "roles": ["strategist", "writer", "critic"], "use_for": "LinkedIn and other social posts; never Yann Kronberg on X"},
-    "corey/ad-creative": {"compiled": "compiled/corey/ad-creative.md", "loadable": true, "roles": ["strategist", "writer", "critic"], "use_for": "ad copy, angles and creative specs; no media generation"},
-    "corey/emails": {"compiled": "compiled/corey/emails.md", "loadable": true, "roles": ["strategist", "writer", "critic"], "use_for": "email sequences and single emails; nothing is sent"},
-    "corey/product-marketing": {"compiled": "compiled/corey/product-marketing.md", "loadable": true, "roles": ["writer"], "use_for": "format of the job context; brand profile drafts"},
-    "corey/content-strategy": {"compiled": null, "loadable": false, "reason": "sem overlay"},
-    "corey/sales-enablement": {"compiled": null, "loadable": false, "reason": "sem overlay"},
-    "corey/marketing-council": {"compiled": null, "loadable": false, "reason": "sem overlay"},
-    "bytedance/newsletter-generation": {"compiled": "compiled/bytedance/newsletter-generation.md", "loadable": true, "roles": ["strategist", "writer", "critic"], "use_for": "newsletters, digests and roundups"},
-    "bytedance/deep-research": {"compiled": "compiled/bytedance/deep-research.md", "loadable": true, "roles": ["strategist"], "use_for": "web research, only when the operator asks for it"}
+    "corey/copywriting": {
+      "compiled": "compiled/corey/copywriting.md",
+      "loadable": true,
+      "roles": [
+        "strategist",
+        "writer",
+        "critic"
+      ],
+      "use_for": "page and web copy, articles: headlines, structure, claims",
+      "focus": {
+        "strategist": [
+          "## Before Writing",
+          "## Copywriting Principles",
+          "## Voice and Tone"
+        ],
+        "writer": [
+          "## Diagnose the Situation First",
+          "## Drafting Protocol",
+          "## Copywriting Principles",
+          "## Writing Style Rules",
+          "## Voice and Tone"
+        ],
+        "critic": [
+          "## Copywriting Principles",
+          "## No AI Tells",
+          "## Voice and Tone"
+        ]
+      }
+    },
+    "corey/copy-editing": {
+      "compiled": "compiled/corey/copy-editing.md",
+      "loadable": true,
+      "roles": [
+        "writer",
+        "critic"
+      ],
+      "use_for": "editing existing copy; quality sweeps; expert panel (Critic only)",
+      "focus": {
+        "writer": [
+          "## Core Philosophy",
+          "## The Seven Sweeps Framework",
+          "## Quick-Pass Editing Checks"
+        ],
+        "critic": [
+          "## The Seven Sweeps Framework",
+          "## Copy Editing Checklist",
+          "## Common Copy Problems & Fixes"
+        ]
+      }
+    },
+    "corey/social": {
+      "compiled": "compiled/corey/social.md",
+      "loadable": true,
+      "roles": [
+        "strategist",
+        "writer",
+        "critic"
+      ],
+      "use_for": "LinkedIn and other social posts; never Yann Kronberg on X",
+      "focus": {
+        "strategist": [
+          "## Before Creating Content",
+          "## Hook Formulas",
+          "## Content Repurposing System"
+        ],
+        "writer": [
+          "## Hook Formulas",
+          "## Content Repurposing System"
+        ],
+        "critic": [
+          "## Hook Formulas",
+          "## Content Repurposing System"
+        ]
+      }
+    },
+    "corey/ad-creative": {
+      "compiled": "compiled/corey/ad-creative.md",
+      "loadable": true,
+      "roles": [
+        "strategist",
+        "writer",
+        "critic"
+      ],
+      "use_for": "ad copy, angles and creative specs; no media generation",
+      "focus": {
+        "strategist": [
+          "## Before Starting",
+          "## Grounded Inputs",
+          "## Generating Ad Copy"
+        ],
+        "writer": [
+          "## Platform Specs",
+          "## Generating Ad Copy",
+          "## Writing Quality Standards"
+        ],
+        "critic": [
+          "## Platform Specs",
+          "## Writing Quality Standards"
+        ]
+      }
+    },
+    "corey/emails": {
+      "compiled": "compiled/corey/emails.md",
+      "loadable": true,
+      "roles": [
+        "strategist",
+        "writer",
+        "critic"
+      ],
+      "use_for": "email sequences and single emails; nothing is sent",
+      "focus": {
+        "strategist": [
+          "## Initial Assessment",
+          "## Core Principles",
+          "## Email Sequence Strategy"
+        ],
+        "writer": [
+          "## Core Principles",
+          "## Email Copy Guidelines",
+          "## Output Format"
+        ],
+        "critic": [
+          "## Core Principles",
+          "## Email Copy Guidelines"
+        ]
+      }
+    },
+    "corey/product-marketing": {
+      "compiled": "compiled/corey/product-marketing.md",
+      "loadable": true,
+      "roles": [
+        "writer"
+      ],
+      "use_for": "format of the job context; brand profile drafts",
+      "focus": {
+        "writer": [
+          "## Sections to Capture",
+          "## Maintaining Learnings"
+        ]
+      }
+    },
+    "corey/content-strategy": {
+      "compiled": null,
+      "loadable": false,
+      "reason": "sem overlay"
+    },
+    "corey/sales-enablement": {
+      "compiled": null,
+      "loadable": false,
+      "reason": "sem overlay"
+    },
+    "corey/marketing-council": {
+      "compiled": null,
+      "loadable": false,
+      "reason": "sem overlay"
+    },
+    "bytedance/newsletter-generation": {
+      "compiled": "compiled/bytedance/newsletter-generation.md",
+      "loadable": true,
+      "roles": [
+        "strategist",
+        "writer",
+        "critic"
+      ],
+      "use_for": "newsletters, digests and roundups",
+      "focus": {
+        "strategist": [
+          "## Newsletter Workflow"
+        ],
+        "writer": [
+          "## Newsletter Workflow",
+          "## Newsletter Output Template"
+        ],
+        "critic": [
+          "## Newsletter Workflow",
+          "## Newsletter Output Template"
+        ]
+      }
+    },
+    "bytedance/deep-research": {
+      "compiled": "compiled/bytedance/deep-research.md",
+      "loadable": true,
+      "roles": [
+        "strategist"
+      ],
+      "use_for": "web research, only when the operator asks for it",
+      "focus": {
+        "strategist": [
+          "## Research Methodology",
+          "## Quality Bar"
+        ]
+      }
+    }
   }
 }

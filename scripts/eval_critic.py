@@ -34,7 +34,8 @@ def load(path) -> object:
 # Real review files may contain source_comment, labels, suggestions or author names.
 PACK_FIELDS = ("id", "intent", "fidelity", "brief", "job_context", "inputs",
                "candidate", "original", "context", "research_notes",
-               "previous_candidate", "keep", "selected_approach", "keep_exceptions")
+               "previous_candidate", "keep", "selected_approach", "keep_exceptions",
+               "skill_manifest", "skill_context")
 
 
 def validate_keep_exceptions(case: dict) -> None:
@@ -70,6 +71,41 @@ def validate_keep_exceptions(case: dict) -> None:
             raise ValueError("Approach exceptions require the selected approach summary")
 
 
+def critic_skills_for_case(case: dict) -> tuple[list, list]:
+    """Compile only *Critic* role references and exact snippets, without reviewer labels.
+
+    The blind evaluator must present the same knowledge assigned to the live Critic.
+    Explicit case-specific skills must include BOTH manifest and source context.
+    """
+    intent = case.get("intent")
+    if not isinstance(intent, str) or not intent:
+        raise ValueError("Blind Critic cases require a known intent to enforce its actual skill route")
+
+    # Always derive the expected Critic references from the canonical route. An
+    # explicit manifest is NOT authorized to omit a skill or trim its focus
+    # sections, even when the remaining text and hash labels are genuine.
+    # These imports are deliberately pack-only; scoring stays deterministic.
+    from route import route as resolve_route, render_skill_context
+    routed = resolve_route(None, None, None, intent)
+    if routed.get("status") != "ROUTED" or routed.get("owner") != "studio":
+        raise ValueError(f"Cannot route Critic skills for intent: {intent}")
+    expected_refs = routed["skill_manifest"].get("critic", [])
+    expected_context = render_skill_context(expected_refs)
+
+    explicit = "skill_manifest" in case or "skill_context" in case
+    if not explicit:
+        return expected_refs, expected_context
+
+    refs, context = case.get("skill_manifest"), case.get("skill_context")
+    if not isinstance(refs, list) or not isinstance(context, list):
+        raise ValueError("Explicit skill_manifest and skill_context must both be lists")
+    if refs != expected_refs:
+        raise ValueError("Explicit Critic skill_manifest must match all routed skills and exact sections")
+    if context != expected_context:
+        raise ValueError("Explicit skill_context must contain all exact pinned source excerpts")
+    return expected_refs, expected_context
+
+
 def pack(cases: list, out: Path, contract=None) -> None:
     out.mkdir(parents=True, exist_ok=True)
     ids = [case["id"] for case in cases]
@@ -78,6 +114,10 @@ def pack(cases: list, out: Path, contract=None) -> None:
     for case in cases:
         validate_keep_exceptions(case)
     blind = [{k: case[k] for k in PACK_FIELDS if k in case} for case in cases]
+    for case, packet in zip(cases, blind):
+        refs, context = critic_skills_for_case(case)
+        packet["skill_manifest"] = refs
+        packet["skill_context"] = context
     (out / "cases.json").write_text(json.dumps(blind, ensure_ascii=False, indent=2), encoding="utf-8")
     source = Path(contract) if contract else REPO_ROOT / "agents/critic.md"
     shutil.copyfile(source, out / "contract.md")

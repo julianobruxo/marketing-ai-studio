@@ -43,10 +43,10 @@ def names(items: list[str]) -> str:
     return ", ".join(f"`{i}`" for i in items) if items else "none"
 
 
-def routing(catalog: dict) -> str:
+def routing(catalog: dict, skill_catalog: dict) -> str:
     lines = ["## Routing", ""]
     lines.append("If you have a shell, run this and follow its JSON exactly; use `-` for a field that does not apply:")
-    lines += ["", "```", "python scripts/route.py --persona <persona> --brand <brand> --channel <channel> --intent <intent>", "```", ""]
+    lines += ["", "```", "python scripts/route.py --persona <persona> --brand <brand> --channel <channel> --intent <intent> --with-skill-context", "```", ""]
     lines += ["Without a shell, apply the tables below, which come from the same catalog. Never change a route by judgment.", ""]
 
     lines += ["**Aliases.** Normalize these values first, ignoring case:", ""]
@@ -84,13 +84,30 @@ def routing(catalog: dict) -> str:
             f"| {names(skills.get('strategist', []))} | {names(skills.get('writer', []))} "
             f"| {names(skills.get('critic', []))} |"
         )
-    lines += ["", *blocked, f"- `max_rounds`: {catalog['max_rounds']}."]
+    lines += ["", *blocked, f"- `max_rounds`: {catalog['max_rounds']}.", ""]
+    lines += [
+        "**Skill reading plan (mandatory, role-scoped).** For each routed skill, read the",
+        "`## Studio operating rules (read first)` section plus the focus sections below.",
+        "Read additional sections/references only when specifically relevant to the deliverable.",
+        "A skill path in this table is NOT evidence that an agent read the file.",
+        "",
+        "| Skill | Role | Focus sections |",
+        "|---|---|---|",
+    ]
+    for name, spec in skill_catalog["skills"].items():
+        if not spec.get("loadable"):
+            continue
+        for role in spec["roles"]:
+            sections = spec.get("focus", {}).get(role, [])
+            focus = "; ".join(sections) if sections else "MISSING"
+            lines.append(f"| `{name}` | `{role}` | {focus} |")
     return "\n".join(lines)
 
 
 def build(repo: Path = REPO_ROOT) -> str:
     catalog = json.loads(read(repo, "catalog/routing.yaml"))
-    parts = [BANNER, read(repo, "agents/boot.md"), routing(catalog)]
+    skill_catalog = json.loads(read(repo, "catalog/skills.yaml"))
+    parts = [BANNER, read(repo, "agents/boot.md"), routing(catalog, skill_catalog)]
     parts += [demote(read(repo, f"agents/{role}.md")) for role in ("orchestrator", "strategist", "writer", "critic")]
     return "\n\n".join(parts) + "\n"
 

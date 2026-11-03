@@ -440,6 +440,25 @@ Os demais saíram do plano ou ficam para o job real do operador (ADR-19).
 - **Estado:** Proposto para revisão.
 - **Data:** 2026-11-02
 
+
+## ADR-23 — Integração operacional das skills e contexto seletivo do Brain
+
+- **Contexto:** auditoria de 2026-11-03 identificou `vendor/` íntegro, oito skills compiladas, roteamento correto, mas um handoff **não comprovado** para Strategist/Writer e uma contradição entre o catálogo do Critic e sua instrução de só abrir skills indicadas em outra seção. Um primeiro teste editorial aprovou um checklist genérico, e um segundo teste confundiu uma legenda promocional com uma lista para a arte. Os resultados são observações de execução, não provas de que as skills originais não funcionam.
+- **Objetivo:** aproveitar métodos de Corey Haines (copywriting, social, edição, anúncios, e-mails e contexto de produto), ByteDance DeerFlow (newsletter e pesquisa condicionada) e as práticas operacionais do X Content Brain **sem copiar seu conteúdo privado, sem novos agentes e sem contexto excessivo**.
+- **Decisões:**
+  1. **Mapa primeiro; detalhes sob demanda.** `catalog/routing.yaml` continua definindo intenção e papéis. `catalog/skills.yaml` é a fonte para o caminho compilado e **seções relevantes por papel**. `route.py` produz um `skill_manifest` com SHA-256 e faixas de linhas, validando se os títulos existem. `AGENTS.md` espelha a tabela para hosts sem shell. O modelo só lê as seções obrigatórias e outras se o trabalho necessitar; não carrega a biblioteca inteira nem tudo de `vendor/`.
+  2. **Handoff obrigatório para todos os papéis, inclusive Critic.** Um role com skills roteadas deve receber os trechos exatos (`skill_context` em hosts sem leitura) ou ter acesso para fazer `Read` nos caminhos/ranges. O Critic usa as referências de `critic` para fundamentar `skill_checks` próprios, nunca substitui sua avaliação pelas notas do Writer nem por um checklist mecânico. Se falta a skill, o problema é de execução/handoff: tentar acesso ao arquivo bruto autorizado e informar o caminho se indisponível; não fingir aplicação nem consumir rodada editorial para isso.
+  3. **Evidência com força correta.** `skill-plan` prova atribuição; arquivo/excerto inserido na mensagem prova preparação da entrega; o hook `PreToolUse` observa **um pedido de Read autorizado**, não sua conclusão; `skill_checks` do Critic dão rastreabilidade da aplicação alegada, não um benchmark de eficácia. `audit_skill_use.py` confere papéis e IDs por rodada, e é explícito sobre essa limitação. Uma declaração de agente não vale como prova independente.
+  4. **Brief diferenciado por entregável.** A entrada separa o conteúdo fornecido como **fonte** da peça final pedida: por exemplo, legenda de LinkedIn que divulga um infográfico é distinta do texto do próprio infográfico. O Critic verifica o entregável antes de avaliar estilo.
+  5. **Voz da marca com proveniência.** Perfis locais (`profiles/`) e 2–3 goldens **explicitamente aprovados pelo operador**, preferencialmente do mesmo formato e marca, calibram cada job quando disponíveis. A metodologia de `corey/product-marketing` ajuda o orquestrador a estruturar o contexto **sob demanda**, sem criar um quarto agente ou inventar fatos. Perfis e exemplos reais privados ficam ignorados pelo git; correções duráveis seguem PR/decisão humana.
+  6. **Prioridade do briefing e da marca.** Para escolhas de expressão, o briefing e padrões da marca aprovados prevalecem sobre exemplos e preferências de estilo do upstream. Heurísticas sobre emojis, perguntas ou contraste não são proibições universais, salvo instrução explícita do operador. Esta prioridade não dispensa fatos, propriedade de fontes ou fidelidade `strict-source`.
+  7. **Sem ativação indiscriminada de skills não usadas.** `content-strategy`, `sales-enablement` e `marketing-council` permanecem vendorizadas sem compilado: não há papel/intent que justifique consumo automático. Integração futura exige hipótese editorial, overlay e medição de ganho versus custo. `product-marketing` é para context assembly, não para duplicar o Writer em cada rodada. Deep Research só roda quando solicitado.
+  8. **Loop preservado.** Ficam três papéis, até três ciclos completos, Critic como gate editorial, sem Reviewer ou Calibration subagent novos. A revisão do Brain é aplicada como princípios de disciplina e privacidade, não como código copiado para o Studio público.
+- **Teste / critérios de aceite:** validações de catálogo (hashes, seções/ranges), geração de `AGENTS.md`, contratos de todos os papéis, auditoria por role/rodada e regressões sintéticas positivas/negativas. O CI não prova que o modelo absorveu a skill nem que melhorou o copy. Uma prova funcional requer execução limpa com subagentes, evidência de acesso e avaliação de resultados independentes pelo operador.
+- **Fora de escopo:** mudar o número de agentes, adicionar prompts genéricos por falta de skill, importar o histórico privado do Brain, ampliar `vendor/` sem necessidade ou publicar goldens do operador em repositório público.
+- **Estado:** Proposto para revisão e testes de execução ao vivo.
+- **Data:** 2026-11-03
+
 ---
 
 ## Verificações pendentes

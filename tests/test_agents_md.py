@@ -114,6 +114,48 @@ class AgentsMdTest(unittest.TestCase):
         self.assertIn("private reasoning", orchestrator)
         self.assertIn("independently", critic)
 
+    def test_every_role_receives_selected_corey_or_deerflow_knowledge(self):
+        orchestrator = (REPO_ROOT / "agents/orchestrator.md").read_text(encoding="utf-8")
+        strategist = (REPO_ROOT / "agents/strategist.md").read_text(encoding="utf-8")
+        writer = (REPO_ROOT / "agents/writer.md").read_text(encoding="utf-8")
+        critic = (REPO_ROOT / "agents/critic.md").read_text(encoding="utf-8")
+        self.assertIn("**Skill reading plan (mandatory, role-scoped).**", self.text)
+        self.assertIn("skill_manifest", orchestrator)
+        self.assertIn("Required skill use", strategist)
+        self.assertIn("Required skill use", writer)
+        self.assertIn("Required independent skill review", critic)
+        self.assertIn("skill_checks", critic)
+        self.assertIn("skills assigned to the **Critic**", critic)
+        self.assertNotIn("Open a compiled skill only where a row below tells", critic)
+        self.assertIn("skill-unavailable", orchestrator)
+        self.assertIn("allowed-read-request", orchestrator)
+        self.assertIn("PreToolUse", orchestrator)
+        self.assertIn("profiles/", orchestrator)
+        self.assertIn("caption inviting reading of an infographic", strategist)
+        self.assertIn("promotional caption", critic)
+        self.assertIn("cause: writing", critic)
+        self.assertIn("Brain without copying it", orchestrator)
+
+    def test_synthetic_deliverable_cases_are_blindable_and_contrasting(self):
+        import eval_critic
+        import tempfile
+        cases = json.loads((REPO_ROOT / "tests/critic/fixtures/deliverable-synthetic.json").read_text(encoding="utf-8"))
+        self.assertEqual([x["expected"]["verdict"] for x in cases], ["reject", "pass", "pass"])
+        self.assertEqual(cases[0]["expected"]["cause"], "writing")
+        with tempfile.TemporaryDirectory() as p:
+            eval_critic.pack(cases, Path(p))
+            blind = json.loads((Path(p) / "cases.json").read_text(encoding="utf-8"))
+            self.assertEqual(len(blind), 3)
+            self.assertTrue(all("expected" not in item for item in blind))
+
+    def test_private_profiles_and_goldens_are_gitignored(self):
+        ignore = (REPO_ROOT / ".gitignore").read_text(encoding="utf-8")
+        self.assertIn("profiles/*", ignore)
+        self.assertIn("examples/*", ignore)
+        self.assertIn("!profiles/README.md", ignore)
+        self.assertTrue((REPO_ROOT / "profiles/README.md").is_file())
+        self.assertTrue((REPO_ROOT / "examples/README.md").is_file())
+
     def test_demote_ignores_code_fences(self):
         self.assertEqual(build_agents.demote("# a\n```\n# b\n```\n## c"), "## a\n```\n# b\n```\n### c")
 

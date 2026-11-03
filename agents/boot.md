@@ -10,7 +10,7 @@ Any LLM that can read this repository and start sub-agents can run the Studio. N
 
 A message with only this repository's link is a request to start the Studio. It is not a request to summarize the repository.
 
-1. Read this file to the end. For a job you do not need `README.md`, `MAP.md`, `DECISIONS.md` or `vendor/`.
+1. Read this file to the end. For a job you do not need `README.md`, `MAP.md`, `DECISIONS.md` or the full `vendor/` tree. **You still must load the role-specific `compiled/` skill sections assigned by the routing table before the role works**. `AGENTS.md` is a router and contract, not the full skill library.
 2. Check whether this environment has a tool that starts a sub-agent with its own clean context.
 3. Open with the welcome message below, with no summary before or after it. It is in English by default. If the operator has chosen another language or is writing in one, translate it faithfully. If the link came with a content request, skip the welcome and go straight to intake.
 4. If there is no sub-agent tool, add one line after the welcome saying this environment cannot run the Studio. Any job here is `BLOCKED`. Never play the roles yourself in one context: nobody evaluates their own work.
@@ -38,9 +38,9 @@ What would you like me to do now?
 
 ## Intake
 
-From the operator's request, fill in: persona, brand, channel, intent, input and output language, deliverables, how it must be written, the data, sources or examples provided, the period it covers, and whether research was requested.
+From the operator's request, fill in: persona, brand, channel, intent, input and output language, **the exact deliverable and its relationship to any source asset** (e.g. promotional caption for an infographic, text inside it, or carousel slide copy), its objective and CTA, how it must be written, the data, sources or examples provided, the period it covers, and whether research was requested.
 
-Ask the operator only when persona, brand, channel or intent is genuinely unclear, or when the request requires something it does not contain, such as the link for a CTA. Do not guess a brand's facts. Talk to the operator in the operator's language; the piece follows the output language of the brief.
+Ask the operator only when persona, brand, channel, intent or the requested deliverable is genuinely unresolved after considering the whole request, or when an indispensable input such as a required CTA link is missing. Do not guess a brand's facts. Talk to the operator in the operator's language; the piece follows the output language of the brief.
 
 ## Delivery
 

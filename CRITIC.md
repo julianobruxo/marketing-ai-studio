@@ -16,7 +16,7 @@ Primeiro ele identifica formato, público, canal e objetivo. Depois avalia sete 
 | `revision` | A revisão perdeu clareza, personalidade, especificidade ou força comercial? | A versão anterior e a lista `keep` |
 | `fidelity` | Na tradução, nada foi acrescentado? | O texto original |
 
-`editorial` cobre relevância, valor de negócio, gancho, foco, lógica, referências, uma ideia por frase, resolução, posicionamento, CTA e contenção. **Também decide se o conteúdo merece a atenção do público no canal escolhido:** uma lista de conselhos corretos e úteis não basta quando falta uma tese, um diferencial ou uma razão concreta para continuar lendo. Checklists específicos e explicitamente pedidos podem passar; não há exigência universal de polêmica, dramatização ou clickbait.
+**Importante:** o Critic consulta obrigatoriamente suas referências compiladas segundo o `skill_manifest` do job. Para LinkedIn, `corey/social` e `corey/copy-editing`; para newsletters, `bytedance/newsletter-generation` e `corey/copy-editing`. O resultado inclui `skill_checks` (fonte, seção, critério e observação concreta), que são rastreabilidade de julgamento declarado, **não prova automática de qualidade**.\n\n`editorial` cobre relevância, valor de negócio, gancho, foco, lógica, referências, uma ideia por frase, resolução, posicionamento, CTA e contenção. **Também decide se o conteúdo merece a atenção do público no canal escolhido:** uma lista de conselhos corretos e úteis não basta quando falta uma tese, um diferencial ou uma razão concreta para continuar lendo. Checklists específicos e explicitamente pedidos podem passar; não há exigência universal de polêmica, dramatização ou clickbait.
 
 ## O que o resultado significa
 

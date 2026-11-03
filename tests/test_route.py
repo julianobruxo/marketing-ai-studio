@@ -8,6 +8,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SCRIPT = REPO_ROOT / "scripts" / "route.py"
+sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
 
 def route(persona="-", brand="-", channel="-", intent="-"):
@@ -46,6 +47,38 @@ class RouteTest(unittest.TestCase):
         self.assertIsNone(r["research_skill"])
         self.assertEqual(r["max_rounds"], 3)
 
+    def test_role_skills_have_pinned_hashes_and_read_ranges(self):
+        import hashlib
+        r = route(brand="zazmic", channel="linkedin", intent="social-post")
+        self.assertEqual(set(r["skill_manifest"]), {"strategist", "writer", "critic"})
+        for role, refs in r["skill_manifest"].items():
+            self.assertEqual([x["path"] for x in refs], r["skills"][role])
+            for ref in refs:
+                source = REPO_ROOT / ref["path"]
+                self.assertEqual(ref["sha256"], hashlib.sha256(source.read_bytes()).hexdigest())
+                lines = source.read_text(encoding="utf-8").splitlines()
+                self.assertEqual(ref["sections"][0]["heading"], "## Studio operating rules (read first)")
+                self.assertEqual([s["heading"] for s in ref["sections"][1:]], ref["focus"])
+                for section in ref["sections"]:
+                    self.assertEqual(lines[section["start_line"] - 1], section["heading"])
+                    self.assertGreaterEqual(section["end_line"], section["start_line"])
+
+    def test_skill_sections_ignore_headings_inside_code_fences(self):
+        import route as router
+        content = "## Real\nfirst\n\n```md\n## Fake\n```\n## Next\nsecond\n"
+        result = router.section_ranges(content, ["## Real", "## Next"])
+        self.assertEqual(result[0], {"heading": "## Real", "start_line": 1, "end_line": 6})
+        self.assertEqual(result[1]["start_line"], 7)
+        with self.assertRaises(router.CatalogError):
+            router.section_ranges(content, ["## Fake"])
+
+    def test_research_is_available_but_not_auto_requested(self):
+        r = route(brand="zazmic", intent="newsletter")
+        self.assertEqual(r["research_manifest"]["path"], "compiled/bytedance/deep-research.md")
+        self.assertEqual(r["skills"]["critic"], ["compiled/bytedance/newsletter-generation.md",
+                                                   "compiled/corey/copy-editing.md"])
+        self.assertEqual(r["skill_manifest"]["critic"][0]["name"], "bytedance/newsletter-generation")
+
     def test_other_brand_on_x_is_studio(self):
         r = route(brand="acme", channel="x", intent="social-post")
         self.assertEqual((r["owner"], r["status"]), ("studio", "ROUTED"))
@@ -83,6 +116,43 @@ class RouteTest(unittest.TestCase):
             r = route(brand="zazmic", channel="web", intent=intent)
             self.assertEqual(r["status"], "ROUTED", intent)
             self.assertEqual(r["skills"]["writer"], [f"compiled/corey/{skill}.md"])
+
+    def test_source_excerpts_are_generated_once_by_router_not_invented_by_model(self):
+        cmd = [sys.executable, str(SCRIPT), "--brand", "zazmic", "--channel", "linkedin",
+               "--intent", "social-post", "--with-skill-context"]
+        proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8")
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        result = json.loads(proc.stdout)
+        self.assertEqual(set(result["skill_context"]), {"strategist", "writer", "critic"})
+        self.assertEqual(len(result["skill_context"]["critic"]), 2)
+        social = result["skill_context"]["writer"][0]
+        self.assertEqual(social["name"], "corey/social")
+        self.assertIn("## Hook Formulas", [s["heading"] for s in social["sections"]])
+        self.assertNotIn("## Short-Form Video (TikTok, Reels, Shorts)",
+                         [s["heading"] for s in social["sections"]])
+        self.assertIn("The first line determines", "\n".join(s["excerpt"] for s in social["sections"]))
+        self.assertNotIn("research_context", result)
+
+    def test_deerflow_research_excerpts_only_when_requested(self):
+        base = [sys.executable, str(SCRIPT), "--intent", "newsletter", "--with-skill-context"]
+        normal = subprocess.run(base, capture_output=True, text=True, encoding="utf-8")
+        research = subprocess.run(base + ["--research"], capture_output=True, text=True, encoding="utf-8")
+        self.assertEqual(normal.returncode, 0, normal.stderr)
+        self.assertEqual(research.returncode, 0, research.stderr)
+        self.assertNotIn("research_context", json.loads(normal.stdout))
+        active = json.loads(research.stdout)
+        self.assertEqual(active["research_context"][0]["name"], "bytedance/deep-research")
+        self.assertIn("## Research Methodology",
+                      [s["heading"] for s in active["research_context"][0]["sections"]])
+
+    def test_context_renderer_rejects_wrong_pin_and_path(self):
+        import route as router
+        r = route(brand="acme", intent="social-post")
+        item = dict(r["skill_manifest"]["writer"][0])
+        with self.assertRaises(router.CatalogError):
+            router.render_skill_context([{**item, "sha256": "0" * 64}])
+        with self.assertRaises(router.CatalogError):
+            router.render_skill_context([{**item, "path": "../private.md"}])
 
     def test_usage_error_exits_nonzero(self):
         proc = subprocess.run([sys.executable, str(SCRIPT), "--bogus", "x"], capture_output=True)

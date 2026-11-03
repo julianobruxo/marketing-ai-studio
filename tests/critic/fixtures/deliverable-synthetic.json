@@ -1,0 +1,49 @@
+[
+  {
+    "id": "DEL-01",
+    "test": "caption-must-not-copy-entire-infographic",
+    "intent": "social-post",
+    "fidelity": "grounded-creative",
+    "brief": "Write a short promotional LinkedIn caption for a fictional B2B infographic. The copy should invite readers to explore the infographic, NOT reproduce its internal 6-item feature list. Natural, direct, no invented claims.",
+    "job_context": "Fictional brand. Avoid unsourced results; CTA link provided.",
+    "inputs": "Infographic contains: agents perform multiple steps, visual agent builder, shared projects, reusable skills, enterprise connectors, and access controls. CTA: https://example.org/demo",
+    "candidate": "Six capabilities to help your business:\n\n1. Multi-step agents\n2. Visual agent builder\n3. Shared projects\n4. Reusable skills\n5. Enterprise connectors\n6. Access controls\n\nSee https://example.org/demo",
+    "expected": {
+      "verdict": "reject",
+      "category": "brief",
+      "cause": "writing",
+      "severity": "blocking",
+      "reason": "The brief asks for a promotional caption; candidate merely duplicates the text of the infographic. Clear brief means writing or approach failure, not operator clarification."
+    }
+  },
+  {
+    "id": "DEL-02",
+    "test": "promotional-caption-with-brand-allowed-question",
+    "intent": "social-post",
+    "fidelity": "grounded-creative",
+    "brief": "Write a promotional LinkedIn caption that earns attention for this infographic. Keep it conversational. A natural question and one emoji are allowed. CTA to provided link. No numerical results or company testimonials.",
+    "job_context": "Fictional B2B brand; emoji and direct conversational questions are explicitly approved by the operator for this piece.",
+    "inputs": "Infographic covers shared project context, custom agent workflows and business-data connectors. CTA https://example.org/demo",
+    "candidate": "Your AI tools can answer questions. Can they actually help your team move work forward?\n\nThis infographic shows three ways to bring agents, shared project context and connected business information into the same workflow.\n\nTake a look at the visual below 👇\n\nWant to explore the setup for your team? https://example.org/demo",
+    "expected": {
+      "verdict": "pass",
+      "category": "brief",
+      "reason": "The caption promotes the source visual rather than reproducing its item list. The allowed conversational question and emoji are appropriate to the brief, not a mandatory AI-style failure."
+    }
+  },
+  {
+    "id": "DEL-03",
+    "test": "inside-infographic-text-is-not-caption",
+    "intent": "social-post",
+    "fidelity": "grounded-creative",
+    "brief": "Write concise text INSIDE a fictional three-panel LinkedIn infographic. Use labels and one explanation per feature; do not add a promotional caption.",
+    "job_context": "Fictional B2B brand; content only, no logo needed.",
+    "inputs": "Features: multi-step agents, visual builder, shared project context.",
+    "candidate": "1. Multi-step agents — coordinate several tasks.\n2. Visual builder — configure agents without writing code.\n3. Shared projects — provide teams a common workspace.",
+    "expected": {
+      "verdict": "pass",
+      "category": "brief",
+      "reason": "The requested deliverable is the asset's internal text, so an itemized feature list is appropriate."
+    }
+  }
+]
