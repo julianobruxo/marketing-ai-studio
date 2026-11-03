@@ -64,7 +64,7 @@ class RouteTest(unittest.TestCase):
 
     def test_skill_sections_ignore_headings_inside_code_fences(self):
         import route as router
-        content = "## Real\\nfirst\\n\\n\`\`\`md\\n## Fake\\n\`\`\`\\n## Next\\nsecond\\n"
+        content = "## Real\nfirst\n\n```md\n## Fake\n```\n## Next\nsecond\n"
         result = router.section_ranges(content, ["## Real", "## Next"])
         self.assertEqual(result[0], {"heading": "## Real", "start_line": 1, "end_line": 6})
         self.assertEqual(result[1]["start_line"], 7)
