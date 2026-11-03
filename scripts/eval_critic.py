@@ -90,6 +90,11 @@ def critic_skills_for_case(case: dict) -> tuple[list, list]:
             if (ref.get("path") != excerpt.get("path")
                     or ref.get("sha256") != excerpt.get("sha256")):
                 raise ValueError("Explicit skill context path/SHA does not match manifest")
+        # Trust no caller-supplied excerpt merely because its *label* has the right hash:
+        # compare all required section ranges and every byte of the decoded source text.
+        from route import render_skill_context
+        if context != render_skill_context(refs):
+            raise ValueError("Explicit skill_context must contain the exact complete pinned sections")
         return refs, context
 
     intent = case.get("intent")
