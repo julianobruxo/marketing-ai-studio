@@ -116,7 +116,6 @@ A skill path in this table is NOT evidence that an agent read the file.
 | `corey/emails` | `strategist` | ## Initial Assessment; ## Core Principles; ## Email Sequence Strategy |
 | `corey/emails` | `writer` | ## Core Principles; ## Email Copy Guidelines; ## Output Format |
 | `corey/emails` | `critic` | ## Core Principles; ## Email Copy Guidelines |
-| `corey/product-marketing` | `orchestrator` | ## Sections to Capture; ## Maintaining Learnings |
 | `corey/product-marketing` | `writer` | ## Sections to Capture; ## Maintaining Learnings |
 | `bytedance/newsletter-generation` | `strategist` | ## Newsletter Workflow |
 | `bytedance/newsletter-generation` | `writer` | ## Newsletter Workflow; ## Newsletter Output Template |
