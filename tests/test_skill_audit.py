@@ -54,6 +54,28 @@ class SkillAuditTest(unittest.TestCase):
                          (10, 5, 5))
         self.assertEqual({e["round"] for e in result["entries"] if e["evidence"] == "not-observed"}, {2})
 
+    def test_deerflow_research_requires_read_only_in_active_rounds(self):
+        self.route["research_manifest"] = {
+            "name": "bytedance/deep-research", "path": "compiled/bytedance/deep-research.md"
+        }
+        self.agents["rounds"][0]["research_active"] = True
+        self.agents["rounds"][1]["research_active"] = False
+        log = [
+            event("s1", "strategist", "compiled/bytedance/deep-research.md"),
+            event("s2", "strategist", "compiled/corey/social.md"),
+        ]
+        result = audit_skill_use.audit(self.route, self.agents, log, "job-one")
+        research = [x for x in result["entries"] if x["skill"] == "bytedance/deep-research"]
+        self.assertEqual(len(research), 1)
+        self.assertEqual(research[0]["round"], 1)
+        self.assertEqual(research[0]["evidence"], "allowed-read-request")
+        self.assertEqual(result["checked"], 11)
+
+    def test_research_without_route_is_invalid(self):
+        self.agents["rounds"][0]["research_active"] = True
+        with self.assertRaises(ValueError):
+            audit_skill_use.audit(self.route, self.agents, [], "job-one")
+
     def test_wrong_role_denial_and_other_job_cannot_fake_use(self):
         entries = [
             event("c1", "writer", "compiled/corey/social.md"),
