@@ -5,7 +5,7 @@ The Studio runs on capabilities, not on a list of products (ADR-20). A job needs
 | Capability | With it | Without it |
 |---|---|---|
 | Sub-agents | Job runs | BLOCKED, never simulated |
-| Read this repository | Reads `AGENTS.md` and the focused `compiled/` sections listed by the manifest | The orchestrator injects exact selected source sections into each role; if unavailable the job is BLOCKED before writing |
+| Read this repository | Reads `AGENTS.md` and the focused `compiled/` sections listed by the manifest | The orchestrator injects exact selected source sections into each role (also preferred on native hosts lacking observable successful Reads); if unavailable the job is BLOCKED before writing |
 | Write files | Job record in `runs/<job>/` | Job record as labeled blocks in the conversation |
 | Shell | `scripts/route.py` routes the job | The orchestrator applies the routing tables in `AGENTS.md` |
 | Web tools | Strategist can research when asked | Research is unavailable; the piece uses the operator's sources |
