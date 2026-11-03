@@ -38,3 +38,9 @@ venv/
 Thumbs.db
 .idea/
 .vscode/
+
+# Perfis de marca e exemplos editoriais locais: opt-in para publicação explícita.
+profiles/*
+!profiles/README.md
+examples/*
+!examples/README.md
