@@ -46,6 +46,38 @@ class RouteTest(unittest.TestCase):
         self.assertIsNone(r["research_skill"])
         self.assertEqual(r["max_rounds"], 3)
 
+    def test_role_skills_have_pinned_hashes_and_read_ranges(self):
+        import hashlib
+        r = route(brand="zazmic", channel="linkedin", intent="social-post")
+        self.assertEqual(set(r["skill_manifest"]), {"strategist", "writer", "critic"})
+        for role, refs in r["skill_manifest"].items():
+            self.assertEqual([x["path"] for x in refs], r["skills"][role])
+            for ref in refs:
+                source = REPO_ROOT / ref["path"]
+                self.assertEqual(ref["sha256"], hashlib.sha256(source.read_bytes()).hexdigest())
+                lines = source.read_text(encoding="utf-8").splitlines()
+                self.assertEqual(ref["sections"][0]["heading"], "## Studio operating rules (read first)")
+                self.assertEqual([s["heading"] for s in ref["sections"][1:]], ref["focus"])
+                for section in ref["sections"]:
+                    self.assertEqual(lines[section["start_line"] - 1], section["heading"])
+                    self.assertGreaterEqual(section["end_line"], section["start_line"])
+
+    def test_skill_sections_ignore_headings_inside_code_fences(self):
+        import route as router
+        content = "## Real\\nfirst\\n\\n\`\`\`md\\n## Fake\\n\`\`\`\\n## Next\\nsecond\\n"
+        result = router.section_ranges(content, ["## Real", "## Next"])
+        self.assertEqual(result[0], {"heading": "## Real", "start_line": 1, "end_line": 6})
+        self.assertEqual(result[1]["start_line"], 7)
+        with self.assertRaises(router.CatalogError):
+            router.section_ranges(content, ["## Fake"])
+
+    def test_research_is_available_but_not_auto_requested(self):
+        r = route(brand="zazmic", intent="newsletter")
+        self.assertEqual(r["research_manifest"]["path"], "compiled/bytedance/deep-research.md")
+        self.assertEqual(r["skills"]["critic"], ["compiled/bytedance/newsletter-generation.md",
+                                                   "compiled/corey/copy-editing.md"])
+        self.assertEqual(r["skill_manifest"]["critic"][0]["name"], "bytedance/newsletter-generation")
+
     def test_other_brand_on_x_is_studio(self):
         r = route(brand="acme", channel="x", intent="social-post")
         self.assertEqual((r["owner"], r["status"]), ("studio", "ROUTED"))
