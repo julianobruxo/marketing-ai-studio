@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -61,6 +62,38 @@ def compiled_path(name: str, role: str, skills: dict, root: Path) -> str:
     return spec["compiled"]
 
 
+def section_ranges(content: str, headings: list[str]) -> list[dict]:
+    """Precise 1-based Markdown section spans, excluding fenced-code fake headings."""
+    lines = content.splitlines()
+    sections = []
+    fence = None
+    for index, line in enumerate(lines):
+        match = re.match(r"^ {0,3}(`{3,}|~{3,})", line)
+        if match:
+            marker = match.group(1)
+            if fence is None:
+                fence = (marker[0], len(marker))
+            elif marker[0] == fence[0] and len(marker) >= fence[1]:
+                fence = None
+            continue
+        if fence:
+            continue
+        m = re.match(r"^(#{1,6}) (.+)$", line)
+        if m:
+            sections.append((line, index + 1, len(m.group(1))))
+    output = []
+    for wanted in headings:
+        hits = [i for i, v in enumerate(sections) if v[0] == wanted]
+        if len(hits) != 1:
+            raise CatalogError(f"heading ausente/ambíguo: {wanted!r} ({len(hits)})")
+        i = hits[0]
+        _, start, level = sections[i]
+        next_starts = [n for _, n, lev in sections[i + 1:] if lev <= level]
+        end = (next_starts[0] - 1) if next_starts else len(lines)
+        output.append({"heading": wanted, "start_line": start, "end_line": end})
+    return output
+
+
 def skill_ref(name: str, role: str, skills: dict, root: Path) -> dict:
     """Pinned, role-scoped reading plan. This is an assignment, not evidence of a tool read."""
     path = compiled_path(name, role, skills, root)
@@ -70,15 +103,16 @@ def skill_ref(name: str, role: str, skills: dict, root: Path) -> dict:
         raise CatalogError(f"skill {name!r} sem foco válido para {role!r}")
     data = (root / path).read_bytes()
     content = data.decode("utf-8")
-    for heading in ["## Studio operating rules (read first)", *headings]:
-        count = sum(1 for line in content.splitlines() if line == heading)
-        if count != 1:
-            raise CatalogError(f"heading ausente/ambíguo em {path}: {heading!r} ({count})")
+    try:
+        ranges = section_ranges(content, ["## Studio operating rules (read first)", *headings])
+    except CatalogError as exc:
+        raise CatalogError(f"{path}: {exc}") from exc
     return {
         "name": name,
         "path": path,
         "sha256": hashlib.sha256(data).hexdigest(),
         "focus": headings,
+        "sections": ranges,
     }
 
 
