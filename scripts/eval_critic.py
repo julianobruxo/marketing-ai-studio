@@ -77,36 +77,33 @@ def critic_skills_for_case(case: dict) -> tuple[list, list]:
     The blind evaluator must present the same knowledge assigned to the live Critic.
     Explicit case-specific skills must include BOTH manifest and source context.
     """
-    explicit = "skill_manifest" in case or "skill_context" in case
-    if explicit:
-        refs, context = case.get("skill_manifest"), case.get("skill_context")
-        if not isinstance(refs, list) or not isinstance(context, list):
-            raise ValueError("Explicit skill_manifest and skill_context must both be lists")
-        if len(refs) != len(context):
-            raise ValueError("Every explicit Critic skill needs matching context")
-        for ref, excerpt in zip(refs, context):
-            if not isinstance(ref, dict) or not isinstance(excerpt, dict):
-                raise ValueError("Invalid skill reference/context object")
-            if (ref.get("path") != excerpt.get("path")
-                    or ref.get("sha256") != excerpt.get("sha256")):
-                raise ValueError("Explicit skill context path/SHA does not match manifest")
-        # Trust no caller-supplied excerpt merely because its *label* has the right hash:
-        # compare all required section ranges and every byte of the decoded source text.
-        from route import render_skill_context
-        if context != render_skill_context(refs):
-            raise ValueError("Explicit skill_context must contain the exact complete pinned sections")
-        return refs, context
-
     intent = case.get("intent")
     if not isinstance(intent, str) or not intent:
-        raise ValueError("Blind Critic case requires a known intent or explicit skills")
-    # Imported only inside the packer, not inside the deterministic scoring functions.
+        raise ValueError("Blind Critic cases require a known intent to enforce its actual skill route")
+
+    # Always derive the expected Critic references from the canonical route. An
+    # explicit manifest is NOT authorized to omit a skill or trim its focus
+    # sections, even when the remaining text and hash labels are genuine.
+    # These imports are deliberately pack-only; scoring stays deterministic.
     from route import route as resolve_route, render_skill_context
     routed = resolve_route(None, None, None, intent)
     if routed.get("status") != "ROUTED" or routed.get("owner") != "studio":
         raise ValueError(f"Cannot route Critic skills for intent: {intent}")
-    refs = routed["skill_manifest"].get("critic", [])
-    return refs, render_skill_context(refs)
+    expected_refs = routed["skill_manifest"].get("critic", [])
+    expected_context = render_skill_context(expected_refs)
+
+    explicit = "skill_manifest" in case or "skill_context" in case
+    if not explicit:
+        return expected_refs, expected_context
+
+    refs, context = case.get("skill_manifest"), case.get("skill_context")
+    if not isinstance(refs, list) or not isinstance(context, list):
+        raise ValueError("Explicit skill_manifest and skill_context must both be lists")
+    if refs != expected_refs:
+        raise ValueError("Explicit Critic skill_manifest must match all routed skills and exact sections")
+    if context != expected_context:
+        raise ValueError("Explicit skill_context must contain all exact pinned source excerpts")
+    return expected_refs, expected_context
 
 
 def pack(cases: list, out: Path, contract=None) -> None:
