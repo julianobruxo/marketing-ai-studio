@@ -4,13 +4,13 @@
 
 ## Como começar
 
-Cole o link deste repositório em qualquer LLM com subagentes. Ele lê o `AGENTS.md`, abre com a mensagem de boas-vindas, em inglês por padrão ou no idioma que você escolher, e pergunta o que você quer fazer. Se ele só resumir o repositório ou não conseguir abrir o link, envie esta mensagem:
+Cole o link deste repositório em um LLM com subagentes **e acesso ao repositório (ou a um pacote dos arquivos compilados necessários)**. Ele lê o `AGENTS.md`, abre com a mensagem de boas-vindas, em inglês por padrão ou no idioma que você escolher, e pergunta o que você quer fazer. Se ele só resumir o repositório ou não conseguir abrir o link, envie esta mensagem:
 
 ```text
 Leia https://raw.githubusercontent.com/julianobruxo/marketing-ai-studio/main/AGENTS.md e siga.
 ```
 
-> **Estado: portátil (ADR-20).** O Studio roda em qualquer LLM com subagentes, a partir do `AGENTS.md`, sem instalar nada. Ele integra as skills de Corey Haines (copy, anúncios, e-mails, LinkedIn) e da ByteDance DeerFlow (newsletter e pesquisa) e roda Strategist, Writer e Critic como subagentes independentes, em até 3 rodadas.
+> **Estado: portátil (ADR-20/23).** O Studio roda em hosts com subagentes independentes e acesso aos arquivos de skill atribuídos. O `AGENTS.md` contém o roteamento, **não o conteúdo completo das skills**. Não basta conseguir abrir o link do repositório. Ele integra as skills de Corey Haines (copy, anúncios, e-mails, LinkedIn) e da ByteDance DeerFlow (newsletter e pesquisa) e roda Strategist, Writer e Critic como subagentes independentes, em até 3 rodadas.
 
 ## O que é
 
@@ -46,6 +46,20 @@ Exemplos de pedido:
 - **Artigo com tema e fontes:** "Escreve um artigo para o blog da Zazmic sobre como medir o ROI de agentes de IA, para gestores de marketing, com umas 1.500 palavras. Fontes: os dois links abaixo e o PDF anexo; não pesquise além delas."
 
 A web só é usada quando você pede, e só pelo Strategist. Com acesso a arquivos, o job fica em `runs/<job>/` (fora do git) e a peça em `runs/<job>/drafts/`; sem isso, tudo fica na conversa. Os parâmetros do Critic estão em [`CRITIC.md`](CRITIC.md).
+
+## Integração real das skills (ADR-23)
+
+A origem e integridade estão em `provenance/upstream-lock.json`; conteúdo original intacto em `vendor/`, adaptação em `overlays/` e arquivos utilizados em `compiled/`. O catálogo define, por intenção e **por papel**, quais fontes são obrigatórias.
+
+O roteador `scripts/route.py` devolve `skill_manifest` com caminhos, hashes SHA-256 e **seções com linhas de início/fim**. O `AGENTS.md` contém o mesmo plano de leitura para hosts sem shell. Cada subagente deve acessar a seção de regras do Studio e as seções relevantes; referências extras só quando a tarefa pede. Não se lê o Corey ou a DeerFlow inteira a cada rodada. Se um subagente não puder ler arquivos, o orquestrador deve injetar os **trechos originais exatos** no contexto do papel, não um resumo impreciso.
+
+O Critic agora **deve** usar as skills que o catálogo lhe atribui: para um LinkedIn post, `corey/social` e `corey/copy-editing`; para newsletters, `bytedance/newsletter-generation` e `corey/copy-editing`. Ele inclui `skill_checks` com critérios vinculados ao candidato. Isso mostra o que ele diz ter aplicado, mas **não prova qualidade nem leitura do conteúdo por si só**.
+
+Em Claude Code reforçado, `scripts/audit_skill_use.py` confere pedidos `Read` autorizados no log por `agent_id` e rodada, usando o manifesto. O hook atual é **PreToolUse**, portanto não comprova a conclusão da ferramenta ou que o modelo realmente aplicou as regras. Isso exige validação ao vivo e avaliação editorial humana. No modo portátil, os trechos injetados são registrados como entrega, não como prova de aplicação.
+
+O Studio aproveita do Brain o mapa seletivo, contexto enxuto, referência humana aprovada e revisão independente, **não** os arquivos privados, a quantidade de papéis ou seu loop específico para X. A voz da marca é formada por briefing, eventual perfil local em `profiles/` e alguns goldens realmente aprovados (`profiles/README.md`). Não se presume uma voz proprietária sem exemplos. O método `corey/product-marketing` pode estruturar contexto de marca sob demanda; `content-strategy`, `sales-enablement` e `marketing-council` continuam importadas, porém intencionalmente não executáveis até terem necessidade comprovada e overlay.
+
+**Exemplo de entregáveis diferentes:** `"Crie uma legenda comercial para promover este infográfico"` pede uma legenda que desperte interesse, **não** a reprodução da lista de itens da arte. `"Escreva o texto interno de um infográfico"` pede o conteúdo da arte. O Critic deve avaliar se a saída corresponde ao formato solicitado, antes de julgar naturalidade.
 
 ## Onde já rodou
 
@@ -85,7 +99,7 @@ Este repositório é **público** e é um projeto pessoal do operador (ADR-14). 
 
 ## Decisões e licenças
 
-- `DECISIONS.md` é o registro canônico (ADR-01 a ADR-21). Mudanças entram por PR aprovado pelo operador; não há merge automático.
+- `DECISIONS.md` é o registro canônico, incluindo o ADR-23. Mudanças entram por PR aprovado pelo operador; não há merge automático.
 - O conteúdo próprio do Studio ainda não tem licença de uso definida (todos os direitos reservados ao autor). O material de terceiros está em `THIRD_PARTY_NOTICES.md`.
 - `MAP.md` descreve a estrutura do repositório.
 - `AGENTS.md` é gerado: edite `agents/` ou `catalog/` e rode `python scripts/build_agents.py`.
