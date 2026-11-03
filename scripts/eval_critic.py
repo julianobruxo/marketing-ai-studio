@@ -96,26 +96,12 @@ def critic_skills_for_case(case: dict) -> tuple[list, list]:
     if not isinstance(intent, str) or not intent:
         raise ValueError("Blind Critic case requires a known intent or explicit skills")
     # Imported only inside the packer, not inside the deterministic scoring functions.
-    from route import route as resolve_route
+    from route import route as resolve_route, render_skill_context
     routed = resolve_route(None, None, None, intent)
     if routed.get("status") != "ROUTED" or routed.get("owner") != "studio":
         raise ValueError(f"Cannot route Critic skills for intent: {intent}")
     refs = routed["skill_manifest"].get("critic", [])
-    context = []
-    for ref in refs:
-        file = REPO_ROOT / ref["path"]
-        text_lines = file.read_text(encoding="utf-8").splitlines()
-        sections = [{
-            "heading": section["heading"],
-            "start_line": section["start_line"],
-            "end_line": section["end_line"],
-            "excerpt": "\n".join(text_lines[section["start_line"] - 1:section["end_line"]])
-        } for section in ref["sections"]]
-        context.append({
-            "name": ref["name"], "path": ref["path"], "sha256": ref["sha256"],
-            "sections": sections,
-        })
-    return refs, context
+    return refs, render_skill_context(refs)
 
 
 def pack(cases: list, out: Path, contract=None) -> None:
