@@ -13,7 +13,7 @@ Real subagents are required. If you cannot launch `studio-strategist`, `studio-w
 
 ## 2. Intake
 
-From the operator's request, fill in: persona, brand, channel, intent, input and output language, deliverables, how it must be written, the data, sources or examples provided, the period it covers, and whether research was requested. The intent is one of the keys under `intents` in `catalog/routing.yaml`.
+From the operator's request, fill in: persona, brand, channel, intent, input/output language, **the exact deliverable and whether any supplied material is source content or the requested output**, goal/CTA, how it must be written, the data, sources or examples provided, the period, and whether research was requested. A LinkedIn caption promoting an infographic is not its internal ten-feature script. The intent is one of the keys under `intents` in `catalog/routing.yaml`.
 
 Ask the operator only when persona, brand, channel or intent is genuinely unclear. Do not guess a brand's facts.
 
@@ -29,7 +29,7 @@ Use `-` for a field that does not apply. The router prints JSON.
 
 - `owner: brain` → do not start any subagent. Tell the operator this belongs to the X Content Brain and must run in a Brain session.
 - `status: NEEDS_OPERATOR` or `BLOCKED` → show the reason to the operator and stop.
-- `status: ROUTED` → run the loop in `agents/orchestrator.md` with the skills, `strategist` flag, `research_skill` and `max_rounds` from the router.
+- `status: ROUTED` → run the loop in `agents/orchestrator.md` with the **role-specific `skill_manifest`** (paths, content SHA-256 and focused reading ranges), `strategist` flag, conditional research skill and `max_rounds`. Each actual agent must receive/access these skill sections. A route entry alone does not mean the skills were used.
 
 Never change the route by judgment. If it looks wrong, stop and tell the operator.
 
