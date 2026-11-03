@@ -116,6 +116,36 @@ def skill_ref(name: str, role: str, skills: dict, root: Path) -> dict:
     }
 
 
+def render_skill_context(refs: list[dict], root: Path = REPO_ROOT) -> list[dict]:
+    """Build exact source excerpts once for each role, without interpretation by an LLM."""
+    out = []
+    trusted = (root / "compiled").resolve()
+    for ref in refs:
+        rel = ref.get("path", "")
+        if not isinstance(rel, str) or not rel.startswith("compiled/"):
+            raise CatalogError("Skill context path must live under compiled/")
+        file = (root / rel).resolve()
+        if not file.is_relative_to(trusted) or not file.is_file():
+            raise CatalogError(f"Invalid compiled source path: {rel}")
+        raw = file.read_bytes()
+        actual_sha = hashlib.sha256(raw).hexdigest()
+        if actual_sha != ref.get("sha256"):
+            raise CatalogError(f"Compiled source changed since routing: {rel}")
+        lines = raw.decode("utf-8").splitlines()
+        sections = []
+        for section in ref.get("sections", []):
+            start, end, heading = section["start_line"], section["end_line"], section["heading"]
+            if (not isinstance(start, int) or not isinstance(end, int)
+                    or start < 1 or end > len(lines) or start > end
+                    or lines[start - 1] != heading):
+                raise CatalogError(f"Invalid section range for {rel}: {heading}")
+            sections.append({**section, "excerpt": "\n".join(lines[start - 1:end])})
+        if not sections:
+            raise CatalogError(f"Missing sections for skill {rel}")
+        out.append({"name": ref["name"], "path": rel, "sha256": actual_sha, "sections": sections})
+    return out
+
+
 def route(persona, brand, channel, intent, root: Path = REPO_ROOT) -> dict:
     routing, skills = load(root)
     aliases = routing.get("aliases", {})
@@ -172,9 +202,19 @@ def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description="Roteador determinístico do Studio.")
     for name in (*FIELDS, "intent"):
         parser.add_argument(f"--{name}", default="-", help='valor ou "-" (não se aplica)')
+    parser.add_argument("--with-skill-context", action="store_true",
+                        help="include exact role-scoped source excerpts, not only paths/hashes")
+    parser.add_argument("--research", action="store_true",
+                        help="include DeerFlow research excerpts only when the operator requested research")
     args = parser.parse_args(argv)
     try:
         result = route(args.persona, args.brand, args.channel, args.intent)
+        if args.with_skill_context and result["status"] == "ROUTED" and result["owner"] == "studio":
+            result["skill_context"] = {
+                role: render_skill_context(refs) for role, refs in result["skill_manifest"].items()
+            }
+            if args.research and result["research_manifest"] is not None:
+                result["research_context"] = render_skill_context([result["research_manifest"]])
     except CatalogError as exc:
         print(json.dumps({"error": str(exc)}, ensure_ascii=False), file=sys.stderr)
         return 3
