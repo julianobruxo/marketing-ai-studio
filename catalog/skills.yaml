@@ -133,16 +133,11 @@
       "compiled": "compiled/corey/product-marketing.md",
       "loadable": true,
       "roles": [
-        "orchestrator",
         "writer"
       ],
       "use_for": "format of the job context; brand profile drafts",
       "focus": {
         "writer": [
-          "## Sections to Capture",
-          "## Maintaining Learnings"
-        ],
-        "orchestrator": [
           "## Sections to Capture",
           "## Maintaining Learnings"
         ]
