@@ -160,6 +160,50 @@ class CasesTest(unittest.TestCase):
             with self.assertRaises(ValueError):
                 eval_critic.pack([item], Path(tmp))
 
+    def test_explicit_blind_context_cannot_omit_skills_or_sections(self):
+        from route import route, render_skill_context
+        refs = route(None, None, None, "social-post")["skill_manifest"]["critic"]
+        context = render_skill_context(refs)
+        base = {
+            "id": "FULL-CONTEXT", "intent": "social-post",
+            "candidate": "A synthetic test candidate.",
+            "skill_manifest": refs, "skill_context": context,
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            # Complete explicit context is allowed and remains blind.
+            eval_critic.pack([base], Path(tmp))
+            packed = json.loads((Path(tmp) / "cases.json").read_text(encoding="utf-8"))[0]
+            self.assertEqual(packed["skill_manifest"], refs)
+            self.assertEqual(packed["skill_context"], context)
+
+            # A subset of valid skill references cannot impersonate the routed
+            # complete Critic packet, even if each remaining excerpt is genuine.
+            partial = {**base, "skill_manifest": refs[:1], "skill_context": context[:1]}
+            with self.assertRaisesRegex(ValueError, "all routed skills"):
+                eval_critic.pack([partial], Path(tmp))
+
+            # A real file path and matching source SHA do not authorize dropping
+            # the required sections or a single character of the source text.
+            no_sections = json.loads(json.dumps(context))
+            no_sections[0]["sections"] = []
+            with self.assertRaisesRegex(ValueError, "exact pinned"):
+                eval_critic.pack([{**base, "skill_context": no_sections}], Path(tmp))
+
+            changed_text = json.loads(json.dumps(context))
+            changed_text[0]["sections"][0]["excerpt"] += " ALTERED"
+            with self.assertRaisesRegex(ValueError, "exact pinned"):
+                eval_critic.pack([{**base, "skill_context": changed_text}], Path(tmp))
+
+            dropped_section = json.loads(json.dumps(refs))
+            dropped_section[0]["sections"] = dropped_section[0]["sections"][:1]
+            with self.assertRaisesRegex(ValueError, "all routed skills"):
+                eval_critic.pack([{**base, "skill_manifest": dropped_section}], Path(tmp))
+
+    def test_missing_intent_cannot_bypass_skill_contract(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            with self.assertRaisesRegex(ValueError, "known intent"):
+                eval_critic.pack([{"id": "NO-INTENT", "candidate": "Some text"}], Path(tmp))
+
     def test_pack_rejects_duplicate_case_ids(self):
         with tempfile.TemporaryDirectory() as tmp:
             with self.assertRaises(ValueError):
