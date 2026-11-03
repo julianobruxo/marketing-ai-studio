@@ -34,7 +34,8 @@ def load(path) -> object:
 # Real review files may contain source_comment, labels, suggestions or author names.
 PACK_FIELDS = ("id", "intent", "fidelity", "brief", "job_context", "inputs",
                "candidate", "original", "context", "research_notes",
-               "previous_candidate", "keep", "selected_approach", "keep_exceptions")
+               "previous_candidate", "keep", "selected_approach", "keep_exceptions",
+               "skill_manifest", "skill_context")
 
 
 def validate_keep_exceptions(case: dict) -> None:
@@ -70,6 +71,53 @@ def validate_keep_exceptions(case: dict) -> None:
             raise ValueError("Approach exceptions require the selected approach summary")
 
 
+def critic_skills_for_case(case: dict) -> tuple[list, list]:
+    """Compile only *Critic* role references and exact snippets, without reviewer labels.
+
+    The blind evaluator must present the same knowledge assigned to the live Critic.
+    Explicit case-specific skills must include BOTH manifest and source context.
+    """
+    explicit = "skill_manifest" in case or "skill_context" in case
+    if explicit:
+        refs, context = case.get("skill_manifest"), case.get("skill_context")
+        if not isinstance(refs, list) or not isinstance(context, list):
+            raise ValueError("Explicit skill_manifest and skill_context must both be lists")
+        if len(refs) != len(context):
+            raise ValueError("Every explicit Critic skill needs matching context")
+        for ref, excerpt in zip(refs, context):
+            if not isinstance(ref, dict) or not isinstance(excerpt, dict):
+                raise ValueError("Invalid skill reference/context object")
+            if (ref.get("path") != excerpt.get("path")
+                    or ref.get("sha256") != excerpt.get("sha256")):
+                raise ValueError("Explicit skill context path/SHA does not match manifest")
+        return refs, context
+
+    intent = case.get("intent")
+    if not isinstance(intent, str) or not intent:
+        raise ValueError("Blind Critic case requires a known intent or explicit skills")
+    # Imported only inside the packer, not inside the deterministic scoring functions.
+    from route import route as resolve_route
+    routed = resolve_route(None, None, None, intent)
+    if routed.get("status") != "ROUTED" or routed.get("owner") != "studio":
+        raise ValueError(f"Cannot route Critic skills for intent: {intent}")
+    refs = routed["skill_manifest"].get("critic", [])
+    context = []
+    for ref in refs:
+        file = REPO_ROOT / ref["path"]
+        text_lines = file.read_text(encoding="utf-8").splitlines()
+        sections = [{
+            "heading": section["heading"],
+            "start_line": section["start_line"],
+            "end_line": section["end_line"],
+            "excerpt": "\\n".join(text_lines[section["start_line"] - 1:section["end_line"]])
+        } for section in ref["sections"]]
+        context.append({
+            "name": ref["name"], "path": ref["path"], "sha256": ref["sha256"],
+            "sections": sections,
+        })
+    return refs, context
+
+
 def pack(cases: list, out: Path, contract=None) -> None:
     out.mkdir(parents=True, exist_ok=True)
     ids = [case["id"] for case in cases]
@@ -78,6 +126,10 @@ def pack(cases: list, out: Path, contract=None) -> None:
     for case in cases:
         validate_keep_exceptions(case)
     blind = [{k: case[k] for k in PACK_FIELDS if k in case} for case in cases]
+    for case, packet in zip(cases, blind):
+        refs, context = critic_skills_for_case(case)
+        packet["skill_manifest"] = refs
+        packet["skill_context"] = context
     (out / "cases.json").write_text(json.dumps(blind, ensure_ascii=False, indent=2), encoding="utf-8")
     source = Path(contract) if contract else REPO_ROOT / "agents/critic.md"
     shutil.copyfile(source, out / "contract.md")
