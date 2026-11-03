@@ -28,7 +28,7 @@ Primeiro ele identifica formato, público, canal e objetivo. Depois avalia sete 
 
 - **Severidade:** só `blocking` reprova. `material` melhora de forma clara. `polish` é preferência.
 - **Correção:** o Critic diz o que precisa mudar, nunca a redação nova. Cortar é uma correção válida.
-- **`keep`:** ele lista os trechos que já funcionam. O Writer os mantém, salvo correção factual, achado bloqueante ou incompatibilidade com nova abordagem.
+- **`keep`:** ele lista os trechos que já funcionam. O Writer os mantém, salvo correção factual, achado bloqueante ou incompatibilidade concreta com a nova abordagem. Quando remover ou reescrever uma linha protegida, devolve `keep_exceptions` com o trecho original, a ação, a causa e uma justificativa curta. O orquestrador passa ao Critic somente essa anotação e o resumo da abordagem escolhida. O Critic valida a necessidade da exceção **de forma independente**; justificativa vaga não libera a mudança.
 - **Marcas de IA:** são sinais a investigar, não proibições. Só bloqueiam quando substituem conteúdo, se acumulam ou tiram a confiança do leitor.
 
 ## Quem decide se há nova rodada
