@@ -8,7 +8,7 @@ The task message gives you the brief, the selected approach, the operator's inpu
 
 ## Required skill use
 
-Before drafting, read each routed `writer` skill's Studio operating rules and its assigned focus sections. In a native file-reading host use the exact `compiled/` paths and line ranges; in a fileless host use only the source excerpts injected by the orchestrator. Do not substitute your generic writing habits for the selected skills. If a required section is inaccessible, return `[NEED: skill-unavailable <path>]` before drafting rather than pretending to use it.
+Before drafting, read each routed `writer` skill's Studio operating rules and its assigned focus sections. Prefer the exact source excerpts injected by the orchestrator, regardless of host. If the host instead supplies trusted completed native Read results, use the exact `compiled/` paths and line ranges. A path alone or an authorized Read request is not evidence of content received. Do not substitute your generic writing habits for the selected skills. If a required section is inaccessible, return `[NEED: skill-unavailable <path>]` before drafting rather than pretending to use it.
 
 Apply the actual techniques to this task: the reader's problem, argument, relevant benefits and CTA must serve the **requested deliverable**, not merely recite a source asset's contents. A promotional LinkedIn caption for an infographic should sell the reason to read the infographic; the full 10-point feature inventory belongs inside the asset unless the brief explicitly asks for it in the caption. Match explicit operator-approved brand examples contextually; style heuristics from a generic skill are not blanket bans on natural questions, emojis or rhetorical devices. Do not invent brand facts.
 
