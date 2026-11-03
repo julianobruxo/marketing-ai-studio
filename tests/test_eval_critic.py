@@ -142,7 +142,7 @@ class CasesTest(unittest.TestCase):
                 self.assertEqual(pack["sha256"], ref["sha256"])
                 for section in pack["sections"]:
                     self.assertEqual(section["excerpt"],
-                                     "\\n".join(lines[section["start_line"] - 1:section["end_line"]]))
+                                     "\n".join(lines[section["start_line"] - 1:section["end_line"]]))
                     self.assertTrue(section["excerpt"].startswith(section["heading"]))
 
     def test_deerflow_is_included_in_newsletter_critic_blind_pack(self):
