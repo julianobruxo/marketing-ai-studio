@@ -34,12 +34,21 @@ def audit(route: dict, agent_map: dict, log: list[dict], job: str) -> dict:
     seen = set()
     for round_info in rounds:
         num, ids = round_info.get("round"), round_info.get("agents")
+        research_active = round_info.get("research_active", False)
+        if not isinstance(research_active, bool):
+            raise ValueError("research_active must be boolean")
         if not isinstance(num, int) or num < 1 or num in seen or not isinstance(ids, dict):
             raise ValueError("Invalid, duplicate or missing round/agents")
         seen.add(num)
         for role, refs in manifest.items():
             if role not in NATIVE_ROLES or not isinstance(refs, list):
                 raise ValueError("Unexpected role or refs in skill manifest")
+            refs = list(refs)
+            if role == "strategist" and research_active:
+                research_ref = route.get("research_manifest")
+                if not isinstance(research_ref, dict):
+                    raise ValueError("Research active but route has no research_manifest")
+                refs.append(research_ref)
             if role == "strategist" and not route.get("strategist"):
                 raise ValueError("Strategist refs configured when role disabled")
             agent_id = ids.get(role)
