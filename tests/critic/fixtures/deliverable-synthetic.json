@@ -36,7 +36,7 @@
     "test": "inside-infographic-text-is-not-caption",
     "intent": "social-post",
     "fidelity": "grounded-creative",
-    "brief": "Write concise text INSIDE a fictional six-panel LinkedIn infographic. Use labels and one explanation per feature; do not add a promotional caption.",
+    "brief": "Write concise text INSIDE a fictional three-panel LinkedIn infographic. Use labels and one explanation per feature; do not add a promotional caption.",
     "job_context": "Fictional B2B brand; content only, no logo needed.",
     "inputs": "Features: multi-step agents, visual builder, shared project context.",
     "candidate": "1. Multi-step agents — coordinate several tasks.\n2. Visual builder — configure agents without writing code.\n3. Shared projects — provide teams a common workspace.",
