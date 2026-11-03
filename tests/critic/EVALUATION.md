@@ -4,7 +4,7 @@
 
 The blind `pack` command now includes the **same role-selected Critic skills** as the Studio route. For a case with a known intent, `scripts/eval_critic.py` resolves `skill_manifest.critic`, copies the relevant **exact excerpts** from the pinned compiled files into `skill_context`, and carries the source SHA and line spans. It does **not** copy Writer/Strategist notes, reviewer comments, labels or expected verdicts.
 
-When a case needs a special skill configuration, supply both `skill_manifest` and `skill_context` explicitly with matching paths and hashes; one without the other is an error, not a silent fallback. This keeps the Critic's blind context aligned with its runtime contract without disclosing private reviewer labels.
+A case may supply both `skill_manifest` and `skill_context` explicitly to pin an exact evaluation packet, but **both must match the full Critic route for the declared intent**, including every assigned skill, every required section and every byte of source excerpts. Omitting one skill, dropping any section, altering source text, or supplying a partial/unknown intent is an error, not a fallback. For a deliberately different skill configuration, define a proper catalog/intent revision and freeze its corresponding route, rather than silently bypassing the real contract. Reviewer labels and private annotations remain excluded.
 
 These are **inputs for a real model evaluation**, not proof that a model has run or that its editorial decisions improved. The scoring commands remain deterministic, with no model involved.
 
